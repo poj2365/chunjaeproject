@@ -1,0 +1,9 @@
+/target/
+Users/
+workspace-web/
+.DS_Store
+Scripts/
+.project
+.classpath
+.settings/
+src/main/resources/
