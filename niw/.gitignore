@@ -7,3 +7,4 @@ Scripts/
 .classpath
 .settings/
 src/main/resources/
+bin/
