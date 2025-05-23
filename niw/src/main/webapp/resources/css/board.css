@@ -17,6 +17,7 @@
 /* 커뮤니티 보드 카드 스타일 */
 .card {
   border-radius: 10px;
+  height: 30vh;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
   transition: transform 0.2s, box-shadow 0.2s;
   overflow: hidden;
@@ -31,7 +32,7 @@
 
 .card-header {
   background-color: white;
-  border-bottom: 1px solid #e9ecef;
+  border-bottom: none;
   padding: 1rem 1.5rem;
 }
 
@@ -58,14 +59,6 @@
   border: none;
   border-bottom: 1px solid #e9ecef;
   transition: background-color 0.2s;
-}
-
-.list-group-item:last-child {
-  border-bottom: none;
-}
-
-.list-group-item:hover {
-  background-color: var(--bs-primary-light);
 }
 
 .list-group-item a {
