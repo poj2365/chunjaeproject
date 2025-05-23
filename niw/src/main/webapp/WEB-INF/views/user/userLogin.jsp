@@ -1,74 +1,333 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
-<%@include file="/WEB-INF/views/common/header.jsp" %>
-  <main class="bg-primary-light py-5">
-    <div class="container login-animation">
-      <div class="login-container">
-        <div class="card login-card shadow-custom">
-          <div class="login-header gradient-header text-center text-white position-relative"
-            style="background: linear-gradient(135deg, var(--bs-blind-dark) 0%, var(--bs-blind-gray) 100%);">
-            <div class="position-relative">
-              <h2 class="fw-bold mb-2 fs-1">로그인</h2>
-              <p class="mb-0 fs-6">학습메이트에 오신 것을 환영합니다! 😄</p>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%
+    // 메시지 처리
+    String errorMessage = (String) request.getAttribute("errorMessage");
+    String successMessage = (String) request.getAttribute("successMessage");
+    String infoMessage = (String) request.getAttribute("infoMessage");
+    String username = request.getParameter("username");
+    String redirect = request.getParameter("redirect");
+    
+    // 세션에서 사용자 정보 확인
+    Object user = session.getAttribute("user");
+    
+    // 이미 로그인된 사용자 리다이렉트 처리
+    if (user != null) {
+        if (redirect != null && !redirect.isEmpty()) {
+            response.sendRedirect(redirect);
+        } else {
+            response.sendRedirect(request.getContextPath() + "/dashboard");
+        }
+        return;
+    }
+%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>로그인 - 학습메이트</title>
+    <link rel="stylesheet" href="<%=request.getContextPath()%>/resources/css/login.css">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+</head>
+<body>
+    <%@ include file="/WEB-INF/views/common/header.jsp" %>
+    
+    <main class="bg-primary-light py-5">
+        <div class="container login-animation">
+            <div class="login-container">
+                <div class="card login-card shadow-custom">
+                    <div class="login-header gradient-header text-center text-white position-relative"
+                        style="background: linear-gradient(135deg, var(--bs-blind-dark) 0%, var(--bs-blind-gray) 100%);">
+                        <div class="position-relative">
+                            <h2 class="fw-bold mb-2 fs-1">로그인</h2>
+                            <p class="mb-0 fs-6">학습메이트에 오신 것을 환영합니다! 😄</p>
+                        </div>
+                    </div>
+                    <div class="login-body">
+                        <!-- 메시지 표시 영역 -->
+                        <% if (errorMessage != null && !errorMessage.isEmpty()) { %>
+                            <div class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+                                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                <%= errorMessage %>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        <% } %>
+                        
+                        <% if (successMessage != null && !successMessage.isEmpty()) { %>
+                            <div class="alert alert-success alert-dismissible fade show mb-3" role="alert">
+                                <i class="bi bi-check-circle-fill me-2"></i>
+                                <%= successMessage %>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        <% } %>
+                        
+                        <% if (infoMessage != null && !infoMessage.isEmpty()) { %>
+                            <div class="alert alert-info alert-dismissible fade show mb-3" role="alert">
+                                <i class="bi bi-info-circle-fill me-2"></i>
+                                <%= infoMessage %>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        <% } %>
+
+                        <!-- 로그인 폼 -->
+                        <form id="loginForm" action="<%=request.getContextPath()%>/user/login.do" method="post">
+                            <!-- 리다이렉트 URL 유지 -->
+                            <% if (redirect != null && !redirect.isEmpty()) { %>
+                                <input type="hidden" name="redirect" value="<%= redirect %>"/>
+                            <% } %>
+                            
+                            <div class="form-floating mb-3">
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="username" 
+                                       name="username"
+                                       placeholder="아이디"
+                                       value="<%= username != null ? username : "" %>"
+                                       required
+                                       autocomplete="username">
+                                <label for="username">
+                                    <i class="bi bi-person me-1"></i>아이디
+                                </label>
+                                <div class="invalid-feedback" id="username-error" style="display: none;"></div>
+                            </div>
+                            
+                            <div class="form-floating mb-3">
+                                <input type="password" 
+                                       class="form-control" 
+                                       id="password" 
+                                       name="password"
+                                       placeholder="비밀번호"
+                                       required
+                                       autocomplete="current-password">
+                                <label for="password">
+                                    <i class="bi bi-lock me-1"></i>비밀번호
+                                </label>
+                                <div class="invalid-feedback" id="password-error" style="display: none;"></div>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" 
+                                           type="checkbox" 
+                                           id="rememberMe" 
+                                           name="rememberMe">
+                                    <label class="form-check-label" for="rememberMe">
+                                        로그인 상태 유지
+                                    </label>
+                                </div>
+                                <div class="login-options">
+                                    <a href="<%=request.getContextPath()%>/auth/find-account">아이디/비밀번호 찾기</a>
+                                </div>
+                            </div>
+
+                            <div class="d-grid mb-4">
+                                <button class="btn btn-primary py-3 fw-bold fs-5" type="submit" id="loginBtn">
+                                    <span class="login-btn-text">
+                                        <i class="bi bi-box-arrow-in-right me-2"></i>로그인
+                                    </span>
+                                    <span class="login-btn-loading d-none">
+                                        <div class="spinner-border spinner-border-sm me-2" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                        로그인 중...
+                                    </span>
+                                </button>
+                            </div>
+
+                            <div class="login-divider">
+                                <span>또는</span>
+                            </div>
+
+                            <div class="row g-2 mb-4">
+                                <div class="col-6">
+                                    <button type="button" 
+                                            class="btn w-100 btn-google d-flex align-items-center justify-content-center"
+                                            onclick="socialLogin('google')">
+                                        <img src="https://img.icons8.com/?size=100&id=V5cGWnc9R4xj&format=png&color=000000" 
+                                             alt="구글" style="height:20px;" class="me-2">
+                                        구글 로그인
+                                    </button>
+                                </div>
+                                <div class="col-6">
+                                    <button type="button" 
+                                            class="btn w-100 btn-naver d-flex align-items-center justify-content-center"
+                                            onclick="socialLogin('naver')">
+                                        <img src="https://mblogthumb-phinf.pstatic.net/MjAyMjEyMTVfMTE0/MDAxNjcxMDkwNjU3NTkw.KoGra3iQfkuqnbSFoQ7PA3YMqnExItsdfOLk960Rxnkg.umx5uLYTj2TEMhx7rMA5uNxvyJD2T42OSeSFsxNUQygg.PNG.y2kwooga/%EB%84%A4%EC%9D%B4%EB%B2%84_AI-04.png?type=w800"
+                                             alt="네이버" style="height:25px;" class="me-2">
+                                        네이버 로그인
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="text-center login-options">
+                                <p class="mb-0">
+                                    아직 회원이 아니신가요? 
+                                    <a href="<%=request.getContextPath()%>/auth/register<% if (redirect != null && !redirect.isEmpty()) { %>?redirect=<%= redirect %><% } %>" 
+                                       class="fw-bold text-primary">회원가입</a>
+                                </p>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
-          </div>
-          <div class="login-body">
-            <form>
-              <div class="form-floating mb-3">
-                <input type="text" class="form-control" id="username" placeholder="아이디">
-                <label for="username"><i class="bi bi-person me-1"></i>아이디</label>
-              </div>
-              <div class="form-floating mb-3">
-                <input type="password" class="form-control" id="password" placeholder="비밀번호">
-                <label for="password"><i class="bi bi-lock me-1"></i>비밀번호</label>
-              </div>
-
-              <div class="d-flex justify-content-between align-items-center mb-4">
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" id="rememberMe">
-                  <label class="form-check-label" for="rememberMe">
-                    로그인 상태 유지
-                  </label>
-                </div>
-                <div class="login-options">
-                  <a href="#">아이디/비밀번호 찾기</a>
-                </div>
-              </div>
-
-              <div class="d-grid mb-4">
-                <button class="btn btn-primary py-3 fw-bold fs-5" type="submit">
-                  <i class="bi bi-box-arrow-in-right me-2"></i>로그인
-                </button>
-              </div>
-
-              <div class="login-divider">
-                <span>또는</span>
-              </div>
-
-              <div class="row g-2 mb-4">
-                <div class="col-6">
-                  <button type="button" class="btn w-100 btn-google d-flex align-items-center justify-content-center">
-  					<img src="https://img.icons8.com/?size=100&id=V5cGWnc9R4xj&format=png&color=000000" alt="구글" style="height:20px;" class="me-2">
-  					구글 로그인
-				</button>
-                </div>
-                <div class="col-6">
-                  <button type="button" class="btn w-100 btn-naver d-flex align-items-center justify-content-center">
-                    <img src="https://mblogthumb-phinf.pstatic.net/MjAyMjEyMTVfMTE0/MDAxNjcxMDkwNjU3NTkw.KoGra3iQfkuqnbSFoQ7PA3YMqnExItsdfOLk960Rxnkg.umx5uLYTj2TEMhx7rMA5uNxvyJD2T42OSeSFsxNUQygg.PNG.y2kwooga/%EB%84%A4%EC%9D%B4%EB%B2%84_AI-04.png?type=w800"
-                      alt="네이버" style="height:25px;" class="me-2">
-                    네이버 로그인
-                  </button>
-                </div>
-              </div>
-
-              <div class="text-center login-options">
-                <p class="mb-0">아직 회원이 아니신가요? <a href="#" class="fw-bold text-primary">회원가입</a></p>
-              </div>
-            </form>
-          </div>
         </div>
-      </div>
-    </div>
-  </main>
-<%@ include file="/WEB-INF/views/common/footer.jsp"%>
+    </main>
 
+    <%@ include file="/WEB-INF/views/common/footer.jsp"%>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- JavaScript -->
+    <script>
+        // 로그인 폼 검증 및 제출
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            
+            // 기존 에러 메시지 제거
+            clearAllErrors();
+            
+            let hasError = false;
+            
+            // 클라이언트 사이드 검증
+            if (!username) {
+                showFieldError('username', '아이디를 입력해주세요.');
+                hasError = true;
+            } else if (username.length < 3) {
+                showFieldError('username', '아이디는 3자 이상 입력해주세요.');
+                hasError = true;
+            }
+            
+            if (!password) {
+                showFieldError('password', '비밀번호를 입력해주세요.');
+                hasError = true;
+            } else if (password.length < 4) {
+                showFieldError('password', '비밀번호는 4자 이상 입력해주세요.');
+                hasError = true;
+            }
+            
+            if (hasError) {
+                e.preventDefault();
+                return false;
+            }
+            
+            // 로딩 상태 표시
+            showLoginLoading(true);
+        });
+        
+        // 필드 에러 표시
+        function showFieldError(fieldName, message) {
+            const field = document.getElementById(fieldName);
+            const errorDiv = document.getElementById(fieldName + '-error');
+            
+            // 필드에 에러 클래스 추가
+            field.classList.add('is-invalid');
+            
+            // 에러 메시지 표시
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            
+            // 포커스 이동
+            field.focus();
+        }
+        
+        // 필드 에러 제거
+        function clearFieldError(fieldName) {
+            const field = document.getElementById(fieldName);
+            const errorDiv = document.getElementById(fieldName + '-error');
+            
+            field.classList.remove('is-invalid');
+            errorDiv.style.display = 'none';
+            errorDiv.textContent = '';
+        }
+        
+        // 모든 에러 제거
+        function clearAllErrors() {
+            clearFieldError('username');
+            clearFieldError('password');
+        }
+        
+        // 입력 시 에러 제거
+        document.getElementById('username').addEventListener('input', function() {
+            clearFieldError('username');
+        });
+        
+        document.getElementById('password').addEventListener('input', function() {
+            clearFieldError('password');
+        });
+        
+        // 로딩 상태 표시/숨김
+        function showLoginLoading(show) {
+            const btn = document.getElementById('loginBtn');
+            const textSpan = btn.querySelector('.login-btn-text');
+            const loadingSpan = btn.querySelector('.login-btn-loading');
+            
+            if (show) {
+                btn.disabled = true;
+                textSpan.classList.add('d-none');
+                loadingSpan.classList.remove('d-none');
+            } else {
+                btn.disabled = false;
+                textSpan.classList.remove('d-none');
+                loadingSpan.classList.add('d-none');
+            }
+        }
+        
+        // 소셜 로그인
+        function socialLogin(provider) {
+            const redirect = new URLSearchParams(window.location.search).get('redirect') || '';
+            const url = '<%=request.getContextPath()%>/auth/social/' + provider + 
+                       (redirect ? '?redirect=' + encodeURIComponent(redirect) : '');
+            window.location.href = url;
+        }
+        
+        // 페이지 로드 완료 시 로딩 상태 해제
+        window.addEventListener('load', function() {
+            showLoginLoading(false);
+        });
+        
+        // Enter 키 처리
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && e.target.matches('#username, #password')) {
+                if (e.target.id === 'username') {
+                    document.getElementById('password').focus();
+                } else {
+                    document.getElementById('loginForm').dispatchEvent(new Event('submit'));
+                }
+            }
+        });
+        
+        // 자동 포커스 (에러가 없는 경우에만)
+        window.addEventListener('DOMContentLoaded', function() {
+            const hasErrors = document.querySelector('.alert-danger');
+            if (!hasErrors) {
+                const usernameField = document.getElementById('username');
+                if (!usernameField.value.trim()) {
+                    usernameField.focus();
+                } else {
+                    document.getElementById('password').focus();
+                }
+            }
+        });
+        
+        // 알림 자동 숨김 (5초 후)
+        document.addEventListener('DOMContentLoaded', function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                setTimeout(function() {
+                    if (alert.classList.contains('show')) {
+                        alert.classList.remove('show');
+                        setTimeout(function() {
+                            alert.remove();
+                        }, 150);
+                    }
+                }, 5000);
+            });
+        });
+    </script>
+</body>
+</html>
