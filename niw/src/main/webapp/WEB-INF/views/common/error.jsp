@@ -66,7 +66,7 @@ String errorCode = (String)request.getAttribute("errorCode");
     <div class="container">
         <div class="error-code"><%=errorCode %></div>
         <div class="error-message">
-        <% if(errorCode.equals("404")){ %>
+        <% if("404".equals(errorCode)){ %>
         	404 Not Found
             요청하신 페이지를 찾을 수 없습니다.<br>
             주소를 다시 확인하거나 홈으로 이동해주세요.
