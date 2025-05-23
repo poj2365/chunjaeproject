@@ -27,4 +27,31 @@ public enum CalendarService {
 		JDBCTemplate.close(conn);
 		return result;
 	}
+
+	public Calendar searchCalendarById(Calendar c) {
+		Connection conn = JDBCTemplate.getConnection();
+		Calendar calendar = dao.searchCalendarById(conn, c);
+		JDBCTemplate.close(conn);
+		return calendar;
+	}
+
+	public int updateCalendar(Calendar c) {
+		Connection conn = JDBCTemplate.getConnection();
+		int result = dao.updateCalendar(conn,c);
+		if(result>0) JDBCTemplate.commit(conn);
+		else JDBCTemplate.rollback(conn);
+		JDBCTemplate.close(conn);
+		return result;
+	}
+
+	public int deleteCalendar(Calendar c) {
+		Connection conn = JDBCTemplate.getConnection();
+		int result = dao.deleteCalendar(conn,c);
+		if(result>0) JDBCTemplate.commit(conn);
+		else JDBCTemplate.rollback(conn);
+		JDBCTemplate.close(conn);
+		return result;
+	}
+
+
 }

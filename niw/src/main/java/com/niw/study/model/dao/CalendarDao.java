@@ -7,7 +7,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -47,7 +46,7 @@ public enum CalendarDao {
 	}
 
 	private Calendar getCalendar(ResultSet rs) throws SQLException {
-		return new Calendar(rs.getString("calendar_name"), rs.getString("calendar_content"),
+		return new Calendar(rs.getInt("calendar_no"), rs.getString("calendar_name"), rs.getString("calendar_content"),
 				rs.getDate("start_time"), rs.getDate("end_time"),rs.getString("user_id"));
 	}
 
@@ -68,4 +67,55 @@ public enum CalendarDao {
 		}
 		return result;
 	}
+
+	public Calendar searchCalendarById(Connection conn, Calendar c) {
+		Calendar calendar = null;
+		try {
+			pstmt = conn.prepareStatement(sql.getProperty("searchCalendarById"));
+			pstmt.setString(1, c.userId());
+			pstmt.setTimestamp(2, new Timestamp(c.startTime().getTime()));
+			rs = pstmt.executeQuery();
+			if (rs.next()) {
+				calendar=getCalendar(rs);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return calendar;
+	}
+
+	public int updateCalendar(Connection conn, Calendar c) {
+		int result = 0;
+		try {
+			pstmt = conn.prepareStatement(sql.getProperty("updateCalendar"));
+			pstmt.setString(1, c.calendarName());
+			pstmt.setString(2, c.calendarContent());
+			pstmt.setTimestamp(3, new Timestamp(c.startTime().getTime()));
+			pstmt.setTimestamp(4, new Timestamp(c.endTime().getTime()));
+			pstmt.setString(5, c.userId());
+			pstmt.setInt(6, c.calendarNo());
+			result = pstmt.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			JDBCTemplate.close(pstmt);
+		}
+		return result;
+	}
+
+	public int deleteCalendar(Connection conn, Calendar c) {
+		int result = 0;
+		try {
+			pstmt = conn.prepareStatement(sql.getProperty("deleteCalendar"));
+			pstmt.setString(1, c.userId());
+			pstmt.setInt(2, c.calendarNo());
+			result = pstmt.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			JDBCTemplate.close(pstmt);
+		}
+		return result;
+	}
+
 }
