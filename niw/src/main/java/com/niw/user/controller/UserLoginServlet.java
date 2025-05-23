@@ -58,7 +58,7 @@ public class UserLoginServlet extends HttpServlet {
 			
 		}else{
 		request.setAttribute("msg","아이디나 패스워드가 일치하지 않습니다. :(");
-		request.setAttribute("loc", "/");
+		request.setAttribute("loc", "/user/loginview.do");
 		request.getRequestDispatcher("/WEB-INF/views/common/msg.jsp").forward(request, response);
 			
 		}
