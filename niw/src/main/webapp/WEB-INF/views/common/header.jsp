@@ -78,6 +78,7 @@ User loginUser= (User)session.getAttribute("loginUser");
         </div>
         <div class="col-lg-3 col-md-1 d-none d-md-block">
           <div class="d-flex justify-content-end gap-3">
+          	<button class="blind-btn" onclick="addPoint();"><i class="bi bi-credit-card-fill"></i></button>
             <button class="blind-btn"><i class="bi bi-cart fs-4"></i></button>
             <button class="blind-btn"><i class="bi bi-bell fs-4"></i></button>
           </div>
@@ -116,7 +117,7 @@ User loginUser= (User)session.getAttribute("loginUser");
             <a class="custom-dropdown-item" href="#">고민 상담</a>
             <div class="custom-dropdown-divider"></div>
             <a class="custom-dropdown-item" href="#">정보 공유</a>
-            <a class="custom-dropdown-item" href="<%=request.getContextPath()%>/point/addpoint.do">유머</a>
+            <a class="custom-dropdown-item" href="#">유머</a>
           </div>
         </li>
         <li class="nav-item">
@@ -201,6 +202,10 @@ User loginUser= (User)session.getAttribute("loginUser");
     	    closeAllDropdowns();
     	  });
     	});
+    
+    const addPoint =()=>{
+    	open('<%=request.getContextPath()%>/point/addpoint.do','포인트충전',"width=700, height=880, scrollbars=no, resizable=no");
+    }
   </script>
 
 
