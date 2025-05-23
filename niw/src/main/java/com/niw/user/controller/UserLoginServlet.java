@@ -1,16 +1,21 @@
 package com.niw.user.controller;
 
 import java.io.IOException;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import com.niw.user.model.dto.User;
+import com.niw.user.model.service.UserService;
 
 /**
  * Servlet implementation class UserLoginServlet
  */
-@WebServlet(name = "UserLoginViewServlet", urlPatterns = { "/user/loginview.do" })
+@WebServlet("/user/login.do")
 public class UserLoginServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
@@ -26,16 +31,38 @@ public class UserLoginServlet extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		request.getRequestDispatcher("/WEB-INF/views/user/userLogin.jsp").forward(request, response);
-		
+		// TODO Auto-generated method stub
+		response.getWriter().append("Served at: ").append(request.getContextPath());
 	}
 
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		doGet(request, response);
+		String userId = request.getParameter("username");
+		String password = request.getParameter("password");
+		
+		//String saveId=request.getParameter("saveId");
+		
+		User user =UserService.USERSERVICE.searchById(userId);
+		//String username=user.getUserName();
+		
+		if(user!=null&&user.password().equals(password)) {
+
+			
+			HttpSession session = request.getSession();
+			session.setAttribute("loginUser", user);
+			System.out.println("로그인성공");
+			response.sendRedirect(request.getContextPath());
+		
+			
+		}else{
+		request.setAttribute("msg","아이디나 패스워드가 일치하지 않습니다. :(");
+		request.setAttribute("loc", "/");
+		request.getRequestDispatcher("/WEB-INF/views/common/msg.jsp").forward(request, response);
+			
+		}
+		
 	}
 
 }
