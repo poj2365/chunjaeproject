@@ -16,24 +16,28 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.niw.common.CommonTemplate;
 
 /**
  * Servlet implementation class PointAddCheckServlet
  */
 @WebServlet("/point/verifyPayment")
 public class PointAddCheckServlet extends HttpServlet {
-    private static final String IMP_KEY = "imp_apikey"; // 본인 REST API Key
-    private static final String IMP_SECRET = "ekKoeW8RyKuT0zgaZsUtXXTLQ4AhPFW"; // 본인 REST API Secret
+    private static final String IMP_KEY = "7168663054823466"; // 본인 REST API Key
+    private static final String IMP_SECRET = "53lWitAeCRueY2S26m5LqAq2TNimYC0b3KZWt2irKGKzSBuktTMZ51R2wo4ixIWDI8FJbScJ5ACTnoN0"; // 본인 REST API Secret
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-    	System.out.println("제발되라");
-        // JSON 파싱
+        System.out.println("제발되라");
+
+        // 요청 JSON 파싱
         BufferedReader reader = request.getReader();
-        Gson json = new Gson();
-        String impUid=""; //json.get("imp_uid").getAsString();
-        String merchantUid="";// = json.get("merchant_uid").getAsString();
+        Gson gson = new Gson();
+        JsonObject jsonRequest = JsonParser.parseReader(reader).getAsJsonObject();
+
+        String impUid = jsonRequest.get("imp_uid").getAsString();
+        String merchantUid = jsonRequest.get("merchant_uid").getAsString();
 
         // 1. 토큰 요청
         URL url = new URL("https://api.iamport.kr/users/getToken");
@@ -68,17 +72,29 @@ public class PointAddCheckServlet extends HttpServlet {
         String status = payment.get("status").getAsString();
 
         // 3. 검증 (예: 우리 DB에서 주문 가격이 11000원이라고 가정)
-        int expectedAmount = 11000; // TODO: DB에서 merchant_uid로 주문 조회
+        int expectedAmount = 11000; // TODO: merchantUid로 DB에서 주문 조회
 
-        if (paidAmount == expectedAmount && status.equals("paid")) {
-            // 결제 성공 처리 로직
-            response.getWriter().write("결제 성공");
+        JsonObject jsonResponse = new JsonObject();
+        if (paidAmount == expectedAmount && "paid".equals(status)) {
+        	System.out.println("성공");
+            jsonResponse.addProperty("result", "success");
+            jsonResponse.addProperty("message", "결제 성공");
+            
+            // DB에 저장하는 알고리즘 
+            
+           
         } else {
-            // 위조 가능성
-            response.getWriter().write("결제 금액 불일치 또는 실패");
+        	System.out.println("fail");
+            jsonResponse.addProperty("result", "fail");
+            jsonResponse.addProperty("message", "결제 금액 불일치 또는 실패");
+            
+            // JSON 응답 반환/        
+//            response.sendRedirect(CommonTemplate.WEB_VIEWS + "/point/addPoint.jsp");
+                
         }
-        System.out.println("결제 UID: " + impUid);
-        System.out.println("결제 상태: " + status);
-        System.out.println("결제 금액: " + paidAmount);
+        response.setContentType("application/json;charset=UTF-8");
+        response.getWriter().write(gson.toJson(jsonResponse));
+     
     }
+    
 }
