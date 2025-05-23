@@ -1,23 +1,24 @@
 package com.niw.board.model.dto;
 
-import java.sql.Date;
+import java.sql.Timestamp;
 
 import lombok.Builder;
 
 @Builder
 public record Article(
 			int articleId,
-			int userId,
+			String userId,
 			String articleTitle,
 			String articleContent,
 			String articleFilePath,
-			Date articleDateTime,
-			Date articleModifiedTime,
+			Timestamp articleDateTime,
+			Timestamp articleModifiedTime,
 			int articleViews,
 			int articleLikes,
 			int articleDislikes,
 			int articleCategory,
-			int articleDelete
+			int articleDelete,
+			int commentCount
 		) {
 
 }
