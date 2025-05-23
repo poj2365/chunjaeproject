@@ -53,7 +53,9 @@ public enum UserDao {
 				.userPoint(rs.getInt("USER_POINT"))
 				.userIntroduce(rs.getString("USER_INTRODUCE"))
 				.enrollDate(rs.getDate("ENROLL_DATE"))
-				.userRole(rs.getString("USER_ROLE"))				
+				.userRole(rs.getString("USER_ROLE"))
+				.userAddress(rs.getString("USER_ADDRESS"))
+				.userBirthDate(rs.getDate("USER_BIRTH_DATE"))
 				.build();
 	}
 }

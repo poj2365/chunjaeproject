@@ -16,7 +16,9 @@ public record User(
 		int userPoint,
 		String userIntroduce,
 		Date enrollDate,
-		String userRole
+		String userRole,
+		String userAddress,
+		Date userBirthDate
 
 		) {
 }
