@@ -206,6 +206,10 @@ User loginUser= (User)session.getAttribute("loginUser");
     const addPoint =()=>{
     	open('<%=request.getContextPath()%>/point/addpoint.do','포인트충전',"width=700, height=880, scrollbars=no, resizable=no");
     }
+    
+    const myPoint =()=>{
+    	location.assign('<%=request.getContextPath()%>/point/mypoint.do');
+    }
   </script>
 
 
