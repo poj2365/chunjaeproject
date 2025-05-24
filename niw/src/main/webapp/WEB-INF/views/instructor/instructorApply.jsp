@@ -2,32 +2,7 @@
 <%@ page import="com.niw.user.model.dto.User" %>
 <%@ page import="java.sql.Date" %>
 
-<%
-    // ========== 테스트용 임시 로그인 사용자 생성 ==========
-    User sessionUser = (User)session.getAttribute("loginUser");
-    if(sessionUser == null) {
-        // 테스트용 임시 사용자 생성
-        User testUser = new User(
-            "testuser123",                              // userId
-            null,                                       // userPwd (보안상 null)
-            "김테스트",                                   // userName
-            "010-1234-5678",                            // userPhone
-            "test@example.com",                         // userEmail
-            null,                                       // userProfileImg
-            "STUDENT",                                  // userGrade
-            1000,                                       // userPoint
-            new Date(System.currentTimeMillis()),       // userCreateDate
-            new Date(System.currentTimeMillis())        // userUpdateDate
-        );
-        
-        // 세션에 저장 (header.jsp에서 사용할 수 있도록)
-        session.setAttribute("loginUser", testUser);
-        
-        System.out.println("=== 테스트용 로그인 사용자 생성됨 ===");
-        System.out.println("사용자 ID: " + testUser.userId());
-        System.out.println("사용자 이름: " + testUser.userName());
-    }
-%>
+
 <%@ include file="../common/header.jsp" %>
 
 <style>
