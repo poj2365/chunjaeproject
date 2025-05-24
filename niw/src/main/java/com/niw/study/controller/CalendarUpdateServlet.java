@@ -35,7 +35,9 @@ public class CalendarUpdateServlet extends HttpServlet {
 		String jsonData = request.getReader().lines().collect(Collectors.joining());
 		Gson gson = new Gson();
 		Calendar c = gson.fromJson(jsonData, Calendar.class);
+		System.out.println(c);
 		int result = CalendarService.SERVICE.updateCalendar(c);
+		System.out.println(result);
 	}
 
 	/**

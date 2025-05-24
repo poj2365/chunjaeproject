@@ -41,6 +41,9 @@ public enum CalendarDao {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+		} finally {
+			JDBCTemplate.close(rs);
+			JDBCTemplate.close(pstmt);
 		}
 		return c;
 	}

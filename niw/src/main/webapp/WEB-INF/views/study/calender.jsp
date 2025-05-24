@@ -1,3 +1,4 @@
+<%@page import="com.niw.study.model.dto.TimeRecord"%>
 <%@page import="com.niw.study.model.dto.Calendar"%>
 <%@page import="java.util.List"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
@@ -7,6 +8,7 @@
 	src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.17/index.global.min.js'></script>
 <%
 List<Calendar> calendarList = (List<Calendar>) request.getAttribute("calendar");
+List<TimeRecord> trList = (List<TimeRecord>) request.getAttribute("trList");
 %>
 <style>
 .cal-container {
@@ -67,10 +69,12 @@ form button {
 form button:hover {
 	background-color: #5ea137;
 }
-#updateForm{
-	display:none;
+
+#updateForm {
+	display: none;
 }
-#delete{
+
+#delete {
 	background-color: red;
 }
 /* modal end */
@@ -85,19 +89,19 @@ form button:hover {
 			<span class="close" onclick="closeModal()">&times;</span>
 			<h2>일정 입력</h2>
 			<form id="applyForm">
-				<input type="hidden" id="no">
-				<label>일정명<br> <input type="text" name="name" id="name"
-					required /></label><br> <br> <label>상세 내용<br> <textarea
-						name="content" id="content" rows="4"></textarea></label><br> <br>
-				<label>시작일<br> <input type="date" name="start-time"
-					id="start" required /></label><br> <br> <label>종료일<br>
+				<input type="hidden" id="no"> <label>일정명<br> <input
+					type="text" name="name" id="name" required /></label><br> <br> <label>상세
+					내용<br> <textarea name="content" id="content" rows="4"></textarea>
+				</label><br> <br> <label>시작일<br> <input type="date"
+					name="start-time" id="start" required /></label><br> <br> <label>종료일<br>
 					<input type="date" name="end-time" id="end" required /></label><br> <br>
 				<div id="insertForm">
-				<button type="button" onclick="calendar('calendarsave')">저장</button>
+					<button type="button" onclick="calendar('calendarsave');">저장</button>
 				</div>
 				<div id="updateForm">
-				<button type="button" onclick="calendar('calendarupdate');">수정</button>
-				<button type="button" id="delete" onclick="calendar('calendardelete');">삭제</button>
+					<button type="button" onclick="calendar('calendarupdate');">수정</button>
+					<button type="button" id="delete"
+						onclick="calendar('calendardelete');">삭제</button>
 				</div>
 			</form>
 		</div>
@@ -119,13 +123,19 @@ form button:hover {
               selectable: true,
               select : function(arg){
             	  openModal();
+            	  document.getElementById("no").value = "";
+            	  document.getElementById("name").value = "";
+            	  document.getElementById("content").textContent = "";
             	  document.getElementById("start").value = arg.startStr;
+            	  document.getElementById("end").value = "";
+		    		document.getElementById("insertForm").style.display = "block";
+		    		document.getElementById("updateForm").style.display = "none";
               },
               eventClick : function(arg){
             	  openModal();
-      		      document.getElementById("name").value = arg.event.title;
+            	  document.getElementById("content").textContent = "";
             	  document.getElementById("start").value = arg.event.startStr;
-            	  document.getElementById("end").value = arg.event.endStr;
+
             	  const userId = "user_0001";
             	  console.log("end"+arg.event.endStr);
       		    const jsonData = {
@@ -142,13 +152,15 @@ form button:hover {
     		        if (response.ok) {
     		            return response.json();
     		        }
+    		        throw new Error('네트워크 응답이 올바르지 않습니다.');
     		    }).then(data=>{
     		    	document.getElementById("no").value = data.calendarNo;
+        		      document.getElementById("name").value = arg.event.title;
+              	  document.getElementById("end").value = arg.event.endStr;
     		    		document.getElementById("insertForm").style.display = "none";
     		    		document.getElementById("updateForm").style.display = "block";
-    		    		if(!data.calendarContent == undefined || !data.calendarContent == null){
-	    		            document.getElementById("content").value = data.calendarContent;
-    		    		}
+    		    		console.log(data.calendarContent);
+	    		            document.getElementById("content").textContent = data.calendarContent;
     		            if(arg.event.endStr == undefined || arg.event.endStr==""){
     		            	console.log(formatDateToInput(arg.event.end));
     		            	document.getElementById("end").value = formatDateToInput(arg.event.end);
@@ -160,6 +172,15 @@ form button:hover {
     		    })
               },
               events : [
+            	  <%if (trList != null) {%>
+            	  <%for (TimeRecord tr : trList) {%>
+            	  {
+              		title : '<%=tr.totalTime()%>',
+              		start : '<%=tr.startTime()%>',
+              		end : '<%=tr.endTime()%>'
+              	  },
+              	  <%}
+					}%>
             	  <%if (calendarList != null) {%>
                   <%for (Calendar c : calendarList) {%>
             	  {
@@ -168,7 +189,7 @@ form button:hover {
             		end : '<%=c.endTime()%>'
             	  },
             	  <%}
-}%>
+					}%>
             	  ]
         });
         calendar.render();
@@ -209,16 +230,31 @@ form button:hover {
     		    const startDate = document.getElementById('start').value;
     		    const endDate = document.getElementById('end').value;
     		    const userId = "user_0001";
-
-    		    const jsonData = {
-    		    		calendarNo: no,
+				
+    		    let jsonData = {}
+    		    if(path=="calendarsave"){
+    		    jsonData = {
     		    		calendarName : name,
     		    		calendarContent : content,
     		    		startTime: startDate,
     		    		endTime: endDate,
     		    		userId: userId
     		    };
-
+    		    }else if(path=="calendarupdate"){
+        		    jsonData = {
+        		    		calendarNo : no,
+        		    		calendarName : name,
+        		    		calendarContent : content,
+        		    		startTime: startDate,
+        		    		endTime: endDate,
+        		    		userId: userId
+        		    };
+    		    }else if(path=="calendardelete"){
+        		    jsonData = {
+        		    		calendarNo : no,
+        		    		userId: userId
+        		    };
+    		    }
     		    fetch("<%=request.getContextPath()%>/study/"+path+".do",{
     		        method: 'POST',
     		        headers: {

@@ -10,7 +10,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.niw.study.model.dto.Calendar;
+import com.niw.study.model.dto.TimeRecord;
 import com.niw.study.model.service.CalendarService;
+import com.niw.study.model.service.TimeRecordService;
 
 /**
  * Servlet implementation class CalenderServlet
@@ -32,8 +34,10 @@ public class CalendarServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String userId = "user_0001";
+		List<TimeRecord> trList = TimeRecordService.SERVICE.searchTime(userId);
 		List<Calendar> c = CalendarService.SERVICE.searchCalendar(userId);
 		request.setAttribute("calendar", c);
+		request.setAttribute("trList", trList);
 		request.getRequestDispatcher("/WEB-INF/views/study/calender.jsp").forward(request, response);
 	}
 
