@@ -43,7 +43,7 @@ User loginUser= (User)session.getAttribute("loginUser");
           <% if(loginUser==null) { %>
             <!-- 비로그인 상태 메뉴 -->
             <a href="<%=request.getContextPath()%>/user/loginview.do" class="active"><i class="bi bi-person-circle me-1"></i>로그인</a>
-            <a href="<%=request.getContextPath()%>/user/enroll.do"><i class="bi bi-person-plus me-1"></i>회원가입</a>
+            <a href="<%=request.getContextPath()%>/user/enrollview.do"><i class="bi bi-person-plus me-1"></i>회원가입</a>
             <a href="<%=request.getContextPath()%>/cs/main.do"><i class="bi bi-headset me-1"></i>고객센터</a>
           <% } else { %>
             <!-- 로그인 상태 메뉴 -->
