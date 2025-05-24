@@ -3,33 +3,25 @@ package com.niw.instructor.model.dto;
 import java.sql.Date;
 import java.util.List;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.niw.instructor.model.Enums.ApplicationStatus;
 
 
-@Data
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
-public class InstructorApplication{
-	private String userId;
-	private String instructorName;
-	
-	private String bankName;
-	private String accountHolder;
-	private String accountNumber;
-	
-	private String introduction;
-	
-	private List<String> portFolio;
-	
-	private String applicationStatus;
-	private Date applicationDate;
-	private Date reviewDate;
-	private String reviewComment;
 
 
+public record InstructorApplication(
+	int applicationId,
+	String userId,
+	String instructorName,
 	
-}
+	String bankName,
+	String accountHolder,
+	String accountNumber,
+	
+	String introduction,
+	
+	List<PortfolioFile> porfolioFiles,
+	
+	ApplicationStatus applicationStatus,
+	Date applicationDate,
+	Date updateDate
+	 ){}

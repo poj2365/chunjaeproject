@@ -12,7 +12,7 @@ import com.niw.common.CommonTemplate;
 /**
  * Servlet implementation class InstructorApplyServlet
  */
-@WebServlet("/instructor/apply.do")
+@WebServlet("/instructor/applyview.do")
 public class InstructorApplyServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        

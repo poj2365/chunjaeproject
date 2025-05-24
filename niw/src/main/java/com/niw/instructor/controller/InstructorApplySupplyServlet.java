@@ -14,6 +14,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import com.niw.instructor.model.dto.InstructorApplication;
+import com.niw.instructor.model.dto.PortfolioFile;
+import com.niw.instructor.model.service.InstructorApplicationService;
 import com.niw.user.model.dto.User;
 import com.oreilly.servlet.MultipartRequest;
 import com.oreilly.servlet.multipart.DefaultFileRenamePolicy;
@@ -21,64 +23,79 @@ import com.oreilly.servlet.multipart.DefaultFileRenamePolicy;
 /**
  * Servlet implementation class InstructorApplySupplyServlet
  */
-@WebServlet("/InstructorApplySupplyServlet")
+@WebServlet("/instructor/apply.do")
 public class InstructorApplySupplyServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-       
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public InstructorApplySupplyServlet() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
 
 	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#HttpServlet()
 	 */
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	public InstructorApplySupplyServlet() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
+	 *      response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		response.getWriter().append("Served at: ").append(request.getContextPath());
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+	 *      response)
 	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		HttpSession session = request.getSession();
-		User user=(User)session.getAttribute("loginUser");
-		String path=getServletContext().getRealPath("/resources/upload/instructor/apply/"+user.userId());
-		File folder = new File(path);
-		if(!folder.exists()) folder.mkdir();
-		int size=1024*1024*50;
-		String encoding ="utf-8";
-		DefaultFileRenamePolicy dfrp=new DefaultFileRenamePolicy();
-		MultipartRequest mr = new MultipartRequest(request, path, size, encoding, dfrp);
-		Enumeration<String> names=mr.getFileNames();
-		String renameFile="";
-		String userId=user.userId();
-		String instructorName=user.userName();
-		
-		String bankName=mr.getParameter("bankName");
-		String accountHolder=mr.getParameter("accountHolder");
-		String accountNumber=mr.getParameter("accountNumber").replaceAll("-", "");
-		List<String> portFolios = new ArrayList();
-		while(names.hasMoreElements()) {
-			String inputName=names.nextElement();
-			renameFile=mr.getFilesystemName(inputName);
-			portFolios.add(renameFile);
+		User user = (User) session.getAttribute("loginUser");
+
+		if (user == null) {
+			response.sendRedirect(request.getContextPath() + "/user/loginview.do");
+			return;
 		}
-		InstructorApplication instructorApplication = InstructorApplication.builder()
-				.userId(userId)
-				.instructorName(instructorName)
-				.bankName(bankName)
-				.accountHolder(accountHolder)
-				.accountNumber(accountNumber)
-				.introduction(accountNumber)
-				.portFolio(portFolios)
-				.build();
-		
-		
+
+		String path = getServletContext().getRealPath("/resources/upload/instructor/apply/" + user.userId());
+//		 String path = "/WEB-INF/resources/upload/instructor/apply/" + user.userId();
+		File folder = new File(path);
+		if (!folder.exists())
+			folder.mkdirs();
+		int size = 1024 * 1024 * 50;
+		String encoding = "utf-8";
+		DefaultFileRenamePolicy dfrp = new DefaultFileRenamePolicy();
+		MultipartRequest mr = new MultipartRequest(request, path, size, encoding, dfrp);
+		Enumeration<String> names = mr.getFileNames();
+		String userId = user.userId();
+		String instructorName = user.userName();
+
+		String bankName = mr.getParameter("bankName");
+		String accountHolder = mr.getParameter("accountHolder");
+		String accountNumber = mr.getParameter("accountNumber").replaceAll("-", "");
+		List<PortfolioFile> portfolioFiles = new ArrayList();
+		while (names.hasMoreElements()) {
+			String inputName = names.nextElement();
+			String originalFile = mr.getOriginalFileName(inputName);
+			String renameFile = mr.getFilesystemName(inputName);
+
+			File uploadFile = new File(path, renameFile);
+			int fileSize = (int) uploadFile.length();
+			String fileType = getServletContext().getMimeType(originalFile);
+			String fileExtension = originalFile.substring(originalFile.lastIndexOf('.') + 1).toLowerCase();
+
+			String filePath = path + "/" + renameFile;
+			PortfolioFile portfolioFile = new PortfolioFile(0, 0, originalFile, renameFile, filePath, fileSize,
+					fileType, fileExtension, null);
+			portfolioFiles.add(portfolioFile);
+		}
+
+		InstructorApplication instructorApplication = new InstructorApplication(size, userId, instructorName, bankName,
+				accountHolder, accountNumber, accountNumber, portfolioFiles, null, null, null);
+		InstructorApplicationService.SERVICE.instructorApply(instructorApplication);
+
 		doGet(request, response);
 	}
 
