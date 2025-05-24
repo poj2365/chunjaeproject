@@ -1,7 +1,12 @@
+<%@page import="com.niw.study.model.dto.TimeRecord"%>
+<%@page import="java.util.List"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@include file="/WEB-INF/views/common/header.jsp"%>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<%
+	List<TimeRecord> trList = (List<TimeRecord>)request.getAttribute("trList");
+%>
 <style>
 .contianer {
 	font-family: 'Arial', sans-serif;
@@ -154,17 +159,18 @@
             let timerInterval;
             let isRunning = false;
             let isPaused = false;
+            let recordedStartTime = null;
             
             // 타이머 업데이트 함수
             function updateTimer() {
                 const currentTime = Date.now();
                 elapsedTime = currentTime - startTime;
-                displayTime(elapsedTime);
+                timer.textContent = formattedTime(elapsedTime);
                 console.log("경과 시간(ms):", elapsedTime); // 디버깅용 로그 추가
             }
             
             // 시간 표시 함수
-            function displayTime(time) {
+            function formattedTime(time) {
                 const hours = Math.floor(time / 3600000);
                 const minutes = Math.floor((time % 3600000) / 60000);
                 const seconds = Math.floor((time % 60000) / 1000);
@@ -173,8 +179,7 @@
                 const formattedMinutes = String(minutes).padStart(2, '0');
                 const formattedSeconds = String(seconds).padStart(2, '0');
                 
-                timer.textContent = `\${formattedHours}:\${formattedMinutes}:\${formattedSeconds}`;
-                console.log("타이머 업데이트:", timer.textContent); // 디버깅용 로그 추가
+                return `\${formattedHours}:\${formattedMinutes}:\${formattedSeconds}`;
             }
             
             // 시작 버튼 클릭 이벤트
@@ -182,6 +187,7 @@
                 if (!isRunning) {
                     if (!isPaused) {
                         startTime = Date.now();
+                        recordedStartTime = new Date();
                     } else {
                         startTime = Date.now() - elapsedTime;
                         isPaused = false;
@@ -196,14 +202,6 @@
                     
                     status.textContent = '타이머가 실행 중입니다...';
                     console.log("타이머 시작됨, 시작 시간:", new Date(startTime).toISOString()); // 디버깅용 로그 추가
-                }
-            });
-            
-         // 페이지 떠날 때 경고
-            window.addEventListener('beforeunload', function(e) {
-                if (isRunning) {
-                    e.preventDefault();
-                    e.returnValue = ''; // 경고창 띄움
                 }
             });
             
@@ -228,42 +226,37 @@
                 
                 // 최종 시간 저장
                 const finalTime = elapsedTime;
+                const recordedEndTime = new Date();
                 
                 // 타이머 초기화
                 isRunning = false;
                 isPaused = false;
                 elapsedTime = 0;
-                displayTime(0);
+                timer.textContent = formattedTime(0);
                 
                 // 버튼 상태 초기화
                 startBtn.disabled = false;
                 pauseBtn.disabled = true;
                 stopBtn.disabled = true;
                 
-                // DB에 저장
-                saveTimeToDatabase(finalTime);
+                saveTime(finalTime, recordedStartTime, recordedEndTime);
             });
             
-            // 데이터베이스에 시간 저장하는 함수
-            function saveTimeToDatabase(time) {
+            function saveTime(time, startTimeObj, endTimeObj) {
                 status.textContent = '데이터 저장 중...';
                 
-                // 시간 데이터 형식 구성
-                const hours = Math.floor(time / 3600000);
-                const minutes = Math.floor((time % 3600000) / 60000);
-                const seconds = Math.floor((time % 60000) / 1000);
-                const milliseconds = time % 1000;
-                
+                const totalTime = formattedTime(time);
+                const category = "test";
+                const userId = "user_0001";
+
                 const timeData = {
-                    hours: hours,
-                    minutes: minutes,
-                    seconds: seconds,
-                    milliseconds: milliseconds,
-                    totalMilliseconds: time,
-                    timestamp: new Date().toISOString()
+					category : category,
+                	startTime: startTimeObj,
+                    endTime: endTimeObj,
+                    totalTime: totalTime,
+                    userId : userId
                 };
                 
-                // fetch API를 사용해 서버에 데이터 전송
                 fetch("<%=request.getContextPath()%>/study/timesave.do", {
                     method: 'POST',
                     headers: {
@@ -288,6 +281,13 @@
             }
         });
         
+        // 페이지 떠날 때 경고
+           window.addEventListener('beforeunload', function(e) {
+               if (isRunning) {
+                   e.preventDefault();
+                   e.returnValue = ''; // 경고창 띄움
+               }
+           });
         
            // 그래프 그리기
             const ctx = document.getElementById('studyChart').getContext('2d');
