@@ -17,23 +17,31 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.niw.common.CommonTemplate;
+import com.niw.point.model.dto.Point;
+import com.niw.point.model.service.PointService;
 
 /**
  * Servlet implementation class PointAddCheckServlet
  */
 @WebServlet("/point/verifyPayment")
 public class PointAddCheckServlet extends HttpServlet {
-    private static final String IMP_KEY = "7168663054823466"; // 본인 REST API Key
-    private static final String IMP_SECRET = "53lWitAeCRueY2S26m5LqAq2TNimYC0b3KZWt2irKGKzSBuktTMZ51R2wo4ixIWDI8FJbScJ5ACTnoN0"; // 본인 REST API Secret
-
-    @Override
+	private static final String IMP_KEY = "7168663054823466"; // 본인 REST API Key
+	private static final String IMP_SECRET = "53lWitAeCRueY2S26m5LqAq2TNimYC0b3KZWt2irKGKzSBuktTMZ51R2wo4ixIWDI8FJbScJ5ACTnoN0"; 
+	// 본인 Secret키
+																																	
+	@Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+    	
+    	response.setContentType("application/json;charset=UTF-8");
+    	Gson gson = new Gson();
+    	JsonObject jsonResponse = new JsonObject();
+    	
         System.out.println("제발되라");
 
         // 요청 JSON 파싱
+        try {
         BufferedReader reader = request.getReader();
-        Gson gson = new Gson();
         JsonObject jsonRequest = JsonParser.parseReader(reader).getAsJsonObject();
 
         String impUid = jsonRequest.get("imp_uid").getAsString();
@@ -67,23 +75,52 @@ public class PointAddCheckServlet extends HttpServlet {
         BufferedReader payReader = new BufferedReader(new InputStreamReader(payConn.getInputStream()));
         JsonObject payRes = JsonParser.parseReader(payReader).getAsJsonObject();
         JsonObject payment = payRes.getAsJsonObject("response");
-
         int paidAmount = payment.get("amount").getAsInt();
         String status = payment.get("status").getAsString();
+        System.out.println("받은 JSON 전체: " + jsonRequest);
+        System.out.println("amount 필드 존재 여부: " + jsonRequest.has("amount"));
+        System.out.println("amount 값: " + jsonRequest.get("amount"));
 
         // 3. 검증 (예: 우리 DB에서 주문 가격이 11000원이라고 가정)
         int expectedAmount = 11000; // TODO: merchantUid로 DB에서 주문 조회
 
-        JsonObject jsonResponse = new JsonObject();
-        if (paidAmount == expectedAmount && "paid".equals(status)) {
-        	System.out.println("성공");
-            jsonResponse.addProperty("result", "success");
-            jsonResponse.addProperty("message", "결제 성공");
-            
-            // DB에 저장하는 알고리즘 
-            
-           
-        } else {
+	        if (paidAmount == expectedAmount && "paid".equals(status)) {
+	        	System.out.println("성공");
+	            jsonResponse.addProperty("result", "success");
+	            jsonResponse.addProperty("message", "결제 성공");
+	            
+	            // DB에 저장하는 알고리즘 
+	//            request.setCharacterEncoding("utf-8");
+	//            long pointId = Integer.parseInt(request.getParameter("merchant_uid"));
+	//            String userId =request.getParameter("buyer_id");
+	//            int pointPrice = Integer.parseInt(request.getParameter("amount"));
+	//            String pointType = request.getParameter("buytype");
+	//            String pointDescription = request.getParameter("description");
+	//
+	            // JSON형태로 와서
+	            long pointId = jsonRequest.get("merchant_uid").getAsLong();
+	            String userId = jsonRequest.get("buyer_id").getAsString();
+	            int pointPrice = jsonRequest.get("amount").getAsInt();
+	            String pointType = jsonRequest.get("buytype").getAsString();
+	            String pointDescription = jsonRequest.get("description").getAsString();
+	            
+	           System.out.println(userId);
+	            Point p = Point.builder()
+	            		.pointId(pointId)
+	            		.userId(userId)
+	            		.pointAmount(pointPrice)
+	            		.pointType(pointType)
+	            		.pointDescription(pointDescription)
+	            		.build();
+	          
+	            int result = PointService.ponitService().insertPointHistory(p);
+	            
+	            System.out.println("성공");
+	            jsonResponse.addProperty("result", "Success");
+	            jsonResponse.addProperty("message", "결제 성공");
+	            
+	        	}
+        	} catch(Exception e) {
         	System.out.println("fail");
             jsonResponse.addProperty("result", "fail");
             jsonResponse.addProperty("message", "결제 금액 불일치 또는 실패");
@@ -92,9 +129,9 @@ public class PointAddCheckServlet extends HttpServlet {
 //            response.sendRedirect(CommonTemplate.WEB_VIEWS + "/point/addPoint.jsp");
                 
         }
-        response.setContentType("application/json;charset=UTF-8");
+        
         response.getWriter().write(gson.toJson(jsonResponse));
      
-    }
+	}
     
 }

@@ -1,0 +1,99 @@
+package com.niw.point.model.dao;
+
+import java.io.FileReader;
+import java.io.IOException;
+import java.net.URL;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Properties;
+
+import com.niw.common.JDBCTemplate;
+import com.niw.point.model.dto.Point;
+import com.niw.point.model.dto.PointRefund;
+
+public class PointDao {
+	
+	private Properties sql=new Properties();
+	// 프로퍼티 만들기
+	private PreparedStatement pstmt;
+	private ResultSet rs;
+	
+	private static final PointDao DAO = new PointDao();
+	
+//	private  PointDao() {
+//		String path = PointDao.class.getResource("sql/point_sql.properties").getPath();
+//		try(FileReader fr=new FileReader(path)) {
+//			sql.load(fr);
+//		}catch(IOException e) {
+//			e.printStackTrace();
+//		}
+//	}
+	private PointDao() {
+	    try {
+	        URL url = PointDao.class.getClassLoader().getResource("sql/point_sql.properties");
+	        if (url == null) {
+	            throw new RuntimeException("point_sql.properties 파일을 classpath에서 찾을 수 없습니다.");
+	        }
+	        String path = url.getPath();
+	        try (FileReader fr = new FileReader(path)) {
+	            sql.load(fr);
+	        }
+	    } catch (IOException e) {
+	        e.printStackTrace();
+	    }
+	}
+	
+	public static PointDao pointDao() {
+		return DAO;
+	}
+	
+	public int insertPointHistory(Connection conn, Point p) {
+		int result =0;
+		
+		try {
+			// pstmt =  conn.prepareStatement(sql.getProperty("insertPointHistory"));// -> 이게 왜 null?
+			String sql = "INSERT INTO POINTS VALUES(?,?,?,?,?,SYSDATE)";
+			pstmt=conn.prepareStatement(sql);
+			pstmt.setLong(1, p.getPointId());
+			pstmt.setString(2, p.getUserId());
+			pstmt.setInt(3, p.getPointAmount());
+			pstmt.setString(4, p.getPointType());
+			pstmt.setString(5, p.getPointDescription());
+			
+			result = pstmt.executeUpdate();
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			JDBCTemplate.close(rs);
+			JDBCTemplate.close(pstmt);
+		}
+		return result;
+	}
+	
+	public int refundPointHistory(Connection conn, PointRefund p) {
+		int result = 0;
+		try{
+			String sql = "INSERT INTO REFUND_POINT VALUES(?,?,?,?,?,?,?)";
+			pstmt=conn.prepareStatement(sql);
+			pstmt.setString(1, p.getUserId());
+			pstmt.setString(3, p.getRefundType());
+			pstmt.setInt(4 , p.getFileId());
+			pstmt.setInt(5, p.getRefundPoint());
+			pstmt.setString(6, p.getRefundStatus());
+			pstmt.setString(7, p.getRefundAccount());
+			
+			result = pstmt.executeUpdate();
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			JDBCTemplate.close(rs);
+			JDBCTemplate.close(pstmt);
+		}
+		return result;
+	}
+
+}
