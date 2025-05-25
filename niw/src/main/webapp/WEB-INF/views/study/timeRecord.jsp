@@ -5,7 +5,7 @@
 <%@include file="/WEB-INF/views/common/header.jsp"%>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <%
-	List<TimeRecord> trList = (List<TimeRecord>)request.getAttribute("trList");
+List<TimeRecord> trList = (List<TimeRecord>) request.getAttribute("trList");
 %>
 <style>
 .contianer {
@@ -22,7 +22,7 @@
 	max-width: 700px;
 	min-width: 300px;
 	margin: 0 auto 30px;
-	margin-top:20px;
+	margin-top: 20px;
 	background: white;
 	padding: 20px;
 	border-radius: 10px;
@@ -104,9 +104,10 @@
 	padding: 20px;
 	border-radius: 10px;
 	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-	margin-bottom : 20px}
+	margin-bottom: 20px
 }
 
+}
 .ranking-item {
 	padding: 10px;
 	border-bottom: 1px solid #ddd;
@@ -129,17 +130,14 @@
 			<div class="status" id="status"></div>
 		</div>
 		<div class="chart-container">
-			<h3>공부 시간 그래프 (단위: 분)</h3>
+			<h3>오늘의 공부 시간 그래프</h3>
 			<canvas id="studyChart"></canvas>
 		</div>
 
 		<div class="ranking-list">
-			<h3>공부 시간 랭킹</h3>
-			<div class="ranking-item">🥇 홍길동 - 120분</div>
-			<div class="ranking-item">🥈 이영희 - 95분</div>
-			<div class="ranking-item">🥉 김민수 - 80분</div>
-			<div class="ranking-item">4위 - 사용자1 - 65분</div>
-			<div class="ranking-item">5위 - 사용자2 - 50분</div>
+			<h3>오늘의 공부 시간 랭킹(시간:분:초)</h3>
+			<div class="ranking-item"></div>
+
 		</div>
 
 	</div>
@@ -166,7 +164,6 @@
                 const currentTime = Date.now();
                 elapsedTime = currentTime - startTime;
                 timer.textContent = formattedTime(elapsedTime);
-                console.log("경과 시간(ms):", elapsedTime); // 디버깅용 로그 추가
             }
             
             // 시간 표시 함수
@@ -201,7 +198,6 @@
                     stopBtn.disabled = false;
                     
                     status.textContent = '타이머가 실행 중입니다...';
-                    console.log("타이머 시작됨, 시작 시간:", new Date(startTime).toISOString()); // 디버깅용 로그 추가
                 }
             });
             
@@ -271,14 +267,72 @@
                     throw new Error('네트워크 응답이 올바르지 않습니다.');
                 })
                 .then(data => {
-                    status.textContent = '타이머 데이터가 성공적으로 저장되었습니다!';
+                    alert('타이머 데이터가 성공적으로 저장되었습니다!');
                     console.log('저장된 데이터:', data);
+					location.replace(location.href);
                 })
                 .catch(error => {
                     status.textContent = '데이터 저장 실패: ' + error.message;
                     console.error('저장 오류:', error);
                 });
             }
+            
+            function totalMinute(timeStr) {
+                const [hours, minutes] = timeStr.split(':').map((v, i) => i < 2 ? Number(v) : null); 
+                return hours * 60 + minutes;
+            }
+            
+            // 그래프
+            fetch("<%=request.getContextPath()%>/study/timerank.do")
+     .then(response => response.json())
+     .then(data => {
+         const labels = data.map(item => item.userId);
+		 const totalTime = data.map(item => totalMinute(item.totalTime));
+         console.log(labels);
+		 console.log(totalTime);
+		 
+         // Chart 생성
+         new Chart(document.getElementById('studyChart').getContext('2d'), {
+             type: 'bar',
+             data: {
+                 labels: labels,
+                 datasets: [{
+                     label: '공부 시간 (분)',
+                     data: totalTime,
+                     backgroundColor: ['#FFD700', '#C0C0C0', '#CD7F32', '#4A90E2', '#4A90E2']
+                 }]
+             },
+             options: {
+                 responsive: true,
+                 scales: {
+                     y: {
+                         beginAtZero: true,
+                         ticks: {
+                             stepSize: 10
+                         }
+                     }
+                 }
+             }
+         });
+
+         // 랭킹 표시
+         const rankingList = document.querySelector('.ranking-list');
+
+         data.forEach((item, index) => {
+        	 if(index<5){
+             const medals = ['🥇', '🥈', '🥉'];
+             const rank = medals[index] || `\${index + 1}위`;
+             const div = document.createElement('div');
+             div.className = 'ranking-item';
+             
+             div.textContent = `\${rank} [\${item.userId}] - \${item.totalTime}`;
+             rankingList.appendChild(div);
+        	 }
+         });
+     })
+     .catch(error => {
+         console.error("랭킹 데이터 불러오기 실패:", error);
+     });
         });
         
         // 페이지 떠날 때 경고
@@ -289,8 +343,8 @@
                }
            });
         
-           // 그래프 그리기
-            const ctx = document.getElementById('studyChart').getContext('2d');
+       
+/*             const ctx = document.getElementById('studyChart').getContext('2d');
             new Chart(ctx, {
                 type: 'bar',
                 data: {
@@ -314,6 +368,6 @@
                         }
                     }
                 }
-            });
+            }); */
     </script>
 <%@include file="/WEB-INF/views/common/footer.jsp"%>
