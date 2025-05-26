@@ -44,7 +44,7 @@ public class PointDao {
 //	        e.printStackTrace();
 //	    }
 //	}
-	
+
 	public static PointDao pointDao() {
 		return DAO;
 	}
@@ -53,14 +53,21 @@ public class PointDao {
 		int result =0;
 		
 		try {
+
+			System.out.println(sql.getProperty("insertPointHistory"));
 			pstmt =  conn.prepareStatement(sql.getProperty("insertPointHistory"));// -> 이게 왜 null?
-			//String sql = "INSERT INTO POINTS VALUES(?,?,?,?,?,SYSDATE)";
-//			pstmt=conn.prepareStatement(sql);
-			pstmt.setLong(1, p.getPointId());
-			pstmt.setString(2, p.getUserId());
-			pstmt.setInt(3, p.getPointAmount());
-			pstmt.setString(4, p.getPointType());
-			pstmt.setString(5, p.getPointDescription());
+			
+			pstmt.setString(1, p.getUserId());
+			pstmt.setInt(2, p.getPointAmount());
+			pstmt.setString(3, p.getPointType());
+			pstmt.setString(4, p.getPointDescription());
+			pstmt.setLong(5, p.getPointId());
+			System.out.println(p.getPointId());
+			System.out.println(p.getUserId());
+			System.out.println(p.getPointAmount());
+			System.out.println(p.getPointType());
+			System.out.println(p.getPointDescription());
+
 			
 			result = pstmt.executeUpdate();
 			
@@ -77,8 +84,9 @@ public class PointDao {
 		int result = 0;
 		try{
 			// String sql = "INSERT INTO REFUND_POINT VALUES(?,?,?,?,?,?,?)";
-//			pstmt=conn.prepareStatement(sql);
+
 			pstmt =  conn.prepareStatement(sql.getProperty("refundPoint"));
+
 			pstmt.setString(1, p.getUserId());
 			pstmt.setString(3, p.getRefundType());
 			pstmt.setInt(4 , p.getFileId());
