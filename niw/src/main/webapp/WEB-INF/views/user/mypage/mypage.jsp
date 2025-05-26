@@ -7,8 +7,10 @@
    
     if(loginUser == null) {
         response.sendRedirect(request.getContextPath() + "/user/loginview.do");
-        return;
-    }
+        return; 
+    }  
+ 
+
 %>
 
 <style>

@@ -1,17 +1,14 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%@ page import="com.niw.user.model.dto.User" %>
+<%
+    User loginUser = (User)session.getAttribute("loginUser");
+%>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<!-- jQuery넣어주기 -->
- <!-- <script src="https://cdn.portone.io/v2/browser-sdk.js"></script> -->
 	<script src="https://cdn.iamport.kr/v1/iamport.js"></script>
-<!--  <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    IMP.init("iamporttest"); // ⚠️ 여기에 본인 MID 넣기 (테스트용: iamporttest_3)
-  });
-</script> -->
 <meta charset="UTF-8">
   <title>포인트 충전</title>
   <style>
@@ -109,7 +106,7 @@
   <h2>포인트 충전</h2>
 
   <div class="point-display">
-    현재 보유 포인트: <strong>2500P</strong>
+    현재 보유 포인트: <strong><%=loginUser.userPoint()%> P</strong>
   </div>
 
   
@@ -156,9 +153,7 @@
 
     const payAmount = Math.floor(pointAmount * 1.1);
     
-	const userId = "user_0001";
-	 <%-- const buyerId = "<%= loginMember.getUserId() %>"; 로그인이 가능해지면 이거를 사용해서 넘겨주기  --%>
-	 
+	const userId = "<%=loginUser.userId()%>";
     const userCode = "imp38113060";
     IMP.init(userCode); 
     
@@ -170,12 +165,11 @@
         pay_method: "card", 
         escrow: false,
         amount: payAmount,
-        buytype : "구매",
+        buytype : "충전",
         description : amount + "P 포인트 구매",
         tax_free: 3000,
-        /* buyer_id : "user_0001", ---> 이곳에 넣어줘도 response에 넘어가지 않는다. */
-        buyer_name: "홍길동",
-        buyer_email: "buyer@example.com",
+        buyer_name: "<%=loginUser.userName()%>",
+        buyer_email: "<%=loginUser.userEmail()%>",
         buyer_tel: "02-1670-5176",
         buyer_addr: "성수이로 20길 16",
         buyer_postcode: "04783",
@@ -236,6 +230,7 @@
         amount: payAmount,
         buytype: "구매",
         description: pointAmount + "P 포인트 구매",
+        pointAmount : pointAmount
         
       	}) 
       })

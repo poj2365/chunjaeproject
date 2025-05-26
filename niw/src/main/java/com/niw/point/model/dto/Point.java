@@ -16,8 +16,9 @@ public class Point {
 	
 	private long pointId;
 	private String userId;
-	private int pointAmount;
 	private String pointType;
+	private int pointAmount;
+	private int price;
 	private String pointDescription;
 	private Date createdDate;
 }
