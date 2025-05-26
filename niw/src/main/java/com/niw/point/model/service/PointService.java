@@ -43,5 +43,7 @@ public class PointService {
 		JDBCTemplate.close(conn);
 		return result;
 	}
+	
+	
 
 }

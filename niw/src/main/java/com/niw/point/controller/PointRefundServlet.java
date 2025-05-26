@@ -47,12 +47,19 @@ public class PointRefundServlet extends HttpServlet {
 		
 		int result = PointService.ponitService().refundPointHistoy(p);
 		
+		if (result > 0) {
+			System.out.println("포인트 환불 기록 성공!");
+			request.setAttribute("message", "환불 요청이 성공했습니다.");
+		} else {
+			System.out.println("포인트 환불 기록 실패");
+			request.setAttribute("message", "환불 요청이 실패했습니다.");
+		}
+		
+		request.getRequestDispatcher("/views/point/refundResult.jsp").forward(request, response);
 		
 	}
 
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
+
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		doGet(request, response);
