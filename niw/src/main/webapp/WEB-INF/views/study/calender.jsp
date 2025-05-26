@@ -90,11 +90,13 @@ form button:hover {
 			<h2>일정 입력</h2>
 			<form id="applyForm">
 				<input type="hidden" id="no"> <label>일정명<br> <input
-					type="text" name="name" id="name" required /></label><br> <br> <label>상세
-					내용<br> <textarea name="content" id="content" rows="4"></textarea>
-				</label><br> <br> <label>시작일<br> <input type="date"
-					name="start-time" id="start" required /></label><br> <br> <label>종료일<br>
-					<input type="date" name="end-time" id="end" required /></label><br> <br>
+					type="text" name="name" id="name" required /></label><br> <br> 
+					<label>상세 내용<br> <textarea name="content" id="content" rows="4"></textarea>
+				</label><br> <br> 
+				<label>시작일<br> <input type="datetime-local"
+					name="start-time" id="start" required /></label><br> <br> 
+					<label>종료일<br>
+					<input type="datetime-local" name="end-time" id="end" required /></label><br> <br>
 				<div id="insertForm">
 					<button type="button" onclick="calendar('calendarsave');">저장</button>
 				</div>
@@ -108,6 +110,15 @@ form button:hover {
 	</div>
 </section>
 <script>
+const timeRecordTitle = [
+    <% if (trList != null) {
+         for (TimeRecord tr : trList) { %>
+           "<%= tr.totalTime() %>",
+    <%   }
+       } %>
+  ];
+
+
 
       document.addEventListener('DOMContentLoaded', function() {
         var calendarEl = document.getElementById('calendar');
@@ -132,13 +143,17 @@ form button:hover {
 		    		document.getElementById("updateForm").style.display = "none";
               },
               eventClick : function(arg){
+            	  if (timeRecordTitle.includes(arg.event.title)) {
+            		    // 타임레코드이면 calendarsearchbydate.do 호출 안함
+            		    return;
+            		  }
             	  openModal();
+            	  
             	  document.getElementById("content").textContent = "";
             	  document.getElementById("start").value = arg.event.startStr;
 
             	  const userId = "user_0001";
-            	  console.log("end"+arg.event.endStr);
-      		    const jsonData = {
+      		   const jsonData = {
     		    		startTime: arg.event.start,
     		    		userId: userId
     		    };

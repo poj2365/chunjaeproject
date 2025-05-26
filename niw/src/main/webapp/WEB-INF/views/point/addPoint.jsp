@@ -140,6 +140,7 @@
 
 <script>
 
+   <%-- const buyerId = "<%= loginMember.getUserId() %>"; 로그인이 가능해지면 이거를 사용해서 넘겨주기  --%>
  
   function requestPay() {
     const amount = parseInt(document.getElementById('amount').value);
@@ -149,7 +150,8 @@
     }
 
     const payAmount = Math.floor(amount * 1.1);
-
+	const userId = "user_0001";
+	
     const userCode = "imp38113060";
     IMP.init(userCode); 
     
@@ -160,8 +162,12 @@
         name: "포인트 : " + amount + "P" , // 출력할 상품정보 이름
         pay_method: "card", 
         escrow: false,
-        amount: amount*1.1,
+        amount: payAmount,
+        buytype : "구매",
+        description : amount + "P 포인트 구매",
         tax_free: 3000,
+        /* buyer_id : "user_0001", ---> 이곳에 넣어줘도 response에 넘어가지 않는다. */
+        // 
         buyer_name: "홍길동",
         buyer_email: "buyer@example.com",
         buyer_tel: "02-1670-5176",
@@ -185,19 +191,26 @@
     	 }
     	 //서버요청 저장하기 로직 구현
     	 /* const endpointResponse=await fetch(""); */
-    	 sendToServer(response);
+    	 sendToServer(response,amount,userId);
     	 
       },
     );
   } 
  
-  function sendToServer(response) {
+  function sendToServer(response,amount,userId) {
 	  
     fetch("<%=request.getContextPath()%>/point/verifyPayment", {
       method: "POST",
+      // 여기서도 서버에서 받는 것이므로 JSON형태로 받아야한다.
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ imp_uid: response.imp_uid ,
-    	  merchant_uid: response.merchant_uid
+      body: JSON.stringify({
+    	imp_uid: response.imp_uid,
+    	merchant_uid: response.merchant_uid,
+        buyer_id: userId,
+        amount: amount,
+        buytype: "구매",
+        description: amount + "P 포인트 구매",
+        
       	}) 
       })
       .then(response=>response.json())

@@ -91,5 +91,24 @@ public enum TimeRecordDao {
 		}
 		return trList;
 	}
+	
+	public List<TimeRecord> searchTimeTodayAll(Connection conn, LocalDateTime startDate, LocalDateTime endDate) {
+		List<TimeRecord> trList = new ArrayList<TimeRecord>();
+		try {
+			pstmt = conn.prepareStatement(sql.getProperty("searchTimeTodayAll"));
+			pstmt.setTimestamp(1,  Timestamp.valueOf(startDate));
+			pstmt.setTimestamp(2,  Timestamp.valueOf(endDate));
+			rs = pstmt.executeQuery();
+			while (rs.next()) {
+				trList.add(getTime(rs));
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			JDBCTemplate.close(rs);
+			JDBCTemplate.close(pstmt);
+		}
+		return trList;
+	}
 }
 

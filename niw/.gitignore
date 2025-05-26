@@ -8,3 +8,4 @@ Scripts/
 .settings/
 src/main/resources/
 bin/
+.dbeaver/
