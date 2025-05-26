@@ -100,7 +100,7 @@ public class PointAddCheckServlet extends HttpServlet {
 			// 3. 검증 (예: 우리 DB에서 주문 가격이 11000원이라고 가정)
 
 			System.out.println(jsonRequest.get("amount"));
-			int expectedAmount = jsonRequest.get("amount").getAsInt(); // TODO: merchantUid로 DB에서 주문 조회
+			int expectedAmount = jsonRequest.get("amount").getAsInt();
 			System.out.println(expectedAmount);
 
 			if (paidAmount == expectedAmount && "paid".equals(status)) {
@@ -115,8 +115,14 @@ public class PointAddCheckServlet extends HttpServlet {
 				String pointDescription = jsonRequest.get("description").getAsString();
 				int pointAmount = jsonRequest.get("pointAmount").getAsInt();
 
-				Point p = Point.builder().pointId(pointId).userId(userId).pointType(pointType).pointAmount(pointAmount)
-						.price(pointPrice).pointDescription(pointDescription).build();
+				Point p = Point.builder()
+						.pointId(pointId)
+						.userId(userId)
+						.pointType(pointType)
+						.pointAmount(pointAmount)
+						.price(pointPrice)
+						.pointDescription(pointDescription)
+						.build();
 
 				int result = PointService.ponitService().insertPointHistory(p);
 				System.out.println(result);

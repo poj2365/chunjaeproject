@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.niw.common.CommonTemplate;
+import com.niw.point.model.dto.PointRefund;
 
 /**
  * Servlet implementation class PointRefundServlet
@@ -23,7 +24,23 @@ public class PointRefundServlet extends HttpServlet {
 
 	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		request.getRequestDispatcher("WEB-INF/views/point/refundPoint.jsp").forward(request, response);
+
+		String userId = request.getParameter("userId");
+		String refundType = request.getParameter("refundType");
+		int fileId = Integer.parseInt(request.getParameter("fileId"));
+		int refundPoint = Integer.parseInt(request.getParameter("refundPoint"));
+		String refundStatus = request.getParameter("refundStatus");
+		String refundAccount = request.getParameter("refundAccount");
+		
+		PointRefund p = PointRefund.builder()
+				.userId(userId)
+				.refundAccount(refundType)
+				.fileId(fileId)
+				.refundPoint(refundPoint)
+				.refundStatus(refundStatus)
+				.refundAccount(refundAccount)
+				.build();
+		
 	}
 
 	/**

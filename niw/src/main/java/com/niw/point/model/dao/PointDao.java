@@ -45,7 +45,7 @@ public class PointDao {
 //	        e.printStackTrace();
 //	    }
 //	}
-//	
+
 	public static PointDao pointDao() {
 		return DAO;
 	}
@@ -54,6 +54,7 @@ public class PointDao {
 		int result =0;
 		
 		try {
+
 			System.out.println(sql.getProperty("insertPointHistory"));
 			pstmt =  conn.prepareStatement(sql.getProperty("insertPointHistory"));// -> 이게 왜 null?
 			pstmt.setLong(1, p.getPointId());
@@ -62,7 +63,7 @@ public class PointDao {
 			pstmt.setInt(4, p.getPointAmount());
 			pstmt.setInt(5, p.getPrice());
 			pstmt.setString(6, p.getPointDescription());
-			result = pstmt.executeUpdate();
+			result =pstmt.executeUpdate();
 			
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -76,7 +77,11 @@ public class PointDao {
 	public int refundPointHistory(Connection conn, PointRefund p) {
 		int result = 0;
 		try{
-			pstmt=conn.prepareStatement(sql.getProperty("refundPoint"));
+
+			// String sql = "INSERT INTO REFUND_POINT VALUES(?,?,?,?,?,?,?)";
+
+			pstmt =  conn.prepareStatement(sql.getProperty("refundPoint"));
+
 			pstmt.setString(1, p.getUserId());
 			pstmt.setString(3, p.getRefundType());
 			pstmt.setInt(4 , p.getFileId());

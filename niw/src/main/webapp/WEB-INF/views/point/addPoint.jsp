@@ -137,22 +137,16 @@
 
 <script>
 
-  
-   const merchantuid = function generateMerchantUid(){
-		  return Date.now().toString();
-	}
-   
-   
-   
+   <%-- const buyerId = "<%= loginMember.getUserId() %>"; 로그인이 가능해지면 이거를 사용해서 넘겨주기  --%>
+ 
   function requestPay() {
-    const pointAmount = parseInt(document.getElementById('amount').value);
-    if (isNaN(pointAmount)) {
+    const amount = parseInt(document.getElementById('amount').value);
+    if (isNaN(amount)) {
        alert("충전할 포인트를 선택해주세요.");
       return; 
     }
 
-    const payAmount = Math.floor(pointAmount * 1.1);
-    
+    const payAmount = Math.floor(amount * 1.1);  
 	const userId = "<%=loginUser.userId()%>";
     const userCode = "imp38113060";
     IMP.init(userCode); 
@@ -160,8 +154,8 @@
     IMP.request_pay(
       {
         channelKey: "channel-key-0444714e-72d4-48cc-a56d-8cf57cdd64db", // 내가 발급한 채널키
-        merchant_uid: merchantuid(),
-        name: "포인트 : " + pointAmount + "P" , // 출력할 상품정보 이름
+        merchant_uid: Math.floor(Math.random()*1000000000),
+        name: "포인트 : " + amount + "P" , // 출력할 상품정보 이름
         pay_method: "card", 
         escrow: false,
         amount: payAmount,
@@ -189,36 +183,16 @@
     	 if(response.error_code != null){
     		  return alert("결제가 정상적으로 처리되지 않았습니다.");
     	 }
-    <%-- 	 const merchantUid = response.merchant_uid;
-    	 const amount = response.amount;
-    	 const userid = response.userId;  "<%= loginUser.getUserId() %>"
-    	 
-    	 // 주문정보를 저장하는 로직
-    	 await fetch("<%=request.getContextPath()%>/point/saveOrder", {
-    		    method: 'POST',
-    		    headers: {
-    		        'Content-Type': 'application/json'
-    		    },
-    		    body: JSON.stringify({
-    		        merchant_uid: merchantUid,
-    		        amount: amount,
-    		        user_id: userId,
-    		        point_type: '충전',
-    		        description: `${amount}P 충전`
-    		    })
-    		})
- 		 --%>
-    	 // 검증하는 로직
-    	sendToServer(response,userId,payAmount,pointAmount);
+    	 //서버요청 저장하기 로직 구현
+    	 /* const endpointResponse=await fetch(""); */
+    	 sendToServer(response,amount,userId);
     	 
       },
     );
   } 
  
-  
-  
-  function sendToServer(response,userId,payAmount,pointAmount) {
-	  console.log(response);
+  function sendToServer(response,amount,userId) {
+	  
     fetch("<%=request.getContextPath()%>/point/verifyPayment", {
       method: "POST",
       // 여기서도 서버에서 받는 것이므로 JSON형태로 받아야한다.
@@ -227,10 +201,11 @@
     	imp_uid: response.imp_uid,
     	merchant_uid: response.merchant_uid,
         buyer_id: userId,
-        amount: payAmount,
+        amount: amount*1.1, 
         buytype: "구매",
-        description: pointAmount + "P 포인트 구매",
-        pointAmount : pointAmount
+        description: amount + "P 포인트 구매",
+        pointAmount : amount
+
         
       	}) 
       })

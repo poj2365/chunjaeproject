@@ -44,6 +44,7 @@ public class PointService {
 		JDBCTemplate.close(conn);
 		return result;
 	}
+
 	
 	public int chargePoint(int addpoint, String userId ) {
 		Connection conn = JDBCTemplate.getConnection();
@@ -58,5 +59,6 @@ public class PointService {
 	}
 	
 	
+
 
 }

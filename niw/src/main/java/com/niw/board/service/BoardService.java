@@ -10,7 +10,6 @@ import java.util.List;
 
 import com.niw.board.model.dao.BoardDao;
 import com.niw.board.model.dto.Article;
-import com.niw.board.model.dto.Comment;
 
 public enum BoardService {
 	SERVICE;
@@ -38,19 +37,5 @@ public enum BoardService {
 		else rollback(conn);
 		close(conn);
 		return result;
-	}
-	
-	public Article searchArticleById(int articleId) {
-		Connection conn = getConnection();
-		Article article = BoardDao.DAO.searchArticleById(conn, articleId);
-		close(conn);
-		return article;
-	}
-	
-	public List<Comment> searchCommentByArticle(int articleId) {
-		Connection conn = getConnection();
-		List<Comment> comments = BoardDao.DAO.searchCommentByArticle(conn, articleId);
-		close(conn);
-		return comments;
 	}
 }

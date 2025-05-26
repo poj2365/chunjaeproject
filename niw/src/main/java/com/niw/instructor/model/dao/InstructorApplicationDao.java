@@ -30,8 +30,6 @@ public enum InstructorApplicationDao {
 		}
 	}
 
-	
-	
 	public int instructorApply(Connection conn, InstructorApplication instructorApplication) {
 		int result = 0;
 

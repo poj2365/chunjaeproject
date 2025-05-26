@@ -1,9 +1,4 @@
 @charset "UTF-8";
-
-.cursor-pointer{
-	cursor: pointer;
-}
-
 .board-wrapper {
 	width: 100%;
 	display: flex;
