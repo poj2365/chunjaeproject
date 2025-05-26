@@ -11,6 +11,12 @@
   </properties>
   
   <dependencies>
+  	<dependency>
+    <groupId>org.apache.pdfbox</groupId>
+    <artifactId>pdfbox</artifactId>
+    <version>3.0.1</version>
+</dependency>
+  
   
       <!-- JavaMail API -->
     <dependency>
@@ -73,6 +79,11 @@
     <version>2.13.1</version>
 </dependency>
 	
+	  <dependency>
+        <groupId>org.json</groupId>
+        <artifactId>json</artifactId>
+        <version>20230227</version>
+    </dependency>
   </dependencies>
   
   <build>
