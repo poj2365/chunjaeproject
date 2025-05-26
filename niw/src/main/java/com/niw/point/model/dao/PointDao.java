@@ -22,28 +22,28 @@ public class PointDao {
 	
 	private static final PointDao DAO = new PointDao();
 	
-//	private  PointDao() {
-//		String path = PointDao.class.getResource("sql/point_sql.properties").getPath();
-//		try(FileReader fr=new FileReader(path)) {
-//			sql.load(fr);
-//		}catch(IOException e) {
-//			e.printStackTrace();
-//		}
-//	}
-	private PointDao() {
-	    try {
-	        URL url = PointDao.class.getClassLoader().getResource("sql/point_sql.properties");
-	        if (url == null) {
-	            throw new RuntimeException("point_sql.properties 파일을 classpath에서 찾을 수 없습니다.");
-	        }
-	        String path = url.getPath();
-	        try (FileReader fr = new FileReader(path)) {
-	            sql.load(fr);
-	        }
-	    } catch (IOException e) {
-	        e.printStackTrace();
-	    }
+	private  PointDao() {
+		String path = PointDao.class.getResource("/sql/point_sql.properties").getPath();
+		try(FileReader fr=new FileReader(path)) {
+			sql.load(fr);
+		}catch(IOException e) {
+			e.printStackTrace();
+		}
 	}
+//	private PointDao() {
+//	    try {
+//	        URL url = PointDao.class.getClassLoader().getResource("sql/point_sql.properties");
+//	        if (url == null) {
+//	            throw new RuntimeException("point_sql.properties 파일을 classpath에서 찾을 수 없습니다.");
+//	        }
+//	        String path = url.getPath();
+//	        try (FileReader fr = new FileReader(path)) {
+//	            sql.load(fr);
+//	        }
+//	    } catch (IOException e) {
+//	        e.printStackTrace();
+//	    }
+//	}
 	
 	public static PointDao pointDao() {
 		return DAO;
@@ -53,9 +53,9 @@ public class PointDao {
 		int result =0;
 		
 		try {
-			// pstmt =  conn.prepareStatement(sql.getProperty("insertPointHistory"));// -> 이게 왜 null?
-			String sql = "INSERT INTO POINTS VALUES(?,?,?,?,?,SYSDATE)";
-			pstmt=conn.prepareStatement(sql);
+			pstmt =  conn.prepareStatement(sql.getProperty("insertPointHistory"));// -> 이게 왜 null?
+			//String sql = "INSERT INTO POINTS VALUES(?,?,?,?,?,SYSDATE)";
+//			pstmt=conn.prepareStatement(sql);
 			pstmt.setLong(1, p.getPointId());
 			pstmt.setString(2, p.getUserId());
 			pstmt.setInt(3, p.getPointAmount());
@@ -76,8 +76,9 @@ public class PointDao {
 	public int refundPointHistory(Connection conn, PointRefund p) {
 		int result = 0;
 		try{
-			String sql = "INSERT INTO REFUND_POINT VALUES(?,?,?,?,?,?,?)";
-			pstmt=conn.prepareStatement(sql);
+			// String sql = "INSERT INTO REFUND_POINT VALUES(?,?,?,?,?,?,?)";
+//			pstmt=conn.prepareStatement(sql);
+			pstmt =  conn.prepareStatement(sql.getProperty("refundPoint"));
 			pstmt.setString(1, p.getUserId());
 			pstmt.setString(3, p.getRefundType());
 			pstmt.setInt(4 , p.getFileId());
