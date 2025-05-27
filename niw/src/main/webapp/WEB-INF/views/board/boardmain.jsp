@@ -28,20 +28,20 @@
 							active
 					<%} %>
 				">
-					<a href="javascript:void(0);" onclick="activeChange(event);" data-category="0">전체글</a>
+					<a href="javascript:void(0);" onclick="activeChange(event, '/board/articlelist.do');" data-category="0">전체글</a>
 				</li>
 				<li class="list-group-item <%if(category == 1){ %>
 						active
 					<%} %>
 				">
-					<a href="javascript:void(0);" onclick="activeChange(event);" data-category="1">일반글</a>
+					<a href="javascript:void(0);" onclick="activeChange(event, '/board/articlelist.do');" data-category="1">일반글</a>
 				</li>
 				<li class="list-group-item 
 					<%if(category == 2){ %>
 						active
 					<%} %>
 				">
-					<a href="javascript:void(0);" onclick="activeChange(event);" data-category="2">질문글</a>
+					<a href="javascript:void(0);" onclick="activeChange(event, '/board/articlelist.do');" data-category="2">질문글</a>
 				</li>
 			</ul>
 		</div>			
@@ -55,14 +55,14 @@
 			</div>
 			<div class="col-lg-7 d-flex justify-content-end align-items-end">
 				<div>
-					<select id="order" class="form-select form-select-sm" onchange="searchArticle()">
+					<select id="order" class="form-select form-select-sm" onchange="searchArticle('1', '/board/articlelist.do')">
 						<option value="0" selected>게시일순</option>
 						<option value="1">추천수순</option>
 						<option value="2">조회수순</option>
 					</select>
 				</div>
 				<div>
-					<select id="numPerPage" class="form-select form-select-sm" onchange="searchArticle()">
+					<select id="numPerPage" class="form-select form-select-sm" onchange="searchArticle('1', '/board/articlelist.do')">
 						<option selected value="10">게시글수</option>
 						<option value="10">10</option>
 						<option value="30">30</option>
@@ -120,15 +120,15 @@
 								} %>
 							</span>
 							<span class="overflow-hidden">
-								<a href="/board/boarddetail.do?articleId=<%=article.articleId()%>" class="text-decoration-none text-black">
+								<a href="<%=request.getContextPath()%>/board/boarddetail.do?articleId=<%=article.articleId()%>" class="text-decoration-none text-black">
 									<%= article.articleTitle() %>
 								</a>
 							</span>
 						</div>
 						<ul class="list-unstyled row flex-row g-1 col-lg-6">
-							<li class="col-lg-2"><i class="bi-eye"></i> <%= article.articleViews() %></li>
-							<li class="col-lg-2"><i class="bi-hand-thumbs-up"></i> <%= article.articleLikes() %></li>
-							<li class="col-lg-2"><i class="bi-chat"></i> <%= article.commentCount() %></li>
+							<li class="col-lg-2"><i class="bi-eye"><%= article.articleViews() %></i></li>
+							<li class="col-lg-2"><i class="bi-hand-thumbs-up"><%= article.articleLikes() %></i></li>
+							<li class="col-lg-2"><i class="bi-chat"><%= article.commentCount() %></i></li>
 							<li class="col-lg-6"><%= article.userId()%> &middot; <%
 								if(timeFlag){
 									if(hours > 0){%><%=String.valueOf(hours)+"시간전"%>
@@ -142,17 +142,21 @@
 					</div>
 					<hr>
 				<%}
-			}%> 
+			} else if(articles != null && articles.isEmpty()){%> 
+				<div class="text-center">
+					<b> 조회된 결과가 없습니다.</b>
+				</div>
+			<% } %>
 				
 		</div>
 		<!-- 게시글 하단 선택요소 -->
 		<div class="row flex-row justify-content-between mt-4">
 			<div class="col-8 ml-4" id="search">
 				<input type="text" placeholder="게시글 검색">
-				<button type="button" class="btn btn-primary" onclick="searchArticle()"> 검색 </button>
+				<button type="button" class="btn btn-primary" onclick="searchFlag('1', '/board/articlelist.do')"> 검색 </button>
 			</div>
 			<div class="col-2">
-				<select id="likes" class="form-select form-select-sm w-auto mr-4" onchange="searchArticle()">
+				<select id="likes" class="form-select form-select-sm w-auto mr-4" onchange="searchArticle('1', '/board/articlelist.do')">
 					<option value="0" selected>추천수</option>
 					<option value="0">전체</option>
 					<option value="5">5개 이상</option>

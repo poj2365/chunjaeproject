@@ -15,15 +15,16 @@ import com.google.gson.Gson;
 import com.niw.board.model.dto.Article;
 import com.niw.board.service.BoardService;
 
-@WebServlet("/board/articlelist.do")
-public class ArticleListServlet extends HttpServlet {
+@WebServlet("/board/underarticle.do")
+public class UnderBoardServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-    public ArticleListServlet() {
+       
+    public UnderBoardServlet() {
         super();
     }
 
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		BufferedReader reader = request.getReader();
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    	BufferedReader reader = request.getReader();
 		Gson gson = new Gson();
 		Map<String, Object> restrictData = gson.fromJson(reader, Map.class);
 		int category = Integer.parseInt(((String) restrictData.get("category")));
@@ -87,9 +88,8 @@ public class ArticleListServlet extends HttpServlet {
 		pageBar.append("</li>");
 		pageBar.append("</ul>");
 		List<Article> articles = BoardService.SERVICE.searchArticle(category, searchData, likes, order, cPage, numPerPage, totalData);
-		new Gson().toJson(Map.of("articles",articles, "pageBar", pageBar),response.getWriter());
-		
-	}
+		new Gson().toJson(Map.of("articles", articles, "pageBar", pageBar),response.getWriter());
+    }
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		doGet(request, response);
