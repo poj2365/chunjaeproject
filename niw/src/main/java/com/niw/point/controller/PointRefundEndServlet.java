@@ -1,6 +1,10 @@
 package com.niw.point.controller;
 
 import java.io.IOException;
+import java.sql.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -30,22 +34,26 @@ public class PointRefundEndServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String userId = request.getParameter("userId");
-		String refundDate = request.getParameter("refundDate");
-		
+		String refunddate = request.getParameter("refundDate");
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		Date refundDate = null;
+//		try {
+//			 // refundDate = sdf.parse(refunddate);
+//		} catch(ParseException e) {
+//			e.printStackTrace();
+//		}
 		String refundType = request.getParameter("refundType");
-		System.out.println(refundType);
-		
-		int fileId = Integer.parseInt(request.getParameter("fileId"));
 		int refundPoint = Integer.parseInt(request.getParameter("refundPoint"));
-		String refundStatus = request.getParameter("refundStatus");
-		String refundAccount = request.getParameter("refundAccount");
+		int refundAmount = (int)(Integer.parseInt(request.getParameter("refundPoint"))*0.9);
+		String refundAccount = request.getParameter("accountNumber");
 		
 		PointRefund p = PointRefund.builder()
 				.userId(userId)
-				.refundAccount(refundType)
-				.fileId(fileId)
-				.refundPoint(refundPoint)
-				.refundAccount(refundAccount)
+				.refundDate(refundDate)
+				.refundType(refundType)
+				
+				
+
 				.build();
 		
 		int result = PointService.ponitService().refundPointHistoy(p);
@@ -57,7 +65,6 @@ public class PointRefundEndServlet extends HttpServlet {
 			System.out.println("포인트 환불 기록 실패");
 			request.setAttribute("message", "환불 요청이 실패했습니다.");
 		}
-		
 		request.getRequestDispatcher("/views/point/refundResult.jsp").forward(request, response);
 		
 	}

@@ -78,15 +78,11 @@ public class PointDao {
 	public int refundPointHistory(Connection conn, PointRefund p) {
 		int result = 0;
 		try{
-
-			// String sql = "INSERT INTO REFUND_POINT VALUES(?,?,?,?,?,?,?)";
-
 			pstmt =  conn.prepareStatement(sql.getProperty("refundPoint"));
 
 			pstmt.setString(1, p.getUserId());
 			pstmt.setString(3, p.getRefundType());
 			pstmt.setInt(4 , p.getFileId());
-			pstmt.setInt(5, p.getRefundPoint());
 			pstmt.setString(7, p.getRefundAccount());
 			
 			result = pstmt.executeUpdate();
@@ -99,6 +95,34 @@ public class PointDao {
 		}
 		return result;
 	}
+	
+	public int refundFileHistory(Connection conn, PointRefund p) {
+		int result = 0;
+		try{
+			pstmt =  conn.prepareStatement(sql.getProperty("refundPoint"));
+			pstmt.setString(1, p.getUserId());
+			pstmt.setString(3, p.getRefundType());
+			pstmt.setInt(4 , p.getFileId());
+			pstmt.setString(7, p.getRefundAccount());
+			
+			result = pstmt.executeUpdate();
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			JDBCTemplate.close(rs);
+			JDBCTemplate.close(pstmt);
+		}
+		return result;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	public int chargePoint (Connection conn, String userId, int addpoint) {
 		int result = 0;

@@ -238,7 +238,7 @@ if (loginUser == null) {
             <tr>
                 <th>회원 ID</th>
                 <td>
-                    <input type="text" class="form-input" value="<%=loginUser.userId()%>" disabled>
+                    <input type="text" name="userId" value="<%=loginUser.userId()%>" disabled>
                 </td>
             </tr>
             <tr id="row-refund-id" style="display: ;" >
@@ -292,12 +292,19 @@ if (loginUser == null) {
             </tr>   
         </table>
         
-        
-        <div style="text-align: right; margin-top: 20px;">
-            <button type="submit" class="btn btn-primary">
-                <i class="bi bi-check-circle me-1"></i>환불 신청하기
+    
+        <div id="completepoint" style="text-align: right; margin-top: 20px; display: none;">
+            <button type="submit" class="btn btn-primary" >
+                <i class="bi bi-check-circle me-1"></i>포인트 환불 신청하기
             </button>
         </div>
+        
+        <div id="completefile" style="text-align: right; margin-top: 20px; display: none;">
+            <button type="submit" class="btn btn-primary" >
+                <i class="bi bi-check-circle me-1"></i>파일 환불 신청하기
+            </button>
+        </div>
+        
     </form>
 </div>
 
@@ -305,7 +312,6 @@ if (loginUser == null) {
 </div>
 
 <script>
-	
 	document.addEventListener('DOMContentLoaded', function () {
 	  const refundTypeRadios = document.querySelectorAll('input[name="refundType"]');
 	
@@ -313,22 +319,34 @@ if (loginUser == null) {
 	  const dPointRow = document.getElementById('row-dpoint-id');
 	  const pointRow = document.getElementById('row-point-id');
 	  const bankAccount = document.getElementById('row-bankAccount-id');
+	  const completepoint = document.getElementById('completepoint');
+	  const completefile = document.getElementById('completefile');
+	  
 	
+	  
 	  documentRow.style.display = 'none';
 	  dPointRow.style.display = 'none';
 	  pointRow.style.display = 'none';
 	  bankAccount.style.display ='none';
+	  completepoint.style.display='none';
+	  completefile.style.display='none';
+
 	
 	  refundTypeRadios.forEach(radio => {
 	    radio.addEventListener('change', () => {
 	      if (radio.value === 'file') {
 	        documentRow.style.display = '';
 	        dPointRow.style.display = '';
+	        completefile.style.display='';
+	        completepoint.style.display='none';
 	        pointRow.style.display = 'none';
 	        bankAccount.style.display='none';
+
 	      } else if (radio.value === 'point') {
 	        documentRow.style.display = 'none';
 	        dPointRow.style.display = 'none';
+	        completefile.style.display='none';
+	        completepoint.style.display='';
 	        pointRow.style.display = '';
 	        bankAccount.style.display='';
 	      }
@@ -336,7 +354,6 @@ if (loginUser == null) {
 	  });
 	  
 	  
-	
 	  // 환불 요청일 자동 설정
 	  const dateInput = document.getElementById('refundDateInput');
 	  if (dateInput) {

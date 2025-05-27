@@ -44,6 +44,18 @@ public class PointService {
 		JDBCTemplate.close(conn);
 		return result;
 	}
+	
+	public int refundFile66Histoy(PointRefund p) {
+		Connection conn = JDBCTemplate.getConnection();
+		int result = dao.refundPointHistory(conn, p);
+		if (result > 0) {
+			JDBCTemplate.commit(conn);	
+		} else {
+			JDBCTemplate.rollback(conn);	
+		}
+		JDBCTemplate.close(conn);
+		return result;
+	}
 
 	
 	public int chargePoint(int addpoint, String userId ) {
