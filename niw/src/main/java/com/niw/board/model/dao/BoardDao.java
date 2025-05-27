@@ -177,4 +177,181 @@ public enum BoardDao {
 					  .build();
 		
 	}
+	
+	public int deleteBookmark(Connection conn, String userId, String articleId) {
+		int result = 0;
+		try {
+			pstmt = conn.prepareStatement(sqlPro.getProperty("deleteBookmark"));
+			pstmt.setInt(1, Integer.parseInt(articleId));
+			pstmt.setString(2, userId);
+			result = pstmt.executeUpdate();
+		} catch(SQLException e) {
+			e.printStackTrace();
+		} finally {
+			close(pstmt);
+		}
+		return result;
+	}
+	
+	public int saveBookmark(Connection conn, String userId, String articleId) {
+		int result = 0;
+		try {
+			pstmt = conn.prepareStatement(sqlPro.getProperty("saveBookmark"));
+			pstmt.setInt(1, Integer.parseInt(articleId));
+			pstmt.setString(2, userId);
+			result = pstmt.executeUpdate();
+		} catch(SQLException e) {
+			e.printStackTrace();
+		} finally {
+			close(pstmt);
+		}
+		return result;
+	}
+	
+	public int searchBookmark(Connection conn, String userId, int articleId) {
+		int bookmark = 0;
+		try {
+			pstmt = conn.prepareStatement(sqlPro.getProperty("searchBookmark"));
+			pstmt.setInt(1, articleId);
+			pstmt.setString(2, userId);
+			rs = pstmt.executeQuery();
+			while(rs.next()) {
+				bookmark = rs.getInt(1);
+			}
+		} catch(SQLException e) {
+			e.printStackTrace();
+		} finally {
+			close(rs);
+			close(pstmt);
+		}
+		return bookmark;
+	}
+	
+	public int searchReport(Connection conn, String userId, int targetId, String targetType) {
+		int result = 0;
+		try {
+			pstmt = conn.prepareStatement(sqlPro.getProperty("searchReport"));
+			pstmt.setString(1, userId);
+			pstmt.setInt(2, targetId);
+			pstmt.setString(3, targetType);
+			rs = pstmt.executeQuery();
+			while(rs.next()) {
+				result = rs.getInt(1);
+			}
+		} catch(SQLException e) {
+			e.printStackTrace();
+		} finally {
+			close(rs);
+			close(pstmt);
+		}
+		return result;
+	}
+	
+	public int saveReport(Connection conn, String userId, int targetId, String targetType, String reason, String details) {
+		int result = 0;
+		try {
+			pstmt = conn.prepareStatement(sqlPro.getProperty("saveReport"));
+			pstmt.setString(1, userId);
+			pstmt.setString(2, reason);
+			pstmt.setString(3, details);
+			pstmt.setString(4, targetType);
+			pstmt.setInt(5, targetId);
+			result = pstmt.executeUpdate();
+		} catch(SQLException e) {
+			e.printStackTrace();
+		} finally {
+			close(pstmt);
+		}
+		return result;
+	}
+	
+	public int saveRecommend(Connection conn, String userId, int recType, String boardType, int targetId) {
+		int recommend = 0;
+		try {
+			pstmt = conn.prepareStatement(sqlPro.getProperty("saveRecommend"));
+			pstmt.setString(1, userId);
+			pstmt.setInt(2, recType);
+			pstmt.setString(3, boardType);
+			pstmt.setInt(4, targetId);
+			recommend = pstmt.executeUpdate();
+		} catch(SQLException e) {
+			e.printStackTrace();
+		} finally {
+			close(pstmt);
+		}
+		return recommend;
+	}
+	
+	public int deleteRecommend(Connection conn, String userId, int recType, String boardType, int targetId) {
+		int recommend = 0;
+		try {
+			pstmt = conn.prepareStatement(sqlPro.getProperty("deleteRecommend"));
+			pstmt.setString(1, userId);
+			pstmt.setInt(2, recType);
+			pstmt.setString(3, boardType);
+			pstmt.setInt(4, targetId);
+			recommend = pstmt.executeUpdate();
+		} catch(SQLException e) {
+			e.printStackTrace();
+		} finally {
+			close(pstmt);
+		}
+		return recommend;
+	}
+	
+	public int searchRecommend(Connection conn, String userId, int recType, String boardType, int targetId) {
+		int recommendFlag = 0;
+		try {
+			pstmt = conn.prepareStatement(sqlPro.getProperty("searchRecommend"));
+			pstmt.setString(1, userId);
+			pstmt.setInt(2, recType);
+			pstmt.setString(3, boardType);
+			pstmt.setInt(4, targetId);
+			rs = pstmt.executeQuery();
+			while(rs.next()) {
+				recommendFlag = rs.getInt(1);
+			}
+		} catch(SQLException e) {
+			e.printStackTrace();
+		} finally {
+			close(pstmt);
+		}
+		return recommendFlag;
+	}
+	
+	public int increaseRecommend(Connection conn, int recType, String boardType, int targetId) {
+		int changeArticle = 0;
+		try {
+			String sql = sqlPro.getProperty("increaseRecommend");
+			String boards = boardType.equals("ARTICLE")? "ARTICLE" : "COMMENT";
+			String ld = recType == 0? "DISLIKES" : "LIKES";
+			sql=sql.formatted(boardType.equals("ARTICLE")? "ARTICLE" : "COMMENTS", boards + "_" + ld, boards + "_" + ld, boards + "_ID");
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, targetId);
+			changeArticle = pstmt.executeUpdate();
+		} catch(SQLException e) {
+			e.printStackTrace();
+		} finally {
+			close(pstmt);
+		}
+		return changeArticle;
+	}
+	
+	public int decreaseRecommend(Connection conn, int recType, String boardType, int targetId) {
+		int changeArticle = 0;
+		try {
+			String sql = sqlPro.getProperty("decreaseRecommend");
+			String boards = boardType.equals("ARTICLE")? "ARTICLE" : "COMMENT";
+			String ld = recType == 0? "DISLIKES" : "LIKES";
+			sql=sql.formatted(boardType.equals("ARTICLE")? "ARTICLE" : "COMMENTS", boards + "_" + ld, boards + "_" + ld, boards + "_ID");
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, targetId);
+			changeArticle = pstmt.executeUpdate();
+		} catch(SQLException e) {
+			e.printStackTrace();
+		} finally {
+			close(pstmt);
+		}
+		return changeArticle;
+	}
 }

@@ -3,26 +3,26 @@ const getContextPath = () => {
 	return "/" + window.location.pathname.split("/")[1];
 }
 
-const activeChange = (e) => {
+const activeChange = (e, url) => {
 	$("#category > li").toArray().forEach(li => {
 	    li.classList.remove("active");
 	});
 	$(e.target.parentNode).addClass("active");
-	searchArticle('1');
+	searchArticle('1', url);
 }
 
-let flag = false;
 
-const searchArticle = (cPage) => {
+const searchArticle = (cPage, url) => {
 	const category = $("#category>li.active>a")[0].getAttribute('data-category');
 	const order = $("#order")[0].value;
 	const numPerPage = $("#numPerPage")[0].value;
 	const likes = $("#likes")[0].value;
 	let searchData = $("#search>input")[0].value;
-	if(!flag){
+	if(sessionStorage.getItem("flag") == null){
 		searchData = "";
 	}
 	const restrictData = {
+		 "url": url,
 		 "category":category,
 		 "searchData":searchData,
 		 "order":order,
@@ -31,9 +31,9 @@ const searchArticle = (cPage) => {
 		 "cPage":cPage
 	 };
 		 
-	fetch(getContextPath() + "/board/articlelist.do", {
+	fetch(getContextPath() + url, {
 		method: "post",
-		header: {
+		headers: {
 			"Content-type":"application/json;charset=utf-8"
 		},
 		body: JSON.stringify(restrictData)
@@ -49,20 +49,21 @@ const searchArticle = (cPage) => {
 		const $article = $("#article-container");
 		$article.html("");
 		const articles = data["articles"];
-		const category = $("#category>li.active>a")[0].getAttribute('data-category');
-		const order = $("#order")[0].value;
-		const numPerPage = $("#numPerPage")[0].value;
-		const likes = $("#likes")[0].value;
-		let searchData = $("#search>input")[0].value;
-		for(let article of articles){
-			$article.append(getArticle(
-				article,
-				category,
-				order,
-				numPerPage,
-				likes,
-				searchData
-			)).append($("<hr>"));
+		if(articles.length > 0){
+			for(let article of articles){
+				$article.append(getArticle(
+					article, 
+					category, 
+					searchData,
+					order, 
+					numPerPage, 
+					likes, 
+					cPage,
+					url
+				)).append($("<hr>"));
+			}
+		} else {
+			$article.append($("<div>").addClass("text-center").append($("<b>").text("조회된 결과가 없습니다."))).append($("<hr>"));
 		}
 		const $pageBar = $("#page-bar");
 		$pageBar.html(data["pageBar"]);
@@ -70,19 +71,20 @@ const searchArticle = (cPage) => {
 	)
 }
 
-const searchFlag = (cPage) => {
-	flag = true;
-	searchArticle(cPage);
+const searchFlag = (cPage, url) => {
+	sessionStorage.setItem("flag", true);
+	searchArticle(cPage, url);
 }
 
-
 const getArticle = (
-	article,
-	category,
-	order,
-	numPerPage,
-	likes,
-	searchData
+			article, 
+			category, 
+			searchData,
+			order, 
+			numPerPage, 
+			likes, 
+			cPage,
+			url
 	) => {
 	const $form = $("<div>").addClass("row flex-row justify-content-between align-item-center");
 	const $container = $("<div>").addClass("col-lg-6 d-flex align-items-center");
@@ -101,12 +103,13 @@ const getArticle = (
 	const $title = $("<span>").addClass("overflow-hidden");
 	const $a = $("<a>").addClass("text-decoration-none text-black").attr("href", 
 		getContextPath() + "/board/boarddetail.do?articleId="
-				 + article['articleId'] + "&category=" 
-				 + category + "&order=" 
-				 + order + "&numPerPage="
-				 + numPerPage + "&likes="
-				 + likes + "&searchData="
-				 + searchData
+					 + article['articleId'] + "&category="
+					 + category + "&searchData="
+					 + searchData + "&order="
+					 + order + "&numPerPage="
+					 + numPerPage + "&likes="
+					 + likes + "&cPage="
+					 + cPage					 
 		)
 	$a.text(article['articleTitle']);
 	$title.append($a);
@@ -207,4 +210,159 @@ const writeComment = (e, level) => {
 	}
 }
 
+const saveBookmark = (userId, articleId) => {
+	if(userId != null){
+		const bookmarkFlag = $("#bookmark")[0].getAttribute('data-flag');
+		fetch(getContextPath() + "/board/savebookmark.do", {
+			method: "post",
+			headers: {
+				"Content-type":"application/json;charset=utf-8"
+			},
+			body: JSON.stringify({
+				"bookmarkFlag": bookmarkFlag,
+				"userId":userId, 
+				"articleId":articleId
+			})
+		})
+		.then(response => {
+			if(response.ok){
+				return response.json();
+			} else {
+				throw new Error('bookmark fail');
+			}
+		})
+		.then(data => {
+			const result = data['result'];
+			const bookmarkFlag = data['bookmarkFlag'];
+			if(result > 0){
+				const $bookmark = $("#bookmark");
+				const $i = $($bookmark).find("i");
+				if(bookmarkFlag == '0'){
+					$bookmark.attr('data-flag', '1');
+					$bookmark.addClass("btn-outline-warning");
+					$i.removeClass("bi-bookmark");
+					$i.addClass("bi-bookmark-fill");
+				} else{
+					$bookmark.attr('data-flag', '0');
+					$i.addClass("bi-bookmark");
+					$i.removeClass("bi-bookmark-fill");
+					$bookmark.removeClass("btn-outline-warning");
+				}
+			}
+		})
+	} else {
+		alert("로그인이 필요한 기능입니다.");
+	}
+}
 
+const saveReport = () => {
+	const $form = $("#reportForm");
+	const userId = $form.find("#reportUserId").val();
+	if(userId != null && userId.trim() !== ""){
+		const targetId = $form.find("#reportTargetId").val();
+		const targetType = $form.find("#reportTargetType").val();
+		const reason = $form.find("#reportReason").val();
+		if(reason != null && reason.trim() !== ""){
+			const details = $form.find("#reportDetails").val();
+			fetch(getContextPath() + "/board/report.do", {
+				method: "post",
+				headers: {
+					"Content-type":"application/json;charset=utf-8"
+				},
+				body: JSON.stringify({
+					"userId":userId,
+					"targetId":targetId,
+					"targetType":targetType,
+					"reason":reason,
+					"details":details
+				})
+			})
+			.then(response => {
+				if(response.ok){
+					return response.json();
+				} else {
+					throw new Error('report fail');
+				}
+			})
+			.then(data => {
+				const reportFlag = data['reportFlag'];
+				const report = data['report'];
+				if(reportFlag == '0' && report == '1'){
+					alert("신고가 접수되었습니다.")
+					const modal = bootstrap.Modal.getInstance($('#reportModal')[0]);
+					modal.hide();
+					$reportButton.setAttribute("disabled", true);
+				} 
+			})
+		} else {
+			alert('신고 사유를 선택해주세요');
+		}
+	} else {
+		alert("로그인이 필요한 기능입니다.");
+	}
+}
+
+const insertRecommend = (e, recType, boardType, userId) => {
+	if(userId != null && userId.trim() != ""){
+		const $span = $(e.target).closest("span[data-target-id]");
+		const targetId = $span[0].getAttribute("data-target-id");
+		fetch(getContextPath() + "/board/recommend.do", {
+			method: "post",
+			headers: {
+				"Content-type":"application/json;charset=utf-8"
+			},
+			body: JSON.stringify({
+				"recType":recType,
+				"boardType":boardType,
+				"targetId":targetId
+			})
+		})
+		.then(response => {
+			if(response.ok){
+				return response.json();
+			} else {
+				throw new Error('recommend fail');
+			}
+		})
+		.then(data => {
+			const recommendFlag = data['recommendFlag'];
+			const recommend = data['recommend'];
+			const changeArticle = data['changeArticle'];
+			console.log(recommendFlag);
+			console.log(recommend);
+			console.log(changeArticle);
+			if(recType == '1'){
+				if(changeArticle > 0 && recommend > 0){
+					if(recommendFlag == 0){
+						$span.find("i")[0].innerText =Number($span.find("i")[0].innerText)+1;
+						$span.find("i").addClass("bi-hand-thumbs-up-fill");
+						$span.find("i").removeClass("bi-hand-thumbs-up");
+					} else{
+						$span.find("i")[0].innerText =Number($span.find("i")[0].innerText)-1;
+						$span.find("i").removeClass("bi-hand-thumbs-up-fill");
+						$span.find("i").addClass("bi-hand-thumbs-up");					
+					}
+				} else {
+					throw new Error("recommend fail");
+				}
+			} else {
+				if(changeArticle > 0 && recommend > 0){
+					if(recommendFlag == 0){
+						$span.find("i")[0].innerText =Number($span.find("i")[0].innerText)+1;
+						$span.find("i").addClass("bi-hand-thumbs-down-fill");
+						$span.find("i").removeClass("bi-hand-thumbs-down");
+					} else{
+						$span.find("i")[0].innerText =Number($span.find("i")[0].innerText)-1;
+						$span.find("i").removeClass("bi-hand-thumbs-down-fill");
+						$span.find("i").addClass("bi-hand-thumbs-down");					
+					}
+				} else {
+					throw new Error("recommend fail");
+				}
+
+			}
+		})		
+	} else {
+		alert("로그인이 필요한 기능입니다.");
+	}
+}

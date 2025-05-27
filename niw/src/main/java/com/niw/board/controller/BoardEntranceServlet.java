@@ -42,7 +42,6 @@ public class BoardEntranceServlet extends HttpServlet {
 			}
 		}
 		
-
 		/* requestDispatcher
 		StringBuffer pageBar = new StringBuffer("<ul class='pagination justify-content-center'>");
 		if(cPage == 1) {
@@ -82,7 +81,7 @@ public class BoardEntranceServlet extends HttpServlet {
 			pageBar.append("</li>");
 		} else {
 			pageBar.append("<li class='page-item '>");
-			pageBar.append("<a class='page-link' href='javascript:void(0);' onclick=\"searchArticle('" + (pageNo > 1? pageNo - 1 : 1) + "')\"> prev </a>");
+			pageBar.append("<a class='page-link' href='javascript:void(0);' onclick=\"searchArticle('" + (pageNo > 1? pageNo - 1 : 1) + "', /board/articlelist.do)\"> prev </a>");
 			pageBar.append("</li>");
 		}
 		for(int i = pageNo; i <= pageEnd; i++) {
@@ -91,7 +90,7 @@ public class BoardEntranceServlet extends HttpServlet {
 				pageBar.append("<a class='page-link' href='#'>"+ i + "</a>");
 			} else {
 				pageBar.append("<li class='page-item'>");
-				pageBar.append("<a class='page-link' href='javascript:void(0);' onclick=\"searchArticle('" + i +"')\"> " + i + " </a>");
+				pageBar.append("<a class='page-link' href='javascript:void(0);' onclick=\"searchArticle('" + i +"', /board/articlelist.do)\"> " + i + " </a>");
 			}
 			pageBar.append("</li>");
 		}
@@ -100,7 +99,7 @@ public class BoardEntranceServlet extends HttpServlet {
 			pageBar.append("<a class='page-link' href='#'> next </a>");
 		} else {
 			pageBar.append("<li class='page-item'>");
-			pageBar.append("<a class='page-link' href='javascript:void(0);' onclick=\"searchArticle('" + (pageEnd < totalPage? pageEnd + 1 : totalPage) +"')\"> next </a>");
+			pageBar.append("<a class='page-link' href='javascript:void(0);' onclick=\"searchArticle('" + (pageEnd < totalPage? pageEnd + 1 : totalPage) +"', /board/articlelist.do)\"> next </a>");
 		}
 		pageBar.append("</li>");
 		pageBar.append("</ul>");

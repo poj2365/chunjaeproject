@@ -6,7 +6,7 @@
 	http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd">
 	<display-name>niw</display-name>
 
-	<error-page>
+<!--	<error-page>
 		<error-code>404</error-code>
 		<location>/errorPage?errorCode=404</location>
 	</error-page>
@@ -29,5 +29,5 @@
 	<error-page>
 		<error-code>403</error-code>
 		<location>/errorPage?errorCode=403</location>
-	</error-page>
+	</error-page>-->
 </web-app>
