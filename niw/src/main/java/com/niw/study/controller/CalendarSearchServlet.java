@@ -1,6 +1,7 @@
 package com.niw.study.controller;
 
 import java.io.IOException;
+import java.sql.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -11,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.niw.study.model.dto.Calendar;
 import com.niw.study.model.service.CalendarService;
 
@@ -34,7 +36,10 @@ public class CalendarSearchServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String jsonData = request.getReader().lines().collect(Collectors.joining());
-		Gson gson = new Gson();
+//		Gson gson = new GsonBuilder().registerTypeAdapter(Date.class, jsonData);
+//		시리얼라이징 하면 가능
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
+		
 		Calendar c = gson.fromJson(jsonData, Calendar.class);
 		Calendar calList = CalendarService.SERVICE.searchCalendarById(c);
 		

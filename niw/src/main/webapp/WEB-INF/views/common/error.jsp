@@ -64,6 +64,13 @@ String errorCode = (String)request.getAttribute("errorCode");
 <body>
     <div class="header">에러 페이지</div>
     <div class="container">
+    	<%if(errorCode == null){%>
+    	<div class="error-code">NULL</div>
+    		<div class="error-message">
+    		예상하지 못한 오류가 발생했습니다.<br>
+           관리자에게 문의 하거나 홈으로 이동해주세요.
+			</div>
+    	<% }else {%>
         <div class="error-code"><%=errorCode %></div>
         <div class="error-message">
         <% if("404".equals(errorCode)){ %>
@@ -83,7 +90,8 @@ String errorCode = (String)request.getAttribute("errorCode");
            관리자에게 문의 하거나 홈으로 이동해주세요.
            <%} %>
         </div>
-        <a href="<%=request.getContextPath()%>/" class="home-btn">홈으로 이동</a>
+        <%} %>
+        <a href="<%= request.getContextPath()%>/" class="home-btn">홈으로 이동</a>
     </div>
 </body>
 </html>
