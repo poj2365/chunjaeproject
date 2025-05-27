@@ -249,7 +249,9 @@
             <th>잔여 포인트</th>
             <td>
                 <span class="point-large"><%=loginUser.userPoint()%>P</span>
-                <button id="refund-request-btn" class="btn btn-secondary" style="float: right;">
+                <button id="refund-request-btn" class="btn btn-secondary" style="float: right;" 
+                onclick="location.assign('<%=request.getContextPath()%>/point/refundpoint.do')">
+                <!-- 실행 -->
                     <i class="bi bi-cash-coin me-1"></i>환불 신청
                 </button>
             </td>

@@ -1,4 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isErrorPage="true"%>
+<%@ page import ="java.util.Objects"%>
 <%
 String errorCode = (String)request.getAttribute("errorCode"); 
 %>
@@ -64,34 +65,29 @@ String errorCode = (String)request.getAttribute("errorCode");
 <body>
     <div class="header">에러 페이지</div>
     <div class="container">
-    	<%if(errorCode == null){%>
-    	<div class="error-code">NULL</div>
-    		<div class="error-message">
-    		예상하지 못한 오류가 발생했습니다.<br>
-           관리자에게 문의 하거나 홈으로 이동해주세요.
-			</div>
-    	<% }else {%>
-        <div class="error-code"><%=errorCode %></div>
+        <div class="error-code"><%=errorCode==null?"":errorCode %></div>
         <div class="error-message">
-        <% if("404".equals(errorCode)){ %>
+        <%-- <% if("404".equals(errorCode)){ %> --%>
+        <% if(Objects.equals("404",errorCode)){ %>
         	404 Not Found
             요청하신 페이지를 찾을 수 없습니다.<br>
             주소를 다시 확인하거나 홈으로 이동해주세요.
-           <%}else if(errorCode.equals("500")){ %>
+           <%-- <%}else if(errorCode.equals("500")){ %> --%>
+        <%}else if(Objects.equals(errorCode,"500")){ %>
            500 Internal Server Error<br>
            내부 서버 오류가 발생했습니다.<br>
            관리자에게 문의 하거나 홈으로 이동해주세요.
-           <%}else if(errorCode.equals("400")){%>
+           <%-- <%}else if(errorCode.equals("400")){%> --%>
+        <%}else if(Objects.equals(errorCode,"400")){ %>
            400 Bad Request<br>
            잘못된 요청입니다.<br>
            관리자에게 문의 하거나 홈으로 이동해주세요.
-           <%}else {%>
+        <%}else {%>
             예상하지 못한 오류가 발생했습니다.<br>
            관리자에게 문의 하거나 홈으로 이동해주세요.
-           <%} %>
-        </div>
         <%} %>
-        <a href="<%= request.getContextPath()%>/" class="home-btn">홈으로 이동</a>
+        </div>
+        <a href="<%=request.getContextPath()%>/" class="home-btn">홈으로 이동</a>
     </div>
 </body>
 </html>

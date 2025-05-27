@@ -13,11 +13,14 @@ import lombok.NoArgsConstructor;
 @Builder
 
 public class PointRefund {
+	private String refundId;
 	private String userId;
 	private Date refundDate;
 	private String refundType;
 	private int fileId;
+	private int filePoint;
 	private int refundPoint;
-	private String refundStatus;
+	private int refundAmount;
 	private String refundAccount;
+	private String refundStatus;
 }
