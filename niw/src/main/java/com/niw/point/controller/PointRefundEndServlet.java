@@ -30,7 +30,11 @@ public class PointRefundEndServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String userId = request.getParameter("userId");
+		String refundDate = request.getParameter("refundDate");
+		
 		String refundType = request.getParameter("refundType");
+		System.out.println(refundType);
+		
 		int fileId = Integer.parseInt(request.getParameter("fileId"));
 		int refundPoint = Integer.parseInt(request.getParameter("refundPoint"));
 		String refundStatus = request.getParameter("refundStatus");
@@ -41,7 +45,6 @@ public class PointRefundEndServlet extends HttpServlet {
 				.refundAccount(refundType)
 				.fileId(fileId)
 				.refundPoint(refundPoint)
-				.refundStatus(refundStatus)
 				.refundAccount(refundAccount)
 				.build();
 		

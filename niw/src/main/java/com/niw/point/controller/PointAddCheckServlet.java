@@ -107,21 +107,24 @@ public class PointAddCheckServlet extends HttpServlet {
 				System.out.println("성공");
 				jsonResponse.addProperty("result", "success");
 				jsonResponse.addProperty("message", "결제 성공");
-
+				
+				
+				
+				
 				long pointId = (long) jsonRequest.get("merchant_uid").getAsLong();
 				String userId = jsonRequest.get("buyer_id").getAsString();
 				int pointPrice = jsonRequest.get("amount").getAsInt();
-				String pointType = jsonRequest.get("buytype").getAsString();
 				String pointDescription = jsonRequest.get("description").getAsString();
 				int pointAmount = jsonRequest.get("pointAmount").getAsInt();
-
+				
+				String stringImpUid = jsonRequest.get("imp_uid").getAsString();
 				Point p = Point.builder()
 						.pointId(pointId)
 						.userId(userId)
-						.pointType(pointType)
 						.pointAmount(pointAmount)
 						.price(pointPrice)
 						.pointDescription(pointDescription)
+						.portOneId(stringImpUid)
 						.build();
 
 				int result = PointService.ponitService().insertPointHistory(p);

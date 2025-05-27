@@ -59,10 +59,11 @@ public class PointDao {
 			pstmt =  conn.prepareStatement(sql.getProperty("insertPointHistory"));// -> 이게 왜 null?
 			pstmt.setLong(1, p.getPointId());
 			pstmt.setString(2, p.getUserId());
-			pstmt.setString(3, p.getPointType());
-			pstmt.setInt(4, p.getPointAmount());
-			pstmt.setInt(5, p.getPrice());
-			pstmt.setString(6, p.getPointDescription());
+			pstmt.setInt(3, p.getPointAmount());
+			pstmt.setInt(4, p.getPrice());
+			pstmt.setString(5, p.getPointDescription());
+			pstmt.setString(6, p.getPortOneId());
+			
 			result =pstmt.executeUpdate();
 			
 		} catch (SQLException e) {
@@ -86,7 +87,6 @@ public class PointDao {
 			pstmt.setString(3, p.getRefundType());
 			pstmt.setInt(4 , p.getFileId());
 			pstmt.setInt(5, p.getRefundPoint());
-			pstmt.setString(6, p.getRefundStatus());
 			pstmt.setString(7, p.getRefundAccount());
 			
 			result = pstmt.executeUpdate();

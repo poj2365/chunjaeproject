@@ -18,6 +18,5 @@ public class PointRefund {
 	private String refundType;
 	private int fileId;
 	private int refundPoint;
-	private String refundStatus;
 	private String refundAccount;
 }
