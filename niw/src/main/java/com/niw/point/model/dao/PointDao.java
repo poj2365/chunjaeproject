@@ -12,6 +12,7 @@ import java.util.Properties;
 import com.niw.common.JDBCTemplate;
 import com.niw.point.model.dto.Point;
 import com.niw.point.model.dto.PointRefund;
+import com.niw.user.model.dto.User;
 
 public class PointDao {
 	
@@ -22,29 +23,29 @@ public class PointDao {
 	
 	private static final PointDao DAO = new PointDao();
 	
-//	private  PointDao() {
-//		String path = PointDao.class.getResource("sql/point_sql.properties").getPath();
-//		try(FileReader fr=new FileReader(path)) {
-//			sql.load(fr);
-//		}catch(IOException e) {
-//			e.printStackTrace();
-//		}
-//	}
-	private PointDao() {
-	    try {
-	        URL url = PointDao.class.getClassLoader().getResource("sql/point_sql.properties");
-	        if (url == null) {
-	            throw new RuntimeException("point_sql.properties 파일을 classpath에서 찾을 수 없습니다.");
-	        }
-	        String path = url.getPath();
-	        try (FileReader fr = new FileReader(path)) {
-	            sql.load(fr);
-	        }
-	    } catch (IOException e) {
-	        e.printStackTrace();
-	    }
+	private  PointDao() {
+		String path = PointDao.class.getResource("/sql/point_sql.properties").getPath();
+		try(FileReader fr=new FileReader(path)) {
+			sql.load(fr);
+		}catch(IOException e) {
+			e.printStackTrace();
+		}
 	}
-	
+//	private PointDao() {
+//	    try {
+//	        URL url = PointDao.class.getClassLoader().getResource("sql/point_sql.properties");
+//	        if (url == null) {
+//	            throw new RuntimeException("point_sql.properties 파일을 classpath에서 찾을 수 없습니다.");
+//	        }
+//	        String path = url.getPath();
+//	        try (FileReader fr = new FileReader(path)) {
+//	            sql.load(fr);
+//	        }
+//	    } catch (IOException e) {
+//	        e.printStackTrace();
+//	    }
+//	}
+
 	public static PointDao pointDao() {
 		return DAO;
 	}
@@ -53,16 +54,17 @@ public class PointDao {
 		int result =0;
 		
 		try {
-			// pstmt =  conn.prepareStatement(sql.getProperty("insertPointHistory"));// -> 이게 왜 null?
-			String sql = "INSERT INTO POINTS VALUES(?,?,?,?,?,SYSDATE)";
-			pstmt=conn.prepareStatement(sql);
+
+			System.out.println(sql.getProperty("insertPointHistory"));
+			pstmt =  conn.prepareStatement(sql.getProperty("insertPointHistory"));// -> 이게 왜 null?
 			pstmt.setLong(1, p.getPointId());
 			pstmt.setString(2, p.getUserId());
 			pstmt.setInt(3, p.getPointAmount());
-			pstmt.setString(4, p.getPointType());
+			pstmt.setInt(4, p.getPrice());
 			pstmt.setString(5, p.getPointDescription());
+			pstmt.setString(6, p.getPortOneId());
 			
-			result = pstmt.executeUpdate();
+			result =pstmt.executeUpdate();
 			
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -76,17 +78,35 @@ public class PointDao {
 	public int refundPointHistory(Connection conn, PointRefund p) {
 		int result = 0;
 		try{
-			String sql = "INSERT INTO REFUND_POINT VALUES(?,?,?,?,?,?,?)";
-			pstmt=conn.prepareStatement(sql);
+
+			// String sql = "INSERT INTO REFUND_POINT VALUES(?,?,?,?,?,?,?)";
+
+			pstmt =  conn.prepareStatement(sql.getProperty("refundPoint"));
+
 			pstmt.setString(1, p.getUserId());
 			pstmt.setString(3, p.getRefundType());
 			pstmt.setInt(4 , p.getFileId());
 			pstmt.setInt(5, p.getRefundPoint());
-			pstmt.setString(6, p.getRefundStatus());
 			pstmt.setString(7, p.getRefundAccount());
 			
 			result = pstmt.executeUpdate();
 			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			JDBCTemplate.close(rs);
+			JDBCTemplate.close(pstmt);
+		}
+		return result;
+	}
+	
+	public int chargePoint (Connection conn, String userId, int addpoint) {
+		int result = 0;
+		try {
+			pstmt = conn.prepareStatement(sql.getProperty("addPoint"));
+			pstmt.setInt(1,addpoint);
+			pstmt.setString(2, userId);
+			result = pstmt.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {

@@ -26,7 +26,7 @@ public class PointHistoryServlet extends HttpServlet {
 
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		request.getRequestDispatcher(CommonTemplate.WEB_VIEWS + "/point/myPoint.jsp").forward(request, response);
+		request.getRequestDispatcher("WEB-INF/views/point/myPoint.jsp").forward(request, response);
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
