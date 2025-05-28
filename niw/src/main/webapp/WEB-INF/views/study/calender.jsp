@@ -78,9 +78,193 @@ form button:hover {
 	background-color: red;
 }
 /* modal end */
+
+    /* 마이페이지 전용 스타일 */
+    .mypage-container {
+        max-width: 1400px; /* 1200px → 1400px로 증가 */
+        margin: 30px auto;
+        display: flex;
+        gap: 30px; /* 20px → 30px로 증가 */
+        flex: 1;
+        padding: 0 20px; /* 15px → 20px로 증가 */
+    }
+    
+    /* 사이드바 스타일 */
+    .sidebar {
+        width: 260px; /* 240px → 220px로 축소 */
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        padding: 20px 0;
+        flex-shrink: 0; /* 사이드바 크기 고정 */
+    }
+    
+    .profile-section {
+        padding: 0 20px 20px;
+        border-bottom: 1px solid #eee;
+        text-align: center;
+    }
+    
+    .profile-pic {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background-color: #f0f0f0;
+        margin: 0 auto 15px;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border: 3px solid var(--bs-primary-light);
+    }
+    
+    .profile-pic img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .user-id {
+        font-weight: bold;
+        margin-bottom: 5px;
+        font-size: 18px;
+        color: #333;
+    }
+    
+    .user-name {
+        color: #666;
+        margin-bottom: 10px;
+    }
+    
+    .point-info {
+        font-size: 16px;
+        color: var(--bs-blind-dark);
+        margin-top: 10px;
+        font-weight: bold;
+    }
+    
+    .menu-section {
+        padding: 20px 0;
+    }
+    
+    .menu-title {
+        padding: 0 20px;
+        margin-bottom: 10px;
+        font-size: 14px;
+        color: #888;
+        font-weight: bold;
+    }
+    
+    .menu-item {
+        padding: 12px 20px;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+    }
+    
+    .menu-item i {
+        margin-right: 10px;
+        font-size: 18px;
+    }
+    
+    .menu-item:hover {
+        background-color: var(--bs-primary-light);
+        color: var(--bs-blind-dark);
+    }
+    
+    .menu-item.active {
+        background-color: var(--bs-primary-light);
+        color: var(--bs-blind-dark);
+        border-left: 3px solid var(--bs-blind-dark);
+        font-weight: bold;
+    }
+    
+    /* 메인 컨텐츠 스타일 */
+    .main-content {
+        flex: 1;
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        padding: 30px;
+        min-height: 450px;
+    }
+    
+    .loading-content {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 400px;
+        flex-direction: column;
+        color: #888;
+    }
+    
+    .loading-spinner {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid var(--bs-blind-dark);
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin-bottom: 20px;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    /* 반응형 스타일 */
+    @media (max-width: 768px) {
+        .mypage-container {
+            flex-direction: column;
+        }
+        
+        .sidebar {
+            width: 100%;
+        }
+    }
 </style>
 <section>
-	<div class="cal-container">
+<!-- 메인 컨테이너 -->
+<div class="mypage-container">
+    <!-- 사이드바 영역 -->
+    <div class="sidebar">
+        <div class="profile-section">
+            <div class="profile-pic">
+                <i class="bi bi-person-circle" style="font-size: 60px; color: #ccc;"></i>
+            </div>
+            <div class="user-id"></div>
+            <div class="user-name"></div>
+            <div class="point-info">포인트:P</div>
+        </div>
+        <div class="menu-section">
+            <div class="menu-title">스터디 그룹</div>
+            <ul>
+                <li class="menu-item" data-tab="grouplist">
+                    <i class="bi bi-person-plus"></i>스터디 모집
+                </li>
+                <li class="menu-item" data-tab="studygroup">
+                    <i class="bi bi-people"></i>내 스터디 그룹
+                </li>
+            </ul>
+        </div>
+			<div class="menu-section">
+				<div class="menu-title">공부</div>
+				<ul>
+					<li class="menu-item" data-tab="record"><i class="bi bi-clock"></i>공부
+						시간 기록</li>
+					<li class="menu-item" data-tab="rank"><i
+						class="bi bi-trophy"></i>랭킹</li>
+					<li class="menu-item active" data-tab="calendar"><i
+						class="bi bi-calendar-check"></i>스터디 플래너</li>
+				</ul>
+			</div>
+		</div>
+    
+    <!-- 메인 컨텐츠 영역 -->
+    <div class="main-content">
+<div class="cal-container">
 		<div id='calendar'></div>
 	</div>
 
@@ -93,10 +277,10 @@ form button:hover {
 					type="text" name="name" id="name" required /></label><br> <br> 
 					<label>상세 내용<br> <textarea name="content" id="content" rows="4"></textarea>
 				</label><br> <br> 
-				<label>시작일<br> <input type="datetime-local"
+				<label>시작일<br> <input type="date"
 					name="start-time" id="start" required /></label><br> <br> 
-					<label>종료일<br>
-					<input type="datetime-local" name="end-time" id="end" required /></label><br> <br>
+					<label>종료일<br><!-- datetime-local -->
+					<input type="date" name="end-time" id="end" required /></label><br> <br>
 				<div id="insertForm">
 					<button type="button" onclick="calendar('calendarsave');">저장</button>
 				</div>
@@ -108,6 +292,8 @@ form button:hover {
 			</form>
 		</div>
 	</div>
+    </div>
+</div>
 </section>
 <script>
 const timeRecordTitle = [
@@ -118,13 +304,28 @@ const timeRecordTitle = [
        } %>
   ];
 
-
-
       document.addEventListener('DOMContentLoaded', function() {
+  	    // 사이드바 메뉴 클릭 이벤트
+  	    $('.menu-item').on('click', function() {
+  	        var $this = $(this);
+  	        var tabId = $this.data('tab');
+  	        if(tabId=="calendar"){
+  	        	location.assign("<%=request.getContextPath() %>/study/calender.do");
+  	        }else if(tabId=="record"){
+  	        	location.assign("<%=request.getContextPath() %>/study/timerecord.do");
+  	        }else if(tabId=="rank"){
+  	        	location.assign("<%=request.getContextPath() %>/study/timeranking.do");
+  	        }else if(tabId=="studygroup"){
+  	        	location.assign("<%=request.getContextPath() %>/study/groupdetail.do");
+  	        }else if(tabId=="grouplist"){
+  	        	location.assign("<%=request.getContextPath() %>/study/grouplist.do");
+  	        }
+  	    });
+
         var calendarEl = document.getElementById('calendar');
         var calendar = new FullCalendar.Calendar(calendarEl, {
             headerToolbar: {
-                left: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth',
+                left: 'dayGridMonth,listMonth',
                 center: 'title',
                 right: 'prev,next'
               },
@@ -139,8 +340,8 @@ const timeRecordTitle = [
             	  document.getElementById("content").textContent = "";
             	  document.getElementById("start").value = arg.startStr;
             	  document.getElementById("end").value = "";
-		    		document.getElementById("insertForm").style.display = "block";
-		    		document.getElementById("updateForm").style.display = "none";
+		    	  document.getElementById("insertForm").style.display = "block";
+		    	  document.getElementById("updateForm").style.display = "none";
               },
               eventClick : function(arg){
             	  if (timeRecordTitle.includes(arg.event.title)) {
@@ -148,7 +349,6 @@ const timeRecordTitle = [
             		    return;
             		  }
             	  openModal();
-            	  
             	  document.getElementById("content").textContent = "";
             	  document.getElementById("start").value = arg.event.startStr;
 
@@ -170,16 +370,16 @@ const timeRecordTitle = [
     		        throw new Error('네트워크 응답이 올바르지 않습니다.');
     		    }).then(data=>{
     		    	document.getElementById("no").value = data.calendarNo;
-        		      document.getElementById("name").value = arg.event.title;
-              	  document.getElementById("end").value = arg.event.endStr;
-    		    		document.getElementById("insertForm").style.display = "none";
-    		    		document.getElementById("updateForm").style.display = "block";
-    		    		console.log(data.calendarContent);
-	    		            document.getElementById("content").textContent = data.calendarContent;
-    		            if(arg.event.endStr == undefined || arg.event.endStr==""){
-    		            	console.log(formatDateToInput(arg.event.end));
-    		            	document.getElementById("end").value = formatDateToInput(arg.event.end);
-    		            	
+        		    document.getElementById("name").value = arg.event.title;
+              	  	document.getElementById("end").value = arg.event.endStr;
+    		    	document.getElementById("insertForm").style.display = "none";
+    		    	document.getElementById("updateForm").style.display = "block";
+	    		    document.getElementById("content").textContent = data.calendarContent;
+    		        if(arg.event.endStr == undefined || arg.event.endStr==""){
+    		            console.log(formatDateToInput(arg.event.start));
+    		            console.log(arg);
+    		            console.log(formatDateToInput(data.endTime));
+    		            document.getElementById("end").value = formatDateToInput(data.endTime);
     		            }
     		    }).catch(error=>{
     		    	console.log("에러발생"+error);
@@ -215,7 +415,7 @@ const timeRecordTitle = [
     	  const year = d.getFullYear();
     	  const month = ('0' + (d.getMonth() + 1)).slice(-2); // 0부터 시작하므로 +1
     	  const day = ('0' + d.getDate()).slice(-2);
-    	  return `${year}-${month}-${day}`;
+    	  return `\${year}-\${month}-\${day}`;
     	}
       
       // modal
@@ -279,16 +479,16 @@ const timeRecordTitle = [
     		    })
     		    .then(response => {
     		        if (response.ok) {
-    		            alert('전송 성공');
+    		            alert('일정 데이터가 정상적으로 저장되었습니다.');
     		            location.replace(location.href);
     		        } else {
-    		            alert('전송 실패');
+    		            alert('일정 데이터를 저장하는데 실패하였습니다.');
     		            location.replace("<%=request.getContextPath()%>");
     		        }
     		    })
     		    .catch(err => {
     		        console.error(err);
-    		        alert('에러 발생');
+    		        alert('일정 데이터를 저장하는데 에러가 발생하였습니다.');
     		        location.replace("<%=request.getContextPath()%>");
     		    });
     		    closeModal();

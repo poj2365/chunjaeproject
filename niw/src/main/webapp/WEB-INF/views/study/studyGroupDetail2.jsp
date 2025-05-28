@@ -1,252 +1,359 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
    <%@include file="/WEB-INF/views/common/header.jsp" %>
- <style>
+   <!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    .detail-container {
-   min-width: 300px;
-  max-width: 700px;
-      margin: 0 auto;
-      background-color: white;
-      padding: 20px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      border-radius: 10px;
-    }
-
-
-
-    .detail-header {
-      border-bottom: 1px solid #ddd;
-      padding-bottom: 10px;
-      margin-bottom: 20px;
-    }
-
-    .title {
-      font-size: 20px;
-      font-weight: bold;
-      margin-bottom: 5px;
-    }
-
-    .meta {
-      color: gray;
-      font-size: 14px;
-    }
-
-
-    .organizer {
-      display: flex;
-      align-items: center;
-      margin: 20px 0;
-    }
-
-    .organizer img {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      margin-right: 10px;
-    }
-
-    .members {
-      display: flex;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-
-    .members span {
-      font-size: 16px;
-      color: green;
-      margin-right: 10px;
-    }
-
-    .avatars {
-      display: flex;
-      gap: 10px;
-    }
-
-    .avatar {
-      width: 40px;
-      height: 40px;
-      background-color: #eee;
-      border-radius: 50%;
-      display: inline-block;
-      line-height: 40px;
-      text-align: center;
-      color: #aaa;
-      overflow: hidden;
-    }
-
-    .info {
-      margin: 20px 0;
-    }
-
-    .info-item {
-      margin-bottom: 10px;
-      font-size: 14px;
-    }
-
-    .info-item span {
-      font-weight: bold;
-      margin-right: 8px;
-    }
-
-    .description {
-      font-size: 14px;
-      line-height: 1.6;
-      white-space: pre-wrap;
-    }
-
-    .apply-button {
-      margin-top: 30px;
-      text-align: center;
-    }
-
-    .apply-button button {
-      background-color: #76c043;
-      border: none;
-      padding: 12px 30px;
-      font-size: 16px;
-      color: white;
-      border-radius: 25px;
-      cursor: pointer;
-    }
-
-    .apply-button button:hover {
-      background-color: #65a83c;
-    }
-
-   /* modal */
-  .modal {
-    display: none;
-    position: fixed;
-    z-index: 999;
-    padding-top: 40px;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0,0,0,0.5);
+<style>
+  .detail-container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 600px;
   }
 
-  .modal-content {
-    background-color: #fff;
-    margin: auto;
+  .arrow-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    /* border: 2px solid black; */
+    background-color: white;
+    font-size: 20px;
+    cursor: pointer;
+    z-index: 10;
+  }
+
+  .arrow-left {
+    left: 20px;
+  }
+
+  .arrow-right {
+    right: 20px;
+  }
+
+  .content-card {
+    width: 700px;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
     padding: 30px;
-    border-radius: 10px;
-    width: 90%;
-    max-width: 500px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    margin-top: 30px;
+    margin-bottom: 30px
   }
 
-  .close {
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-    cursor: pointer;
+  #chartSection {
+    display: none;
   }
 
-  form input, form textarea {
+  .chart-container {
     width: 100%;
-    padding: 10px;
-    margin-top: 5px;
-    box-sizing: border-box;
-    border-radius: 5px;
-    border: 1px solid #ccc;
+    height: 400px;
   }
 
-  form button[type="submit"] {
-    background-color: #76c043;
-    border: none;
-    color: white;
-    padding: 12px 20px;
-    margin-top: 10px;
-    border-radius: 25px;
-    cursor: pointer;
-  }
-
-  form button[type="submit"]:hover {
-    background-color: #5ea137;
-  }
-  /* modal end */
-  </style>
-   <section>
-  <div class="detail-container">
-    <div class="detail-header">
-      <div class="title">같이 성장할 백엔드 스터디원 모집!(JAVA / Spring)</div>
-      <div class="meta">NullisWell · 개설일자: 2025년 4월 24일</div>
+    /* 마이페이지 전용 스타일 */
+    .mypage-container {
+        max-width: 1400px; /* 1200px → 1400px로 증가 */
+        margin: 30px auto;
+        display: flex;
+        gap: 30px; /* 20px → 30px로 증가 */
+        flex: 1;
+        padding: 0 20px; /* 15px → 20px로 증가 */
+    }
+    
+    /* 사이드바 스타일 */
+    .sidebar {
+        width: 260px; /* 240px → 220px로 축소 */
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        padding: 20px 0;
+        flex-shrink: 0; /* 사이드바 크기 고정 */
+    }
+    
+    .profile-section {
+        padding: 0 20px 20px;
+        border-bottom: 1px solid #eee;
+        text-align: center;
+    }
+    
+    .profile-pic {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background-color: #f0f0f0;
+        margin: 0 auto 15px;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border: 3px solid var(--bs-primary-light);
+    }
+    
+    .profile-pic img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .user-id {
+        font-weight: bold;
+        margin-bottom: 5px;
+        font-size: 18px;
+        color: #333;
+    }
+    
+    .user-name {
+        color: #666;
+        margin-bottom: 10px;
+    }
+    
+    .point-info {
+        font-size: 16px;
+        color: var(--bs-blind-dark);
+        margin-top: 10px;
+        font-weight: bold;
+    }
+    
+    .menu-section {
+        padding: 20px 0;
+    }
+    
+    .menu-title {
+        padding: 0 20px;
+        margin-bottom: 10px;
+        font-size: 14px;
+        color: #888;
+        font-weight: bold;
+    }
+    
+    .menu-item {
+        padding: 12px 20px;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+    }
+    
+    .menu-item i {
+        margin-right: 10px;
+        font-size: 18px;
+    }
+    
+    .menu-item:hover {
+        background-color: var(--bs-primary-light);
+        color: var(--bs-blind-dark);
+    }
+    
+    .menu-item.active {
+        background-color: var(--bs-primary-light);
+        color: var(--bs-blind-dark);
+        border-left: 3px solid var(--bs-blind-dark);
+        font-weight: bold;
+    }
+    
+    /* 메인 컨텐츠 스타일 */
+    .main-content {
+        flex: 1;
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        padding: 30px;
+        min-height: 450px;
+    }
+    
+    .loading-content {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 400px;
+        flex-direction: column;
+        color: #888;
+    }
+    
+    .loading-spinner {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid var(--bs-blind-dark);
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin-bottom: 20px;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    /* 반응형 스타일 */
+    @media (max-width: 768px) {
+        .mypage-container {
+            flex-direction: column;
+        }
+        
+        .sidebar {
+            width: 100%;
+        }
+    }
+</style>
+<section>
+<!-- 메인 컨테이너 -->
+<div class="mypage-container">
+    <!-- 사이드바 영역 -->
+    <div class="sidebar">
+        <div class="profile-section">
+            <div class="profile-pic">
+                <i class="bi bi-person-circle" style="font-size: 60px; color: #ccc;"></i>
+            </div>
+            <div class="user-id"></div>
+            <div class="user-name"></div>
+            <div class="point-info">포인트:P</div>
+        </div>
+        <div class="menu-section">
+            <div class="menu-title">스터디 그룹</div>
+            <ul>
+                <li class="menu-item " data-tab="recruit">
+                    <i class="bi bi-person-plus"></i>스터디 모집
+                </li>
+                <li class="menu-item active" data-tab="studygroup">
+                    <i class="bi bi-people"></i>내 스터디 그룹
+                </li>
+            </ul>
+        </div>
+        <div class="menu-section">
+            <div class="menu-title">타이머</div>
+            <ul>
+                <li class="menu-item" data-tab="rank">
+                    <i class="bi bi-trophy"></i>랭킹
+                </li>
+                <li class="menu-item" data-tab="calendar">
+                    <i class="bi bi-calendar-check"></i>스터디 플래너
+                </li>
+            </ul>
+        </div>
     </div>
+    
+    <!-- 메인 컨텐츠 영역 -->
+    <div class="main-content">
+    <div class="content-header">
+   		<h2 class="content-title">스터디 그룹</h2>
+	</div>
+<div class="detail-container">
+  <!-- 화살표 버튼 -->
+  <button class="arrow-button arrow-left btn btn-outline-secondary" onclick="toggleSection()">
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
+  <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/>
+</svg>
+</button>
+  <button class="arrow-button arrow-right btn btn-outline-secondary" onclick="toggleSection()">
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right" viewBox="0 0 16 16">
+  <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8"/>
+</svg>
+  </button>
 
-    <div class="members">
-      <div class="avatars">
-        <div class="avatar">NullisWell</div>
-        <div class="avatar">대기</div>
-        <div class="avatar">대기</div>
-        <div class="avatar">대기</div>
-        <div class="avatar">대기</div>
-        <span>4명 남음 / 5명</span>
-      </div>
-    </div>
 
-    <div class="info">
-      <div class="info-item"><span>시작:</span>2025년 5월 11일 오후 5:00</div>
-      <div class="info-item"><span>종료:</span>2025년 5월 11일 오후 7:00</div>
-      <div class="info-item"><span>장소:</span>연산역 근처 커피숍</div>
-      <div class="info-item"><span>비용:</span>개별 비용</div>
-    </div>
 
-    <div class="description">
-      같이 성장할 백엔드 스터디원 모집합니다
-      매주 자바 스프링을 토론하고 배우는 모임입니다.
-      스터디장소 : 가디역 근처 커피숍
-      인원 : 5명
-      시간 : 일요일 오후 5시~7시 (2시간 이내)
-      대상 : 자바 기반 스프링 관련 백엔드 직장인 스터디 참여
-      필수사항 : 꼭 시간개념이 있는분만 신청해주세요.
-    </div>
-
-    <div class="apply-button">
-        <button onclick="openModal()">참여하기</button>
-    </div>
+  <!-- 상세 정보 -->
+  <div class="content-card" id="detailSection">
+    <h2>같이 성장할 백엔드 스터디원 모집!(JAVA / Spring)</h2>
+    <p><strong>NullisWell</strong> · 개설일자: 2025년 4월 24일</p>
+    <hr/>
+    <p>👥 4명 남음 / 5명</p>
+    <p><strong>시작:</strong> 2025년 5월 11일 오후 5:00</p>
+    <p><strong>종료:</strong> 2025년 5월 11일 오후 7:00</p>
+    <p><strong>장소:</strong> 연산역 근처 커피숍</p>
+    <p><strong>비용:</strong> 개별 비용</p>
+    <br/>
+    <p>같이 성장할 백엔드 스터디원 모집합니다<br/>
+    매주 자바 스프링을 토론하고 배우는 모임입니다.<br/>
+    스터디장소 : 가디역 근처 커피숍<br/>
+    인원 : 5명<br/>
+    시간 : 일요일 오후 5시~7시 (2시간 이내)<br/>
+    대상 : 자바 기반 스프링 관련 백엔드 직장인 스터디 참여<br/>
+    필수사항 : 꼭 시간개념이 있는분만 신청해주세요.</p>
   </div>
 
-  <div id="applyModal" class="modal">
-  <div class="modal-content">
-    <span class="close" onclick="closeModal()">&times;</span>
-    <h2>스터디 신청</h2>
-    <form id="applyForm">
-      <label>이름 <input type="text" name="name" required /></label><br><br>
-      <label>거주지<input type="text" name="location" placeholder="예: 가산동동" required /></label><br><br>
-      <label>학교/전공<input type="text" name="school" placeholder="스터디 관련된 전공일 경우 작성" /></label><br><br>
-      <label>직업<input type="text" name="job" required /></label><br><br>
-      <label>연락처<input type="text" name="contact" required /></label><br><br>
-      <label>신청하는 이유<textarea name="reason" rows="4" required></textarea></label><br><br>
-      <button type="submit">신청하기</button>
-    </form>
+  <!-- 차트 섹션 -->
+  <div class="content-card" id="chartSection">
+    <h3>스터디그룹별 공부 시간</h3>
+    <div class="chart-container">
+      <canvas id="studyChart"></canvas>
+    </div>
   </div>
 </div>
-
-
+		
+    </div>
+</div>
 <script>
-  function openModal() {
-    document.getElementById("applyModal").style.display = "block";
+// 사이드바 메뉴 클릭 이벤트
+$('.menu-item').on('click', function() {
+    var $this = $(this);
+    var tabId = $this.data('tab');
+    console.log(tabId);
+    if(tabId=="calendar"){
+    	location.assign("<%=request.getContextPath() %>/study/calender.do");
+    }else if(tabId=="rank"){
+    	location.assign("<%=request.getContextPath() %>/study/timerecord.do");
+    }else if(tabId=="studygroup"){
+    	location.assign("<%=request.getContextPath() %>/study/groupdetail.do");
+    }else if(tabId=="recruit"){
+    	location.assign("<%=request.getContextPath() %>/study/studymain.do");
+    }
+});
+
+  let showingDetail = true;
+
+  function toggleSection() {
+    showingDetail = !showingDetail;
+    document.getElementById("detailSection").style.display = showingDetail ? "block" : "none";
+    document.getElementById("chartSection").style.display = showingDetail ? "none" : "block";
+
+    if (!showingDetail) {
+      drawChart();
+    }
   }
 
-  function closeModal() {
-    document.getElementById("applyModal").style.display = "none";
+  const studyData = [
+    { name: "홍길동", time: 120 },
+    { name: "김민지", time: 95 },
+    { name: "이영희", time: 75 },
+    { name: "사용자1", time: 60 },
+    { name: "사용자2", time: 50 }
+  ];
+
+  function drawChart() {
+    const ctx = document.getElementById('studyChart').getContext('2d');
+
+    if (window.studyChartInstance) {
+      window.studyChartInstance.destroy();
+    }
+
+    window.studyChartInstance = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: studyData.map(item => item.name),
+        datasets: [{
+          label: '공부 시간 (분)',
+          data: studyData.map(item => item.time),
+          backgroundColor: '#74b9ff'
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              stepSize: 30
+            }
+          }
+        }
+      }
+    });
   }
-
-  // ESC 키로도 닫히게
-  window.addEventListener("keydown", function (e) {
-    if (e.key === "Escape") closeModal();
-  });
-
-  // 폼 제출 시 예시 처리 (백엔드 연동 전용)
-  document.getElementById("applyForm").addEventListener("submit", function (e) {
-    e.preventDefault();
-    alert("신청이 완료되었습니다!");
-    closeModal();
-    this.reset();
-  });
 </script>
-   </section>
+</section>
    <%@include file="/WEB-INF/views/common/footer.jsp" %>
