@@ -16,6 +16,7 @@ public record Comment(
 			int commentModified,
 			int commentDelete,
 			int commentRef,
+			String userRef,
 			int commentLevel
 		) {
 

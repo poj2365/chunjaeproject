@@ -137,4 +137,22 @@ public enum BoardService {
 		close(conn);
 		return result;
 	}
+	
+	public int saveComment(String userId, int articleId, String content, int targetId, int level) {
+		Connection conn = getConnection();
+		int result = BoardDao.DAO.saveComment(conn, userId, articleId, content, targetId, level);
+		if(result > 0) commit(conn);
+		else rollback(conn);
+		close(conn);
+		return result;
+	}
+	
+	public int saveArticle(Article article) {
+		Connection conn = getConnection();
+		int result = BoardDao.DAO.saveArticle(conn, article);
+		if(result > 0) commit(conn);
+		else rollback(conn);
+		close(conn);
+		return result;
+	}
 }
