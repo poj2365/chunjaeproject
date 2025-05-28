@@ -21,37 +21,28 @@ import com.niw.user.model.service.UserService;
 public class UserEnrollServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
     public UserEnrollServlet() {
         super();
     }
 
-    /**
-     * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-     */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.getRequestDispatcher("/WEB-INF/views/user/userEnroll.jsp").forward(request, response);
     }
 
-    /**
-     * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-     */
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // 인코딩 설정
+       
+    	// 인코딩 설정
         request.setCharacterEncoding("UTF-8");
         response.setContentType("application/json; charset=UTF-8");
         
         PrintWriter out = response.getWriter();
-        request.getParameter("formData");
-        
         Gson gson = new Gson();
-        gson.fromJson("String", null)
+   
         try {
+            // FormData로 전송된 파라미터들을 직접 받기
             String userId = request.getParameter("userid");
             String userName = request.getParameter("name");
-            String userType = request.getParameter("userType");
+            String userPhone = request.getParameter("phone");
             String birthYear = request.getParameter("birthYear");
             String birthMonth = request.getParameter("birthMonth");
             String birthDay = request.getParameter("birthDay");
@@ -65,7 +56,7 @@ public class UserEnrollServlet extends HttpServlet {
             System.out.println("=== 회원가입 파라미터 확인 ===");
             System.out.println("userId: " + userId);
             System.out.println("userName: " + userName);
-            System.out.println("userType: " + userType);
+            System.out.println("userPhone: " + userPhone);
             System.out.println("userEmail: " + userEmail);
             System.out.println("birthYear: " + birthYear);
             System.out.println("birthMonth: " + birthMonth);
@@ -74,6 +65,7 @@ public class UserEnrollServlet extends HttpServlet {
             // 기본 유효성 검사
             if (userId == null || userId.trim().isEmpty() ||
                 userName == null || userName.trim().isEmpty() ||
+                userPhone == null || userPhone.trim().isEmpty() ||
                 userEmail == null || userEmail.trim().isEmpty() ||
                 password == null || password.trim().isEmpty()) {
                 
@@ -92,14 +84,14 @@ public class UserEnrollServlet extends HttpServlet {
             );
             Date userBirthDate = Date.valueOf(birthDateStr);
 
-            // 회원 역할 설정
-            String userRole = "student".equals(userType) ? "STUDENT" : "GENERAL";
+            // 회원 역할 기본값으로 설정
+            String userRole = "GENERAL";
 
             User newUser = User.builder()
                 .userId(userId.trim())
                 .password(password)
                 .userName(userName.trim())
-                .userPhone("")
+                .userPhone(userPhone.trim())
                 .userEmail(userEmail.trim())
                 .userProfileImage("")
                 .userPoint(0)

@@ -104,7 +104,7 @@
                             
                             <p><strong>제2조 (정의)</strong><br>
                             1. "서비스"라 함은 회사가 제공하는 학습 관련 온라인 플랫폼 및 관련 서비스를 의미합니다.<br>
-                            2. "회원"이라 함은 회사의 서비스에 접속하여 이 약관에 따라 회사와 이용계약를 체결하고 회사가 제공하는 서비스를 이용하는 고객을 말합니다.</p>
+                            2. "회원"이라 함은 회사의 서비스에 접속하여 이 약관에 따라 회사와 이용계약을 체결하고 회사가 제공하는 서비스를 이용하는 고객을 말합니다.</p>
                             
                             <p><strong>제3조 (약관의 효력 및 변경)</strong><br>
                             1. 이 약관은 서비스를 이용하고자 하는 모든 회원에 대하여 그 효력을 발생합니다.<br>
@@ -155,7 +155,7 @@
             <div class="step-content" id="step-2-content">
                 <h2 class="card-title">회원 정보 입력</h2>
                 
-				<form id="signup-form" method="post">
+				<form id="signup-form" action="<%= request.getContextPath() %>/user/enroll.do" method="post">
                     <!-- 아이디 입력 및 중복검사 -->
                     <div class="form-group">
                         <label for="userid" class="form-label">아이디</label>
@@ -175,42 +175,11 @@
                         <div class="invalid-feedback" id="name-error"></div>
                     </div>
                     
-                    <!-- 회원구분 선택 -->
+                    <!-- 휴대폰 번호 입력 -->
                     <div class="form-group">
-                        <label class="form-label">회원구분</label>
-                        <div class="radio-group">
-                            <div class="radio-item">
-                                <input type="radio" id="user-type-general" name="userType" class="radio-input" value="general" checked>
-                                <label for="user-type-general" class="radio-label">일반회원</label>
-                            </div>
-                            <div class="radio-item">
-                                <input type="radio" id="user-type-student" name="userType" class="radio-input" value="student">
-                                <label for="user-type-student" class="radio-label">학생회원</label>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- 학생증 인증 (회원구분이 학생일 때만 표시) -->
-                    <div class="form-group" id="student-verification" style="display: none;">
-                        <label class="form-label">학생증 인증</label>
-                        <div class="file-upload">
-                            <label for="student-id-upload" class="file-upload-label">
-                                <div class="file-upload-icon">
-                                    <i class="bi bi-camera"></i>
-                                </div>
-                                <div class="file-upload-text">
-                                    학생증 사진을 업로드하세요<br>
-                                    <small>(JPG, PNG 파일 / 10MB 이하)</small>
-                                </div>
-                            </label>
-                            <input type="file" id="student-id-upload" name="studentIdFile" class="file-upload-input" accept="image/*">
-                        </div>
-                        <div id="upload-preview" style="display: none; margin-top: 10px; text-align: center;">
-                            <img id="preview-image" src="" alt="학생증 미리보기" style="max-width: 100%; max-height: 200px; border-radius: 8px;">
-                            <div style="margin-top: 10px;">
-                                <button type="button" class="btn btn-secondary" id="cancel-upload-btn">취소</button>
-                            </div>
-                        </div>
+                        <label for="phone" class="form-label">휴대폰 번호</label>
+                        <input type="tel" id="phone" name="phone" class="form-input" placeholder="01012345678 (숫자만 입력)" maxlength="11" required>
+                        <div class="invalid-feedback" id="phone-error"></div>
                     </div>
                     
                     <!-- 생년월일 입력 -->
@@ -281,7 +250,7 @@
                     
                     <div class="button-group">
                         <button type="button" class="btn btn-secondary" id="prev-step-2-btn">이전</button>
-                        <button type="button" class="btn btn-primary" id="next-step-2-btn">가입하기</button>
+                        <button type="submit" class="btn btn-primary" id="next-step-2-btn">가입하기</button>
                     </div>
                 </form>
             </div>
@@ -297,7 +266,7 @@
                         학습메이트의 회원이 되신 것을 환영합니다.<br>
                         다양한 학습 콘텐츠와 서비스를 이용해보세요.
                     </p>
-                    <a href="<%= request.getContextPath() %>/user/login.do" class="btn btn-primary btn-lg" id="go-login-btn">로그인하기</a>
+                    <a href="<%= request.getContextPath() %>/user/loginview.do" class="btn btn-primary btn-lg" id="go-login-btn">로그인하기</a>
                 </div>
             </div>
         </div>
@@ -313,52 +282,59 @@
     
     <!-- 회원가입 스크립트 -->
     <script>
-    $("#userid").keyup(((request)=>e=>{
-        console.log(request);
-        if(request) clearTimeout(request);
-        request=setTimeout(()=>{
-            console.log(request);
-            const userId=e.target.value.trim();
+        // 아이디 중복검사 디바운싱
+        let userIdCheckTimer;
+        
+        $("#userid").keyup(function(e) {
+            const userId = e.target.value.trim();
+            
+            // 기존 타이머 클리어
+            if (userIdCheckTimer) {
+                clearTimeout(userIdCheckTimer);
+            }
             
             // 길이 체크 먼저 (4자 미만이면 요청하지 않음)
-            if(userId.length < 4) {
+            if (userId.length < 4) {
                 $(e.target).next().remove();
                 return;
             }
             
-            //디바운서 -> 특정 딜레이시간을 발생시켜서 로직실행을 지연시킴
-            fetch("<%=request.getContextPath()%>/user/checkUserId.do?id="+userId)
-            .then(response=>{
-                if(response.ok){
-                    return response.json();
-                }else{
-                    alert("요청실패"+response.status);
-                }
-            }).then(data=>{
-                $(e.target).next().remove();
-                console.log(data);
-                if(data.result){
-                    $(e.target).after($("<span>").text("사용할 수 있는 아이디").css({
-                        "color":"green",
-                        "margin-left":"10px",
-                        "display":"inline-flex",
-                        "align-items":"center",
-                        "font-size":"14px",
-                        "font-weight":"500"
-                    }));
-                }else{
-                    $(e.target).after($("<span>").text("사용할 수 없는 아이디").css({
-                        "color":"red",
-                        "margin-left":"10px",
-                        "display":"inline-flex",
-                        "align-items":"center",
-                        "font-size":"14px",
-                        "font-weight":"500"
-                    }));
-                }
-            })
-        },300);
-    })());
+            // 디바운서 -> 특정 딜레이시간을 발생시켜서 로직실행을 지연시킴
+            userIdCheckTimer = setTimeout(() => {
+                fetch("<%=request.getContextPath()%>/user/checkUserId.do?id=" + userId)
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    } else {
+                        alert("요청실패: " + response.status);
+                    }
+                })
+                .then(data => {
+                    $(e.target).next().remove();
+                    console.log(data);
+                    
+                    if (data.result) {
+                        $(e.target).after($("<span>").text("사용할 수 있는 아이디").css({
+                            "color": "green",
+                            "margin-left": "10px",
+                            "display": "inline-flex",
+                            "align-items": "center",
+                            "font-size": "14px",
+                            "font-weight": "500"
+                        }));
+                    } else {
+                        $(e.target).after($("<span>").text("사용할 수 없는 아이디").css({
+                            "color": "red",
+                            "margin-left": "10px",
+                            "display": "inline-flex",
+                            "align-items": "center",
+                            "font-size": "14px",
+                            "font-weight": "500"
+                        }));
+                    }
+                });
+            }, 300);
+        });
     
         $(document).ready(function() {
             // 아이디 입력창 크기 강제 적용 (여러 번 시도)
@@ -485,6 +461,16 @@
                 return null;
             }
             
+            function validatePhone(phone) {
+                if (!phone || phone.trim().length === 0) {
+                    return '휴대폰 번호를 입력해주세요.';
+                }
+                if (!/^010\d{8}$/.test(phone.replace(/-/g, ''))) {
+                    return '올바른 휴대폰 번호를 입력해주세요. (010으로 시작하는 11자리)';
+                }
+                return null;
+            }
+            
             function validateEmail(email) {
                 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                 if (!email) {
@@ -586,6 +572,24 @@
                 }
             });
             
+            // 휴대폰 번호 입력 제한 및 유효성 검사
+            $('#phone').on('input', function() {
+                // 숫자만 허용
+                $(this).val($(this).val().replace(/[^0-9]/g, ''));
+            });
+            
+            $('#phone').on('blur', function() {
+                const phone = $(this).val().trim();
+                const error = validatePhone(phone);
+                if (error) {
+                    $(this).addClass('is-invalid');
+                    $('#phone-error').text(error).show();
+                } else {
+                    $(this).removeClass('is-invalid').addClass('valid');
+                    $('#phone-error').hide();
+                }
+            });
+            
             $('#email').on('blur', function() {
                 const email = $(this).val().trim();
                 const error = validateEmail(email);
@@ -660,42 +664,6 @@
             // 2단계에서 이전 버튼 클릭
             $('#prev-step-2-btn').on('click', function() {
                 goToStep(1);
-            });
-            
-            // 회원 유형 변경 시 학생증 인증 영역 표시/숨김
-            $('input[name="userType"]').on('change', function() {
-                if ($(this).val() === 'student') {
-                    $('#student-verification').show();
-                } else {
-                    $('#student-verification').hide();
-                }
-            });
-            
-            // 학생증 이미지 업로드 및 미리보기
-            $('#student-id-upload').on('change', function(e) {
-                if (e.target.files.length > 0) {
-                    const file = e.target.files[0];
-                    
-                    // 파일 크기 제한 (10MB)
-                    if (file.size > 10 * 1024 * 1024) {
-                        showAlert('파일 크기는 10MB 이하여야 합니다.');
-                        return;
-                    }
-                    
-                    // 이미지 미리보기
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        $('#preview-image').attr('src', e.target.result);
-                        $('#upload-preview').show();
-                    };
-                    reader.readAsDataURL(file);
-                }
-            });
-            
-            // 학생증 업로드 취소
-            $('#cancel-upload-btn').on('click', function() {
-                $('#student-id-upload').val('');
-                $('#upload-preview').hide();
             });
             
             // 이메일 인증번호 전송
@@ -902,22 +870,64 @@
                 if (parseInt($(this).val()) > 31) $(this).val('31');
             });
             
-            // 회원가입 완료 버튼 클릭
-          $('#next-step-2-btn').on('click', function(e) {
-    			e.preventDefault(); 
+            // 폼 제출 처리
+            $('#signup-form').on('submit', function(e) {
+                e.preventDefault(); 
+                
                 // 전체 유효성 검사
                 if (!validateForm()) {
-                    return;
+                    return false;
                 }
-          
+                
                 // 회원가입 요청
                 enrollUser();
             }); 
             
+            // 회원가입 요청 함수
+            function enrollUser() {
+                // 디버깅용 콘솔출력
+                console.log("=== enrollUser 함수 시작 ===");
+                console.log("userid 값:", $('#userid').val());
+                console.log("name 값:", $('#name').val());
+                console.log("phone 값:", $('#phone').val());
+                console.log("email 값:", $('#email').val());
+               
+                showLoading();
+                
+                // 폼 데이터를 serialize하여 전송
+                const formData = $('#signup-form').serialize();
+                
+                // 약관 동의 정보 추가
+                const termsData = '&terms1=' + ($('#terms-1').prop('checked') ? 'Y' : 'N') +
+                                 '&terms2=' + ($('#terms-2').prop('checked') ? 'Y' : 'N') +
+                                 '&terms3=' + ($('#terms-3').prop('checked') ? 'Y' : 'N') +
+                                 '&terms4=' + ($('#terms-4').prop('checked') ? 'Y' : 'N');
+                
+                $.ajax({
+                    url: '<%= request.getContextPath() %>/user/enroll.do',
+                    type: 'POST',
+                    data: formData + termsData,
+                    dataType: 'json',
+                    success: function(response) {
+                        showLoading(false);
+                        
+                        if (response.success) {
+                            // 회원가입 성공, 3단계로 이동
+                            goToStep(3);
+                        } else {
+                            showAlert(response.message || '회원가입에 실패했습니다.');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        showLoading(false);
+                        showAlert('요청 처리 중 오류가 발생했습니다.');
+                        console.error(error);
+                    }
+                });
+            }
+            
             // 전체 폼 유효성 검사
             function validateForm() {
-                let isValid = true;
-                
                 // 아이디 검사
                 const userid = $('#userid').val().trim();
                 const useridError = validateUserId(userid);
@@ -933,6 +943,15 @@
                 if (nameError) {
                     showAlert(nameError);
                     $('#name').focus();
+                    return false;
+                }
+                
+                // 휴대폰 번호 검사
+                const phone = $('#phone').val().trim();
+                const phoneError = validatePhone(phone);
+                if (phoneError) {
+                    showAlert(phoneError);
+                    $('#phone').focus();
                     return false;
                 }
                 
@@ -976,79 +995,7 @@
                     return false;
                 }
                 
-                // 학생회원 선택 시 학생증 업로드 확인
-                const userType = $('input[name="userType"]:checked').val();
-                if (userType === 'student' && $('#student-id-upload')[0].files.length === 0) {
-                    showAlert('학생증 사진을 업로드해주세요.');
-                    return false;
-                }
-                
                 return true;
-            }
-            
-            // 회원가입 요청 함수
-            function enrollUser() {
-            	//디버깅용 콘솔출력
-            	console.log("=== enrollUser 함수 시작 ===");
-                console.log("userid 값:", $('#userid').val());
-                console.log("name 값:", $('#name').val());
-                console.log("email 값:", $('#email').val());
-                console.log("userType 값:", $('input[name="userType"]:checked').val());
-               
-                showLoading();
-                
-                // FormData 객체 생성 (파일 업로드 포함)
-                const formData = new FormData();
-                
-                
-                // 일반 데이터 추가
-                formData.append('userid', $('#userid').val().trim());
-                formData.append('name', $('#name').val().trim());
-                formData.append('userType', $('input[name="userType"]:checked').val());
-                formData.append('birthYear', $('#birth-year').val().trim());
-                formData.append('birthMonth', $('#birth-month').val().trim());
-                formData.append('birthDay', $('#birth-day').val().trim());
-                formData.append('email', $('#email').val().trim());
-                formData.append('postcode', $('#postcode').val().trim());
-                formData.append('address', $('#address').val().trim());
-                formData.append('addressDetail', $('#address-detail').val().trim());
-                formData.append('password', $('#password').val());
-                
-                // 약관 동의 정보
-                formData.append('terms1', $('#terms-1').prop('checked') ? 'Y' : 'N');
-                formData.append('terms2', $('#terms-2').prop('checked') ? 'Y' : 'N');
-                formData.append('terms3', $('#terms-3').prop('checked') ? 'Y' : 'N');
-                formData.append('terms4', $('#terms-4').prop('checked') ? 'Y' : 'N');
-                
-                // 학생증 파일 추가
-                if ($('input[name="userType"]:checked').val() === 'student') {
-                    const studentIdFile = $('#student-id-upload')[0].files[0];
-                    if (studentIdFile) {
-                        formData.append('studentIdFile', studentIdFile);
-                    }
-                }
-                
-                $.ajax({
-                    url: '<%= request.getContextPath() %>/user/enroll.do',
-                    type: 'POST',
-                    data: formData,
-                    processData: false, // FormData 처리 방지
-                    contentType: false, // Content-Type 헤더 설정 방지
-                    dataType: 'json',
-                    success: function(response) {
-                        showLoading(false);
-                            // 회원가입 성공, 3단계로 이동
-                            goToStep(3);
-                        } else {
-                            showAlert(response.message || '회원가입에 실패했습니다.');
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        showLoading(false);
-                        showAlert('요청 처리 중 오류가 발생했습니다.');
-                        console.error(error);
-                    }
-                });
             }
             
             // 메인으로 돌아가기 버튼
