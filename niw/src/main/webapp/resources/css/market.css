@@ -1,11 +1,12 @@
-@charset "UTF-8";
 /* learning-materials.css - 학습자료 게시판 전용 스타일 */
 
-/* Main Container */
+/* Main Container - 더 넓은 가로폭 설정 */
 main {
-  max-width: 1140px;
+  width: 85%; /* 70%에서 85%로 증가 */
+  max-width: 1600px; /* 1350px에서 1600px로 증가 */
+  min-width: 900px; /* 800px에서 900px로 증가 */
   margin: 0 auto;
-  padding: 32px 16px;
+  padding: 32px 24px; /* 좌우 패딩도 약간 증가 */
 }
 
 /* Tab Header */
@@ -63,8 +64,8 @@ main {
 .search-box {
   background-color: white;
   border-radius: 10px;
-  padding: 24px;
-  margin-bottom: 24px;
+  padding: 28px; /* 24px에서 28px로 증가 */
+  margin-bottom: 28px; /* 24px에서 28px로 증가 */
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
 }
 
@@ -72,7 +73,7 @@ main {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 24px; /* 20px에서 24px로 증가 */
 }
 
 .search-title {
@@ -111,14 +112,14 @@ main {
 
 /* Form Elements */
 .form-group {
-  margin-bottom: 20px;
+  margin-bottom: 24px; /* 20px에서 24px로 증가 */
   display: flex;
   align-items: flex-start;
-  gap: 20px;
+  gap: 24px; /* 20px에서 24px로 증가 */
 }
 
 .form-label {
-  width: 60px;
+  width: 70px; /* 60px에서 70px로 증가 */
   font-weight: 500;
   color: #495057;
   padding-top: 8px;
@@ -128,12 +129,12 @@ main {
 .form-option-group {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 10px; /* 8px에서 10px로 증가 */
   flex: 1;
 }
 
 .form-option {
-  padding: 8px 16px;
+  padding: 10px 18px; /* 8px 16px에서 10px 18px로 증가 */
   border-radius: 20px;
   border: 1px solid #ced4da;
   background-color: white;
@@ -161,16 +162,17 @@ main {
 .search-field {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px; /* 8px에서 12px로 증가 */
   flex: 1;
 }
 
 .search-input-field {
   flex: 1;
-  padding: 10px 16px;
+  padding: 12px 18px; /* 10px 16px에서 12px 18px로 증가 */
   border: 1px solid #ced4da;
   border-radius: 6px;
   transition: all 0.3s;
+  font-size: 15px; /* 폰트 크기 약간 증가 */
 }
 
 .search-input-field:focus {
@@ -183,7 +185,7 @@ main {
   background-color: var(--bs-blind-dark);
   color: white;
   border: none;
-  padding: 10px 16px;
+  padding: 12px 18px; /* 10px 16px에서 12px 18px로 증가 */
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.3s;
@@ -197,7 +199,7 @@ main {
 .breadcrumb {
   display: flex;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: 28px; /* 24px에서 28px로 증가 */
   color: #6c757d;
   font-size: 14px;
 }
@@ -223,12 +225,28 @@ main {
   font-weight: 600;
 }
 
-/* Product Grid */
+/* Product Grid - 더 넓은 화면에서 더 많은 카드 표시 */
 .product-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
+  grid-template-columns: repeat(5, 1fr); /* 4개에서 5개로 증가 */
+  gap: 28px; /* 24px에서 28px로 증가 */
   margin-bottom: 40px;
+}
+
+@media (max-width: 1400px) {
+  .product-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 1200px) {
+  .product-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  main {
+    width: 90%; /* 반응형에서도 더 넓게 */
+  }
 }
 
 .product-card {
@@ -265,7 +283,7 @@ main {
 }
 
 .product-content {
-  padding: 16px;
+  padding: 18px; /* 16px에서 18px로 증가 */
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -303,12 +321,12 @@ main {
 
 .product-actions {
   display: flex;
-  gap: 8px;
+  gap: 10px; /* 8px에서 10px로 증가 */
 }
 
 .cart-button {
   flex: 1;
-  padding: 10px;
+  padding: 12px; /* 10px에서 12px로 증가 */
   border: 1px solid var(--bs-blind-dark);
   background-color: white;
   color: var(--bs-blind-dark);
@@ -324,7 +342,7 @@ main {
 
 .buy-button {
   flex: 1;
-  padding: 10px;
+  padding: 12px; /* 10px에서 12px로 증가 */
   border: none;
   background-color: var(--bs-blind-dark);
   color: white;
@@ -342,7 +360,7 @@ main {
 .no-results {
   grid-column: 1 / -1;
   text-align: center;
-  padding: 60px 20px;
+  padding: 80px 20px; /* 60px에서 80px로 증가 */
   color: #6c757d;
 }
 
@@ -387,6 +405,11 @@ main {
     grid-template-columns: repeat(2, 1fr);
   }
   
+  main {
+    width: 92%; /* 85%에서 92%로 증가 */
+    min-width: 650px; /* 600px에서 650px로 증가 */
+  }
+  
   .tab-header {
     flex-direction: column;
     gap: 15px;
@@ -404,13 +427,15 @@ main {
   }
   
   main {
-    padding: 20px 16px;
+    width: 95%;
+    min-width: auto;
+    padding: 20px 20px; /* 16px에서 20px로 증가 */
   }
   
   .form-group {
     flex-direction: column;
     align-items: stretch;
-    gap: 10px;
+    gap: 12px; /* 10px에서 12px로 증가 */
   }
   
   .form-label {
@@ -446,11 +471,11 @@ main {
   }
   
   .form-option-group {
-    gap: 6px;
+    gap: 8px; /* 6px에서 8px로 증가 */
   }
   
   .form-option {
     font-size: 13px;
-    padding: 6px 12px;
+    padding: 8px 14px; /* 6px 12px에서 8px 14px로 증가 */
   }
 }

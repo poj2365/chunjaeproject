@@ -1,6 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
-<%@ include file="/WEB-INF/views/common/header.jsp"%>
+ <%@ page import="com.niw.market.model.dto.Material" %>
+ <%@ include file="/WEB-INF/views/common/header.jsp"%>
+ 
+
 
 <style>
 :root {
@@ -236,48 +239,356 @@
 	transition: all 0.2s;
 }
 
-.preview-page-item {
-	border: 2px solid #ddd;
-	border-radius: 8px;
-	padding: 1rem;
-	cursor: pointer;
-	transition: all 0.3s;
-	background-color: white;
+.spinner-border.main-color {
+	color: var(--main-color);
 }
 
-.preview-page-item:hover {
-	border-color: var(--main-color);
-	box-shadow: 0 2px 8px rgba(36, 177, 181, 0.15);
+/* PDF 미리보기 뷰어 스타일 - 새로 추가된 부분 */
+.preview-viewer {
+    border: 1px solid #e9ecef;
+    border-radius: 10px;
+    overflow: hidden;
+    background: white;
+    margin-top: 1rem;
 }
 
-.preview-page-item.selected {
-	border-color: var(--main-color);
-	background-color: rgba(36, 177, 181, 0.05);
+.viewer-header {
+    background: var(--main-color);
+    color: white;
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-.preview-page-header {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	margin-bottom: 0.5rem;
+.viewer-body {
+    padding: 1.5rem;
+}
+
+.view-mode-toggle {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-view-mode {
+    padding: 0.5rem 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    background: transparent;
+    color: white;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.btn-view-mode.active,
+.btn-view-mode:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: white;
+}
+
+.grid-viewer,
+.book-viewer {
+    display: none;
+}
+
+.grid-viewer.active,
+.book-viewer.active {
+    display: block;
+}
+
+.page-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.preview-page-card {
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    background: white;
+}
+
+.preview-page-card:hover {
+    border-color: var(--main-color);
+    box-shadow: 0 4px 12px rgba(36, 177, 181, 0.15);
+    transform: translateY(-2px);
+}
+
+.preview-page-card.selected {
+    border-color: var(--main-color);
+    background: var(--main-color-light);
+}
+
+/* 비활성화된 페이지 카드 스타일 */
+.preview-page-card.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+    cursor: not-allowed;
+}
+
+.preview-page-card.disabled .preview-checkbox {
+    cursor: not-allowed;
+}
+
+.preview-page-card.disabled .page-image {
+    filter: grayscale(50%);
+}
+
+.page-image-container {
+    position: relative;
+    height: 250px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8f9fa;
+}
+
+.page-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    transition: transform 0.3s ease;
+}
+
+.preview-page-card:hover .page-image {
+    transform: scale(1.05);
+}
+
+.page-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.preview-page-card:hover .page-overlay {
+    opacity: 1;
+}
+
+.page-info {
+    padding: 0.75rem;
+    border-top: 1px solid #e9ecef;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .page-number {
-	font-weight: 600;
-	color: #495057;
+    font-weight: 600;
+    color: #495057;
 }
 
-.preview-image-container {
-	text-align: center;
+.pagination-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin: 1.5rem 0;
+    flex-wrap: wrap;
 }
 
-.preview-image-container img {
-	max-height: 200px;
-	border: 1px solid #e9ecef;
+.page-info-display {
+    color: #6c757d;
+    font-size: 0.9rem;
 }
 
-.spinner-border.main-color {
-	color: var(--main-color);
+.btn-page {
+    border: none;
+    background: var(--main-color);
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.btn-page:hover:not(:disabled) {
+    background: var(--main-color-dark);
+    transform: scale(1.1);
+}
+
+.btn-page:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+}
+
+.page-input-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.page-input {
+    width: 60px;
+    text-align: center;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 0.25rem;
+}
+
+/* 책 형태 뷰어 스타일 */
+.book-container {
+    position: relative;
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 2rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.book-page {
+    width: 100%;
+    max-width: 600px;
+    max-height: 800px;
+    margin: 0 auto;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    transition: transform 0.5s ease;
+    object-fit: contain;
+}
+
+.book-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.book-nav-btn {
+    background: var(--main-color);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 25px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+}
+
+.book-nav-btn:hover:not(:disabled) {
+    background: var(--main-color-dark);
+    transform: translateY(-2px);
+    color: white;
+}
+
+.book-nav-btn:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+}
+
+.selection-summary {
+    background: var(--main-color-light);
+    border: 1px solid var(--main-color);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-top: 1.5rem;
+}
+
+.selection-summary h6 {
+    color: var(--main-color);
+    margin-bottom: 0.5rem;
+}
+
+.selected-pages-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.selected-page-badge {
+    background: var(--main-color);
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+}
+
+/* 비활성화된 체크박스 스타일 */
+.preview-checkbox:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.preview-checkbox:disabled + label {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* 책 뷰 체크박스 비활성화 스타일 */
+#bookPageSelect:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+#bookPageSelect:disabled + label {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* 최대 선택 경고 스타일 */
+#maximumWarning {
+    font-weight: 500;
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+    .page-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+    }
+    
+    .page-image-container {
+        height: 180px;
+    }
+    
+    .viewer-header {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+    
+    .pagination-controls {
+        gap: 0.5rem;
+    }
+    
+    .book-controls {
+        gap: 1rem;
+    }
+    
+    .book-nav-btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+    }
+    
+    .book-container {
+        padding: 1rem;
+    }
+    
+    .book-page {
+        max-width: 100%;
+    }
 }
 </style>
 
@@ -299,8 +610,8 @@
 
 				<div class="upload-body">
 					<form
-						action="<%=request.getContextPath()%>/study/materialInsert.do"
-						method="post" enctype="multipart/form-data">
+						action="<%=request.getContextPath()%>/market/registMaterial.do"
+						method="post" >
 						<!-- 자료 정보 섹션 -->
 						<div class="form-section">
 							<h3 class="form-section-title">
@@ -323,8 +634,6 @@
 										<option value="초등학교">초등학교</option>
 										<option value="중학교">중학교</option>
 										<option value="고등학교">고등학교</option>
-										<option value="대학교">대학교</option>
-										<option value="직장인">직장인</option>
 										<option value="기타">기타</option>
 									</select>
 								</div>
@@ -332,12 +641,7 @@
 									<label class="form-label">학년</label> <select
 										class="form-select" name="grade">
 										<option value="">선택해주세요</option>
-										<option value="1학년">1학년</option>
-										<option value="2학년">2학년</option>
-										<option value="3학년">3학년</option>
-										<option value="4학년">4학년</option>
-										<option value="5학년">5학년</option>
-										<option value="6학년">6학년</option>
+
 									</select>
 								</div>
 								<div class="col-md-4">
@@ -358,10 +662,10 @@
 								<label class="form-label">판매가격</label>
 								<div class="input-group">
 									<input type="number" class="form-control" name="price"
-										placeholder="자료의 판매 가격을 입력해주세요" min="1000" required> <span
+										placeholder="자료의 판매 가격을 입력해주세요" min="1000" step="100" required> <span
 										class="input-group-text">원</span>
 								</div>
-								<small class="helper-text">최소 1,000원부터 설정 가능합니다.</small>
+								<small class="helper-text">100원 단위로 최소 1,000원부터 설정 가능합니다.</small>
 							</div>
 
 							<div class="mb-3">
@@ -375,13 +679,8 @@
 										class="d-none" accept=".pdf" required>
 								</div>
 
-								<!-- 테스트용 버튼 -->
-								<div class="mt-2">
-									<button type="button" class="btn btn-sm btn-outline-primary"
-										onclick="testFileUpload()">파일 선택 테스트</button>
-									<small class="text-muted ms-2">위 버튼도 안 되면 JavaScript
-										오류입니다</small>
-								</div>
+					
+							
 							</div>
 						</div>
 
@@ -394,7 +693,7 @@
 							<div class="alert alert-info" role="alert">
 								<i class="bi bi-info-circle me-2"></i> <strong>자동 미리보기
 									생성</strong><br> 업로드한 PDF 파일에서 자동으로 미리보기 페이지가 생성됩니다. 파일 등록 후 원하는
-								페이지를 선택하여 미리보기로 설정할 수 있습니다.
+								페이지를 선택하여 미리보기로 설정할 수 있습니다. (최대 3페이지)
 							</div>
 
 							<div class="preview-items mb-3" id="previewContainer">
@@ -430,6 +729,8 @@
 
 						<!-- 제출 버튼 -->
 						<div class="d-grid gap-2 d-md-flex justify-content-md-end">
+              <button class="btn btn-outline-secondary me-md-2" type="button"
+              onclick="cancleRegist()">등록취소</button>
 							<button class="btn btn-outline-secondary me-md-2" type="button"
 								onclick="saveDraft()">임시저장</button>
 							<button class="btn btn-main" type="submit">
@@ -494,7 +795,7 @@
 					<ul class="ps-3 mb-3">
 						<li class="mb-1">업로드한 PDF에서 자동으로 미리보기 생성</li>
 						<li class="mb-1">PDF 문서의 각 페이지를 이미지로 추출</li>
-						<li class="mb-1">최소 3페이지 이상의 미리보기 필수</li>
+						<li class="mb-1">최소 1페이지, 최대 3페이지까지 미리보기 선택 가능</li>
 						<li class="mb-1">자료의 내용을 확인할 수 있는 대표적인 페이지 선택</li>
 					</ul>
 
@@ -625,6 +926,487 @@
 </div>
 
 <script>
+  // 1) 카테고리별 학년 맵핑
+const gradeMap = {
+  '초등학교': ['1학년','2학년','3학년','4학년','5학년','6학년'],
+  '중학교':   ['1학년','2학년','3학년'],
+  '고등학교': ['1학년','2학년','3학년'],
+  '기타':     []
+};
+
+// 2) 이벤트 바인딩
+$('select[name="category"]').on('change', function() {
+  const cat = $(this).val();
+  const grades = gradeMap[cat] || [];
+  const $grade = $('select[name="grade"]');
+  
+  // 3) 기존 옵션 지우고 기본 추가
+  $grade.empty()
+        .append('<option value="">선택해주세요</option>');
+  
+  // 4) 해당 카테고리 학년만 추가
+  grades.forEach(g => {
+    $grade.append(`<option value="\${g}">\${g}</option>`);
+  });
+  
+  // 5) 기타 등 옵션 없을 땐 select 비활성화 (선택 안 되도록)
+  if (grades.length === 0) {
+    $grade.prop('disabled', true);
+  } else {
+    $grade.prop('disabled', false);
+  }
+});
+
+// 6) 페이지 로드 시에도 현재 상태 반영
+$(function(){
+  $('select[name="category"]').trigger('change');
+});
+
+
+// PDF 미리보기 뷰어 클래스 - 수정된 부분
+class PDFPreviewViewer {
+  constructor() {
+    this.pages = [];
+    this.selectedPages = new Set();
+    this.currentViewPage = 1;
+    this.pagesPerView = 6; // 한 번에 6개 페이지만 표시
+    this.currentBookPage = 1;
+    this.viewMode = 'grid';
+    this.userId = '';
+    this.contextPath = '';
+    
+    this.init();
+  }
+  
+  init() {
+    this.bindEvents();
+  }
+  
+  bindEvents() {
+    // 뷰 모드 전환
+    $(document).on('click', '.btn-view-mode', (e) => {
+      const mode = $(e.target).data('mode');
+      this.switchViewMode(mode);
+    });
+    
+    // 격자 뷰 페이지네이션
+    $(document).on('click', '#prevPage', () => {
+      if (this.currentViewPage > 1) {
+        this.currentViewPage--;
+        this.renderGridPages();
+        this.updatePaginationControls();
+      }
+    });
+    
+    $(document).on('click', '#nextPage', () => {
+      const totalViewPages = Math.ceil(this.pages.length / this.pagesPerView);
+      if (this.currentViewPage < totalViewPages) {
+        this.currentViewPage++;
+        this.renderGridPages();
+        this.updatePaginationControls();
+      }
+    });
+    
+    // 페이지 직접 입력
+    $(document).on('change', '#currentPageInput', (e) => {
+      const page = parseInt($(e.target).val());
+      const totalViewPages = Math.ceil(this.pages.length / this.pagesPerView);
+      if (page >= 1 && page <= totalViewPages) {
+        this.currentViewPage = page;
+        this.renderGridPages();
+        this.updatePaginationControls();
+      } else {
+        $(e.target).val(this.currentViewPage);
+      }
+    });
+    
+    // 책 뷰 네비게이션
+    $(document).on('click', '#bookPrevBtn', () => {
+      if (this.currentBookPage > 1) {
+        this.currentBookPage--;
+        this.renderBookPage();
+        this.updateBookControls();
+      }
+    });
+    
+    $(document).on('click', '#bookNextBtn', () => {
+      if (this.currentBookPage < this.pages.length) {
+        this.currentBookPage++;
+        this.renderBookPage();
+        this.updateBookControls();
+      }
+    });
+    
+    // 책 뷰 페이지 선택 - 수정된 부분
+    $(document).on('change', '#bookPageSelect', (e) => {
+      if ($(e.target).is(':checked')) {
+        // 최대 3개 제한 체크
+        if (this.selectedPages.size >= 3) {
+          e.preventDefault();
+          $(e.target).prop('checked', false);
+          alert('미리보기 페이지는 최대 3페이지까지만 선택할 수 있습니다.');
+          return;
+        }
+        this.selectedPages.add(this.currentBookPage);
+      } else {
+        this.selectedPages.delete(this.currentBookPage);
+      }
+      this.updateSelectedPagesDisplay();
+      this.updateCheckboxStates();
+    });
+  }
+  
+  switchViewMode(mode) {
+    this.viewMode = mode;
+    
+    // 버튼 상태 업데이트
+    $('.btn-view-mode').removeClass('active');
+    $(`.btn-view-mode[data-mode="\${mode}"]`).addClass('active');
+    
+    // 뷰어 표시/숨김
+    $('.grid-viewer').toggleClass('active', mode === 'grid');
+    $('.book-viewer').toggleClass('active', mode === 'book');
+    
+    if (mode === 'book') {
+      this.renderBookPage();
+      this.updateBookControls();
+    }
+  }
+  
+  loadPages(pages, fileName, userId, contextPath) {
+    this.pages = pages.map((page, index) => ({
+      url: `\${contextPath}/resources/upload/market/\${userId}/material/previews/\${page}`,
+      pageNumber: index + 1,
+      filename: page
+    }));
+    
+    console.log(`총 \${this.pages.length}개 페이지 로드됨, 페이지당 \${this.pagesPerView}개씩 표시`);
+    
+    this.userId = userId;
+    this.contextPath = contextPath;
+    this.currentViewPage = 1;
+    this.currentBookPage = 1;
+    this.selectedPages.clear();
+    
+    // 처음 3페이지 자동 선택 (최대 3페이지)
+    for (let i = 1; i <= Math.min(3, this.pages.length); i++) {
+      this.selectedPages.add(i);
+    }
+    
+    this.renderGridPages();
+    this.updatePaginationControls();
+    this.updateSelectedPagesDisplay();
+    this.updateCheckboxStates();
+    
+    if (this.viewMode === 'book') {
+      this.renderBookPage();
+      this.updateBookControls();
+    }
+  }
+  
+  renderGridPages() {
+    const startIndex = (this.currentViewPage - 1) * this.pagesPerView;
+    const endIndex = Math.min(startIndex + this.pagesPerView, this.pages.length);
+    const currentPages = this.pages.slice(startIndex, endIndex);
+    
+    console.log(`페이지네이션: \${startIndex}-\${endIndex}, 표시할 페이지: \${currentPages.length}개`);
+    
+    const grid = $('#pageGrid');
+    grid.empty();
+    
+    // 확실히 제한된 개수만 표시
+    if (currentPages.length === 0) {
+      grid.html('<div class="col-12 text-center text-muted">표시할 페이지가 없습니다.</div>');
+      return;
+    }
+    
+    currentPages.forEach((page, index) => {
+      const actualPageNum = startIndex + index + 1;
+      const isSelected = this.selectedPages.has(actualPageNum);
+      
+      const pageCard = $(`
+        <div class="preview-page-card \${isSelected ? 'selected' : ''}" data-page="\${actualPageNum}">
+          <div class="page-image-container">
+            <img class="page-image" src="\${encodeURI(page.url)}" alt="페이지 \${actualPageNum}"
+                 >
+            <div class="page-overlay">
+              <i class="bi bi-eye text-white fs-1"></i>mar
+            </div>
+          </div>
+          <div class="page-info">
+            <span class="page-number">페이지 \${actualPageNum}</span>
+            <div class="form-check">
+              <input class="form-check-input preview-checkbox" type="checkbox" 
+                     id="page\${actualPageNum}" name="selectedPages" value="\${actualPageNum}" 
+                     \${isSelected ? 'checked' : ''}>
+              <label class="form-check-label" for="page\${actualPageNum}">
+                선택
+              </label>
+            </div>
+          </div>
+        </div>
+      `);
+      
+      // 페이지 선택 이벤트 - 수정된 부분
+      pageCard.find('.preview-checkbox').on('change', (e) => {
+        const pageNum = parseInt($(e.target).val());
+        if ($(e.target).is(':checked')) {
+          // 최대 3개 제한 체크
+          if (this.selectedPages.size >= 3) {
+            e.preventDefault();
+            $(e.target).prop('checked', false);
+            alert('미리보기 페이지는 최대 3페이지까지만 선택할 수 있습니다.');
+            return;
+          }
+          this.selectedPages.add(pageNum);
+          pageCard.addClass('selected');
+        } else {
+          this.selectedPages.delete(pageNum);
+          pageCard.removeClass('selected');
+        }
+        this.updateSelectedPagesDisplay();
+        this.updateCheckboxStates();
+      });
+      
+      // 카드 클릭으로도 선택 가능
+      pageCard.on('click', (e) => {
+        if (!$(e.target).is('input, label')) {
+          const checkbox = pageCard.find('.preview-checkbox');
+          checkbox.prop('checked', !checkbox.prop('checked')).trigger('change');
+        }
+      });
+      
+      grid.append(pageCard);
+    });
+    
+    console.log(`실제 렌더링된 페이지 카드: \${grid.children().length}개`);
+  }
+  
+  renderBookPage() {
+    if (this.pages.length === 0) return;
+    
+    const bookPage = $('#bookPage');
+    const currentPage = this.pages[this.currentBookPage - 1];
+    
+    if (currentPage) {
+      bookPage.attr('src', currentPage.url);
+      bookPage.attr('alt', `페이지 \${this.currentBookPage}`);
+    }
+    
+    // 선택 상태 업데이트
+    const checkbox = $('#bookPageSelect');
+    const isSelected = this.selectedPages.has(this.currentBookPage);
+    checkbox.prop('checked', isSelected);
+    
+    // 체크박스 비활성화 상태 업데이트
+    const isMaxSelected = this.selectedPages.size >= 3;
+    if (!isSelected) {
+      checkbox.prop('disabled', isMaxSelected);
+    } else {
+      checkbox.prop('disabled', false);
+    }
+  }
+  
+  updatePaginationControls() {
+    const totalViewPages = Math.ceil(this.pages.length / this.pagesPerView);
+    
+    $('#prevPage').prop('disabled', this.currentViewPage === 1);
+    $('#nextPage').prop('disabled', this.currentViewPage === totalViewPages);
+    $('#currentPageInput').val(this.currentViewPage);
+    $('#totalPages').text(totalViewPages);
+    
+    const startPage = (this.currentViewPage - 1) * this.pagesPerView + 1;
+    const endPage = Math.min(startPage + this.pagesPerView - 1, this.pages.length);
+    $('#pageRangeInfo').text(`\${startPage}-\${endPage} / \${this.pages.length}`);
+  }
+  
+  updateBookControls() {
+    $('#bookPrevBtn').prop('disabled', this.currentBookPage === 1);
+    $('#bookNextBtn').prop('disabled', this.currentBookPage === this.pages.length);
+    $('#bookCurrentPage').text(this.currentBookPage);
+    $('#bookTotalPages').text(this.pages.length);
+  }
+  
+  // 수정된 함수
+  updateSelectedPagesDisplay() {
+    const selectedArray = Array.from(this.selectedPages).sort((a, b) => a - b);
+    const selectedList = $('#selectedPagesList');
+    const selectedCount = $('#selectedCount');
+    const maximumWarning = $('#maximumWarning');
+    
+    selectedCount.text(selectedArray.length);
+    maximumWarning.toggle(selectedArray.length >= 3);
+    
+    if (selectedArray.length === 0) {
+      selectedList.html('<span class="text-muted">아직 선택된 페이지가 없습니다.</span>');
+    } else {
+      selectedList.html(selectedArray.map(page => 
+        `<span class="selected-page-badge">페이지 \${page}</span>`
+      ).join(''));
+    }
+  }
+  
+  // 새로 추가된 함수 - 체크박스 상태 업데이트
+  updateCheckboxStates() {
+    const isMaxSelected = this.selectedPages.size >= 3;
+    
+    // 격자 뷰의 체크박스들 상태 업데이트
+    $('.preview-checkbox').each((index, checkbox) => {
+      const pageNum = parseInt($(checkbox).val());
+      const isCurrentSelected = this.selectedPages.has(pageNum);
+      
+      // 선택되지 않은 체크박스들을 비활성화/활성화
+      if (!isCurrentSelected) {
+        $(checkbox).prop('disabled', isMaxSelected);
+        $(checkbox).closest('.preview-page-card').toggleClass('disabled', isMaxSelected);
+      }
+    });
+    
+    // 책 뷰의 체크박스 상태 업데이트
+    const bookCheckbox = $('#bookPageSelect');
+    if (bookCheckbox.length) {
+      const isBookPageSelected = this.selectedPages.has(this.currentBookPage);
+      if (!isBookPageSelected) {
+        bookCheckbox.prop('disabled', isMaxSelected);
+      }
+    }
+  }
+  
+  getSelectedPages() {
+    return Array.from(this.selectedPages).sort((a, b) => a - b);
+  }
+  
+  // 페이지당 표시 개수 변경 함수 추가
+  setPagesPerView(count) {
+    this.pagesPerView = count;
+    this.currentViewPage = 1; // 첫 페이지로 리셋
+    this.renderGridPages();
+    this.updatePaginationControls();
+    console.log(`페이지당 표시 개수를 \${count}개로 변경했습니다.`);
+  }
+}
+
+// 전역 뷰어 인스턴스
+let pdfViewer = null;
+let savedFileName = null;
+
+// 새로운 displayPreviewPages 함수 - 기존 함수를 완전히 교체
+function displayPreviewPages(pages, fileName) {
+  const userId = '<%=loginUser != null ? loginUser.userId() : ""%>';
+  const contextPath = '<%=request.getContextPath()%>';
+  
+  if (!userId) {
+    console.error('사용자 ID가 없습니다.');
+    handlePreviewError('사용자 인증이 필요합니다.');
+    return;
+  }
+  
+  // 뷰어 HTML 구조 생성
+  const viewerHtml = `
+    <div class="preview-viewer">
+      <div class="viewer-header">
+        <div>
+          <h5 class="mb-0 text-white">
+            <i class="bi bi-file-earmark-pdf me-2"></i>
+            PDF 미리보기 선택 (\${fileName})
+          </h5>
+          <small class="opacity-75">미리보기로 사용할 페이지를 선택해주세요 (최대 3페이지)</small>
+        </div>
+        <div class="view-mode-toggle">
+          <button type="button" class="btn-view-mode active" data-mode="grid">
+            <i class="bi bi-grid-3x3-gap me-1"></i> 격자
+          </button>
+          <button type="button" class="btn-view-mode" data-mode="book">
+            <i class="bi bi-book me-1"></i> 책
+          </button>
+        </div>
+      </div>
+
+      <div class="viewer-body">
+        <!-- 격자 뷰 -->
+        <div class="grid-viewer active">
+          <div class="pagination-controls">
+            <button type="button" class="btn-page" id="prevPage" disabled>
+              <i class="bi bi-chevron-left"></i>
+            </button>
+            
+            <div class="page-input-group">
+              <input type="number" class="page-input" id="currentPageInput" value="1" min="1">
+              <span class="page-info-display">/ <span id="totalPages">1</span></span>
+            </div>
+            
+            <button type="button" class="btn-page" id="nextPage">
+              <i class="bi bi-chevron-right"></i>
+            </button>
+            
+            <div class="page-info-display ms-3">
+              <span id="pageRangeInfo">1-6 / 1</span> 페이지
+            </div>
+          </div>
+
+          <div class="page-grid" id="pageGrid">
+            <!-- 페이지들이 여기에 동적으로 생성됩니다 -->
+          </div>
+        </div>
+
+        <!-- 책 뷰 -->
+        <div class="book-viewer">
+          <div class="book-container">
+            <div class="text-center">
+              <img class="book-page" id="bookPage" src="" alt="PDF 페이지">
+            </div>
+            
+            <div class="book-controls">
+              <button type="button" class="book-nav-btn" id="bookPrevBtn" disabled>
+                <i class="bi bi-chevron-left"></i> 이전
+              </button>
+              
+              <div class="d-flex align-items-center gap-3">
+                <span class="fw-bold">페이지 <span id="bookCurrentPage">1</span> / <span id="bookTotalPages">1</span></span>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="bookPageSelect">
+                  <label class="form-check-label" for="bookPageSelect">
+                    미리보기로 선택
+                  </label>
+                </div>
+              </div>
+              
+              <button type="button" class="book-nav-btn" id="bookNextBtn">
+                다음 <i class="bi bi-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 선택된 페이지 요약 -->
+        <div class="selection-summary">
+          <h6><i class="bi bi-check2-circle me-1"></i> 선택된 미리보기 페이지</h6>
+          <div class="selected-pages-list" id="selectedPagesList">
+            <span class="text-muted">아직 선택된 페이지가 없습니다.</span>
+          </div>
+          <div class="mt-2">
+            <small class="text-muted">
+              선택된 페이지: <span id="selectedCount">0</span>개 / 최대 3개
+              <span class="text-warning ms-2" id="maximumWarning" style="display: none;">
+                (최대 3페이지까지 선택 가능)
+              </span>
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  $('#previewContainer').html(viewerHtml);
+  
+  // 뷰어 인스턴스 생성 및 페이지 로드
+  if (!pdfViewer) {
+    pdfViewer = new PDFPreviewViewer();
+  }
+  
+  pdfViewer.loadPages(pages, fileName, userId, contextPath);
+}
+
 $(document).ready(function() {
 	  console.log('문서 로드 완료');
 	  
@@ -659,6 +1441,15 @@ $(document).ready(function() {
 	  
 	  $('#fileInput').on('change', function(e) {
 	    e.stopPropagation(); // 이벤트 전파 중단
+      $.ajax({
+        url : '<%=request.getContextPath()%>/market/cancleRegist.do',
+        type : 'POST',
+        data : {"savedFileName": savedFileName},
+        success(){
+        
+        }
+
+      })
 	    console.log('파일 선택 이벤트 발생', this.files);
 	    
 	    if (this.files && this.files.length > 0 && !isProcessing) {
@@ -681,8 +1472,9 @@ $(document).ready(function() {
 	      alert('파일 크기는 50MB를 초과할 수 없습니다.');
 	      resetFileInput();
 	      return;
+		
 	    }
-	    
+			
 	    // PDF 파일 확인
 	    if (fileExtension === 'pdf') {
 	      selectedFile = file;
@@ -693,19 +1485,18 @@ $(document).ready(function() {
 	      resetFileInput();
 	    }
 	  }
-	  
+		
 	  // 파일 입력 초기화
 	  function resetFileInput() {
 	    $('#fileInput').val('');
-	    //$('#fileInput')[0].files='';
 	    selectedFile = null;
 	    isProcessing = false;
 	    $('#fileUpload p').text('PDF 파일을 끌어서 놓거나 클릭하여 업로드');
 	  }
-	  
+	  	
 	  // 파일 표시 업데이트
 	  function updateFileDisplay(fileName, fileSize, status) {
-	    $('#fileUpload p').text(`${fileName} (${fileSize}MB) - ${status}`);
+	    $('#fileUpload p').text(`\${fileName} (\${fileSize}MB) - \${status}`);
 	  }
 	  
 	  // AJAX로 PDF 업로드 및 미리보기 생성
@@ -726,8 +1517,10 @@ $(document).ready(function() {
 	      enctype: 'multipart/form-data',
 	      success: function(response) {
 	        try { 
+            debugger;
 	          const result = typeof response === 'string' ? JSON.parse(response) : response;
 	          console.log("실행 ",result);
+              savedFileName=file.name;
 	          if (result.success && result.pages && result.pages.length > 0) {
 	            displayPreviewPages(result.pages, file.name);
 	            updateFileDisplay(file.name, (file.size / 1024 / 1024).toFixed(2), '미리보기 생성 완료');
@@ -741,15 +1534,13 @@ $(document).ready(function() {
 	      },
 	      error: function(xhr, status, error) {
 	        console.error('AJAX 오류:', status, error);
-	        
+			
 	        let errorMessage = '서버 오류로 미리보기 생성에 실패했습니다.';
 	        if (status === 'timeout') {
 	          errorMessage = '서버 응답 시간이 초과되었습니다. 파일 크기를 확인해주세요.';
 	        } else if (xhr.status === 413) {
 	          errorMessage = '파일 크기가 너무 큽니다.';
 	        }
-	        
-	       // handlePreviewError(errorMessage);
 	      },
 	      complete: function() {
 	        isProcessing = false; // 완료 시 플래그 해제
@@ -759,7 +1550,7 @@ $(document).ready(function() {
 	      }
 	    });
 	  }
-	  
+	
 	  // 로딩 상태 표시
 	  function showLoadingState() {
 	    $('#previewContainer').html(`
@@ -794,116 +1585,6 @@ $(document).ready(function() {
 	    isProcessing = false;
 	  }
 	  
-	  // 미리보기 페이지들을 화면에 표시
-	  function displayPreviewPages(pages, fileName) {
-	    const userId = '<%=loginUser != null ? loginUser.userId() : ""%>';
-	    const contextPath = '<%=request.getContextPath()%>';
-	    
-	    if (!userId) {
-	      console.error('사용자 ID가 없습니다.');
-	      handlePreviewError('사용자 인증이 필요합니다.');
-	      return;
-	    }
-	    
-	    let html = '<div class="row g-3">';
-	    
-	    for (let i = 0; i < pages.length; i++) {
-	      const isSelected = i < 3;
-	      const imageUrl = `${contextPath}/resources/upload/market/${userId}/material/previews/${pages[i]}`;
-	      
-	      html += `
-	        <div class="col-md-4 col-sm-6">
-	          <div class="preview-page-item \${isSelected ? 'selected' : ''}" data-page="\${i + 1}">
-	            <div class="preview-page-header">
-	              <span class="page-number">페이지 ${i + 1}</span>
-	              <div class="form-check">
-	                <input class="form-check-input preview-checkbox" type="checkbox" 
-	                       id="page\${i + 1}" name="selectedPages" value="\${i + 1}" 
-	                       ${isSelected ? 'checked' : ''}>
-	                <label class="form-check-label" for="page\${i + 1}">
-	                  미리보기로 사용
-	                </label>
-	              </div>
-	            </div>
-	            <div class="preview-image-container">
-	              <img src="${imageUrl}" 
-	                   alt="페이지 ${i + 1}" 
-	                   class="img-fluid rounded"
-	                   onerror="this.src='\${contextPath}/resources/images/preview-error.png'">
-	            </div>
-	          </div>
-	        </div>
-	      `;
-	    }
-	    
-	    html += '</div>';
-	    html += `
-	      <div class="mt-3 alert alert-info" id="previewAlert">
-	        <i class="bi bi-info-circle me-2"></i>
-	        <strong>미리보기 페이지 선택</strong><br>
-	        최소 3페이지 이상을 선택해주세요. 선택된 페이지들이 구매자에게 미리보기로 제공됩니다.
-	      </div>
-	    `;
-	    
-	    $('#previewContainer').html(html);
-	    bindPreviewPageEvents();
-	  }
-	  
-	  // 미리보기 페이지 선택 이벤트 - 무한 재귀 방지
-	  function bindPreviewPageEvents() {
-	    // 페이지 아이템 클릭 (체크박스 제외)
-	    $(document).off('click.previewPage').on('click.previewPage', '.preview-page-item', function(e) {
-	      // 체크박스나 라벨을 직접 클릭한 경우는 제외
-	      if ($(e.target).is('input[type="checkbox"], label')) {
-	        return;
-	      }
-	      
-	      e.preventDefault();
-	      e.stopPropagation();
-	      
-	      const checkbox = $(this).find('.preview-checkbox');
-	      if (checkbox.length) {
-	        // prop 변경만 하고 change 이벤트는 수동으로 호출
-	        const newState = !checkbox.prop('checked');
-	        checkbox.prop('checked', newState);
-	        
-	        // 페이지 아이템 상태 변경
-	        $(this).toggleClass('selected', newState);
-	        
-	        // 알림 업데이트
-	        updatePreviewAlert();
-	      }
-	    });
-	    
-	    // 체크박스 직접 변경
-	    $(document).off('change.previewCheckbox').on('change.previewCheckbox', '.preview-checkbox', function(e) {
-	      e.stopPropagation();
-	      
-	      const pageItem = $(this).closest('.preview-page-item');
-	      pageItem.toggleClass('selected', this.checked);
-	      
-	      updatePreviewAlert();
-	    });
-	  }
-	  
-	  // 미리보기 알림 업데이트
-	  function updatePreviewAlert() {
-	    const selectedCount = $('.preview-checkbox:checked').length;
-	    const alertElement = $('#previewAlert');
-	    
-	    if (alertElement.length === 0) return;
-	    
-	    if (selectedCount < 3) {
-	      alertElement.removeClass('alert-info').addClass('alert-warning');
-	      alertElement.find('strong').text('미리보기 페이지 부족');
-	      alertElement.find('br').next().text(`현재 ${selectedCount}페이지 선택됨. 최소 3페이지 이상 선택해주세요.`);
-	    } else {
-	      alertElement.removeClass('alert-warning').addClass('alert-info');
-	      alertElement.find('strong').text('미리보기 페이지 선택');
-	      alertElement.find('br').next().text(`${selectedCount}페이지가 선택되었습니다. 구매자에게 미리보기로 제공됩니다.`);
-	    }
-	  }
-	  
 	  // Drag and drop functionality - 무한 재귀 방지
 	  let dragEnterCount = 0;
 	  
@@ -932,7 +1613,7 @@ $(document).ready(function() {
 	      $(this).removeClass('border-main bg-main-light');
 	    }
 	  });
-	  
+		
 	  $('#fileUpload').on('drop', function(e) {
 	    e.preventDefault();
 	    e.stopPropagation();
@@ -956,7 +1637,7 @@ $(document).ready(function() {
 	    }
 	  });
 	  
-	  // Form validation
+	  // Form validation - 수정된 부분
 	  $('form').on('submit', function(e) {
 	    // 처리 중이면 제출 방지
 	    if (isProcessing) {
@@ -972,7 +1653,7 @@ $(document).ready(function() {
 	    requiredCheckboxes.each(function() {
 	      if (!$(this).is(':checked')) {
 	        allChecked = false;
-	        $(this).focus();
+	        // $(this).focus();
 	        return false;
 	      }
 	    });
@@ -987,18 +1668,42 @@ $(document).ready(function() {
 	    if (!selectedFile) {
 	      e.preventDefault();
 	      alert('PDF 파일을 업로드해주세요.');
-	      $('#fileInput').focus();
+	      // $('#fileInput').focus();
 	      return false;
 	    }
 	    
-	    // 미리보기 페이지 선택 확인
-	    const selectedPreviews = $('.preview-checkbox:checked').length;
-	    if (selectedPreviews < 3) {
+	    // 미리보기 페이지 선택 확인 - 수정된 부분
+	    if (pdfViewer) {
+	      const selectedPages = pdfViewer.getSelectedPages();
+	      
+	      // 최소 1페이지, 최대 3페이지 검증
+	      if (selectedPages.length === 0) {
+	        e.preventDefault();
+	        alert('미리보기 페이지를 최소 1페이지 이상 선택해주세요.');
+	        $('html, body').animate({
+	          scrollTop: $('#previewContainer').offset().top - 100
+	        }, 500);
+	        return false;
+	      }
+	      
+	      if (selectedPages.length > 3) {
+	        e.preventDefault();
+	        alert('미리보기 페이지는 최대 3페이지까지만 선택할 수 있습니다.');
+	        $('html, body').animate({
+	          scrollTop: $('#previewContainer').offset().top - 100
+	        }, 500);
+	        return false;
+	      }
+	      
+	      // 선택된 페이지 정보를 hidden input으로 추가
+	      $('input[name="selectedPreviewPages"]').remove();
+	      selectedPages.forEach(page => {
+	        $(this).append(`<input type="hidden" name="selectedPreviewPages" value="\${page}">`);
+	      });
+	      
+	    } else {
 	      e.preventDefault();
-	      alert('미리보기 페이지를 최소 3페이지 이상 선택해주세요.');
-	      $('html, body').animate({
-	        scrollTop: $('#previewContainer').offset().top - 100
-	      }, 500);
+	      alert('PDF 파일을 먼저 업로드해주세요.');
 	      return false;
 	    }
 	    
@@ -1016,8 +1721,8 @@ $(document).ready(function() {
 	    if (emptyField) {
 	      e.preventDefault();
 	      const fieldLabel = emptyField.closest('.mb-3').find('label').text() || '필수 입력 필드';
-	      alert(`${fieldLabel}를 입력해주세요.`);
-	      emptyField.focus();
+	      alert(`\${fieldLabel}를 입력해주세요.`);
+	      // emptyField.focus();
 	      return false;
 	    }
 	    
@@ -1084,13 +1789,27 @@ $(document).ready(function() {
 	  
 	  console.log('=== 디버깅 완료 ===');
 	}
+  function cancleRegist(){
 
+    if(confirm('작성중인 내용이 삭제됩니다, 정말 취소하시겠습니까?')){
+      $.ajax({
+        url : '<%=request.getContextPath()%>/market/cancleRegist.do',
+        type : 'POST',
+        data : {"savedFileName": savedFileName},
+        success(){
+          alert('자료 등록이 취소되었습니다.');
+          location.href='<%=request.getContextPath()%>/'
+        }
+
+      })
+    }
+  }
 	function saveDraft() {
 	  if (confirm('현재 작성 중인 내용을 임시저장하시겠습니까?')) {
 	    const formData = new FormData($('form')[0]);
 	    
-	    $.ajax({
-	      url: '<%=request.getContextPath()%>/study/saveDraft.do',
+	    $.ajax({ 
+	      url: '<%=request.getContextPath()%>/market/saveDraft.do',
 	      type: 'POST',
 	      data: formData,
 	      processData: false,
@@ -1113,6 +1832,46 @@ $(document).ready(function() {
 	    });
 	  }
 	}
+
+	// 디버깅용 함수들 추가
+	function testPagination() {
+	  if (pdfViewer && pdfViewer.pages.length > 0) {
+	    console.log('=== 페이지네이션 테스트 ===');
+	    console.log(`총 페이지: \${pdfViewer.pages.length}`);
+	    console.log(`페이지당 표시: \${pdfViewer.pagesPerView}`);
+	    console.log(`현재 페이지: \${pdfViewer.currentViewPage}`);
+	    
+	    // 3개씩 보기 테스트
+	    pdfViewer.setPagesPerView(3);
+	  } else {
+	    alert('먼저 PDF 파일을 업로드해주세요.');
+	  }
+	}
+
+	function resetPagination() {
+	  if (pdfViewer) {
+	    pdfViewer.setPagesPerView(6);
+	    alert('6개씩 보기로 리셋되었습니다.');
+	  }
+	}
+
+  window.addEventListener("beforeunload",e=>{
+    $.ajax({
+        url : '<%=request.getContextPath()%>/market/cancleRegist.do',
+        type : 'POST',
+        data : {"savedFileName": savedFileName},
+        success(){
+
+        }
+
+      });
+
+      return "1";
+  });
+
 </script>
+
+	
+
 
 <%@ include file="/WEB-INF/views/common/footer.jsp"%>

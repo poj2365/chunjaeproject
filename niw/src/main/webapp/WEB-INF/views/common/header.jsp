@@ -97,7 +97,7 @@ User loginUser= (User)session.getAttribute("loginUser");
             <i class="bi bi-chevron-down dropdown-toggle-icon"></i>
           </a>
           <div class="custom-dropdown-menu">
-            <a class="custom-dropdown-item" href="#">초등 학습자료</a>
+            <a class="custom-dropdown-item" href="<%=request.getContextPath()%>/market/marketview.do">초등 학습자료</a>
             <a class="custom-dropdown-item" href="#">중등 학습자료</a>
             <a class="custom-dropdown-item" href="#">고등 학습자료</a>
             <div class="custom-dropdown-divider"></div>

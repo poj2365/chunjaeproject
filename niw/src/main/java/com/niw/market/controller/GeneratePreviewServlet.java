@@ -4,7 +4,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.UUID;
+import java.sql.Date;
+import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 import javax.servlet.ServletException;
@@ -21,6 +22,7 @@ import org.apache.pdfbox.rendering.PDFRenderer;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.niw.market.model.dto.Material;
 import com.niw.user.model.dto.User;
 import com.oreilly.servlet.MultipartRequest;
 import com.oreilly.servlet.multipart.DefaultFileRenamePolicy;
@@ -39,7 +41,7 @@ public class GeneratePreviewServlet extends HttpServlet {
         super();
         // TODO Auto-generated constructor stub
     }
-
+    	
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -71,28 +73,60 @@ public class GeneratePreviewServlet extends HttpServlet {
 			
 			MultipartRequest multipartRequest= new MultipartRequest(request,uploadPath,fileSize,encoding,dfrp);
 			
+			HttpSession fileSession = request.getSession();
+
 			File uploadFile=multipartRequest.getFile("uploadFile");
 			String originalFileName=multipartRequest.getOriginalFileName("uploadFile");
 			String savedFileName=multipartRequest.getFilesystemName("uploadFile");
+			JSONArray imageFiles= convertPdfToImages(uploadFile, previewPath,savedFileName);
 			
-			JSONArray imageFiles= convertPdfToImages(uploadFile, previewPath);
+			Material material= new Material(
+					0,
+					user.userId(),
+					user.userName(),
+					"",
+					"",
+					originalFileName,
+					savedFileName,
+					"",
+					0,
+					imageFiles.length(),//페이지수
+					new ArrayList<String>(),
+					previewPath,
+					uploadPath,
+					"",
+					"",
+					"",
+					"",
+					new Date(System.currentTimeMillis()),
+					new Date(System.currentTimeMillis()),
+					0,
+					0,
+					0,
+					0
+					);
 			
-			uploadFile.delete();
-			
+					
+					
+			fileSession.setAttribute("material", material);
+
 			result.put("success", true);
 			result.put("pages", imageFiles);
 			result.put("totalPages", imageFiles.length());
-		
 			
+				
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
 		
 		out.print(result.toString());
 		out.flush();
+		
+		
 	} 
 	
-	  private JSONArray convertPdfToImages(File uploadFile, String previewPath) throws IOException {
+		
+	  private JSONArray convertPdfToImages(File uploadFile, String previewPath, String savedFileName) throws IOException {
 	        JSONArray imageFiles = new JSONArray();
 	        
 	        try (PDDocument document = Loader.loadPDF(uploadFile);) {
@@ -104,7 +138,7 @@ public class GeneratePreviewServlet extends HttpServlet {
 	                BufferedImage image = pdfRenderer.renderImageWithDPI(page, 150, ImageType.RGB);
 	                
 	               
-	                String imageFileName = "preview_"+ "_page" + (page + 1) + ".png";
+	                String imageFileName = savedFileName.substring(0,savedFileName.lastIndexOf("."))+"_preview_"+ "page" + (page + 1) + ".png";
 	                String imageFilePath = previewPath + File.separator + imageFileName;
 	                
 	              
@@ -115,7 +149,7 @@ public class GeneratePreviewServlet extends HttpServlet {
 	                imageFiles.put(imageFileName);
 	            }
 	        }
-	        
+	        	
 	        return imageFiles;
 	    }
 	}
