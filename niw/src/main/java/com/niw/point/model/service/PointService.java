@@ -6,6 +6,7 @@ import com.niw.common.JDBCTemplate;
 import com.niw.point.model.dao.PointDao;
 import com.niw.point.model.dto.Point;
 import com.niw.point.model.dto.PointRefund;
+import com.niw.user.model.dto.User;
 
 public class PointService {
 
@@ -43,5 +44,33 @@ public class PointService {
 		JDBCTemplate.close(conn);
 		return result;
 	}
+	
+	public int refundFileHistoy(PointRefund p) {
+		Connection conn = JDBCTemplate.getConnection();
+		int result = dao.refundPointHistory(conn, p);
+		if (result > 0) {
+			JDBCTemplate.commit(conn);	
+		} else {
+			JDBCTemplate.rollback(conn);	
+		}
+		JDBCTemplate.close(conn);
+		return result;
+	}
+
+	
+	public int chargePoint(int addpoint, String userId ) {
+		Connection conn = JDBCTemplate.getConnection();
+		int result = dao.chargePoint(conn, userId, addpoint);
+		if (result > 0) {
+			JDBCTemplate.commit(conn);	
+		} else {
+			JDBCTemplate.rollback(conn);	
+		}
+		JDBCTemplate.close(conn);
+		return result;
+	}
+	
+	
+
 
 }

@@ -1,79 +1,65 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page import="com.niw.user.model.dto.User" %>
-
-
- <%@ include file="/WEB-INF/views/common/header.jsp" %>
-
+<%@ page import="com.niw.user.model.dto.User"%>
+<%@ include file="/WEB-INF/views/common/header.jsp"%>
+<%
+if (loginUser == null) {
+	response.sendRedirect(request.getContextPath() + "/user/loginview.do");
+	return;
+}
+%>
 
 <style>
-    /* 마이페이지 전용 스타일 */
     .mypage-container {
-        max-width: 1400px; /* 1200px → 1400px로 증가 */
+        max-width: 1400px;
         margin: 30px auto;
         display: flex;
-        gap: 30px; /* 20px → 30px로 증가 */
-        flex: 1;
-        padding: 0 20px; /* 15px → 20px로 증가 */
+        gap: 30px;
+        padding: 0 20px;
     }
-    
-    /* 사이드바 스타일 */
+
     .sidebar {
-        width: 260px; /* 240px → 220px로 축소 */
-        background-color: white;
+        width: 260px;
+        background-color: #fff;
         border-radius: 12px;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         padding: 20px 0;
-        flex-shrink: 0; /* 사이드바 크기 고정 */
+        flex-shrink: 0;
     }
-    
+
     .profile-section {
         padding: 0 20px 20px;
         border-bottom: 1px solid #eee;
         text-align: center;
     }
-    
+
     .profile-pic {
         width: 100px;
         height: 100px;
         border-radius: 50%;
         background-color: #f0f0f0;
         margin: 0 auto 15px;
-        overflow: hidden;
         display: flex;
         justify-content: center;
         align-items: center;
         border: 3px solid var(--bs-primary-light);
     }
-    
-    .profile-pic img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-    
+
     .user-id {
         font-weight: bold;
         margin-bottom: 5px;
         font-size: 18px;
         color: #333;
     }
-    
-    .user-name {
+
+    .user-name, .point-info {
         color: #666;
         margin-bottom: 10px;
     }
-    
-    .point-info {
-        font-size: 16px;
-        color: var(--bs-blind-dark);
-        margin-top: 10px;
-        font-weight: bold;
-    }
-    
+
     .menu-section {
         padding: 20px 0;
     }
-    
+
     .menu-title {
         padding: 0 20px;
         margin-bottom: 10px;
@@ -81,72 +67,114 @@
         color: #888;
         font-weight: bold;
     }
-    
+
     .menu-item {
         padding: 12px 20px;
-        transition: all 0.2s;
+        transition: 0.2s;
         display: flex;
         align-items: center;
         cursor: pointer;
     }
-    
-    .menu-item i {
-        margin-right: 10px;
-        font-size: 18px;
-    }
-    
-    .menu-item:hover {
-        background-color: var(--bs-primary-light);
-        color: var(--bs-blind-dark);
-    }
-    
+
+    .menu-item:hover,
     .menu-item.active {
         background-color: var(--bs-primary-light);
         color: var(--bs-blind-dark);
+    }
+
+    .menu-item.active {
         border-left: 3px solid var(--bs-blind-dark);
         font-weight: bold;
     }
-    
-    /* 메인 컨텐츠 스타일 */
+
     .main-content {
         flex: 1;
-        background-color: white;
+        background-color: #fff;
         border-radius: 12px;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         padding: 30px;
         min-height: 450px;
     }
-    
-    .loading-content {
+
+    .content-header {
         display: flex;
-        justify-content: center;
+        justify-content: space-between;
         align-items: center;
-        height: 400px;
-        flex-direction: column;
-        color: #888;
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #eee;
     }
-    
-    .loading-spinner {
-        border: 4px solid #f3f3f3;
-        border-top: 4px solid var(--bs-blind-dark);
-        border-radius: 50%;
-        width: 40px;
-        height: 40px;
-        animation: spin 1s linear infinite;
-        margin-bottom: 20px;
+
+    .content-title {
+        font-size: 24px;
+        font-weight: bold;
+        color: #333;
     }
-    
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
+
+    .content-section {
+        margin-bottom: 30px;
     }
-    
-    /* 반응형 스타일 */
+
+    .section-title {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 15px;
+        color: #444;
+    }
+
+    .info-table {
+        width: 100%;
+        border-collapse: collapse;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 0 0 1px #eee;
+        table-layout: fixed;
+    }
+
+    .info-table th,
+    .info-table td {
+        padding: 20px;
+        text-align: left;
+        border-bottom: 1px solid #eee;
+        vertical-align: middle;
+    }
+
+    .info-table th {
+        width: 200px;
+        background-color: var(--bs-primary-light);
+        font-weight: 600;
+        color: #444;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 15px 18px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 16px;
+        transition: 0.2s;
+        box-sizing: border-box;
+    }
+
+    .form-input:focus {
+        border-color: var(--bs-blind-dark);
+        box-shadow: 0 0 0 3px rgba(36, 177, 181, 0.2);
+        outline: none;
+    }
+
+    .form-input::placeholder {
+        color: #ccc;
+    }
+
+    .form-input:disabled {
+        background-color: #f5f6f7;
+        cursor: not-allowed;
+    }
+
     @media (max-width: 768px) {
         .mypage-container {
             flex-direction: column;
         }
-        
         .sidebar {
             width: 100%;
         }
@@ -199,59 +227,146 @@
     
     <!-- 메인 컨텐츠 영역 -->
     <div class="main-content">
-        <!-- 초기 로딩 시 회원정보 표시 -->
-        <div class="loading-content">
-            <div class="loading-spinner"></div>
-            <p>페이지를 불러오는 중입니다...</p>
+<div class="content-header">
+    <h2 class="content-title">환불 신청</h2>
+</div>
+
+<div class="content-section">
+    <h3 class="section-title">기본 정보</h3>
+    <form action ="<%=request.getContextPath()%>/point/refundendpoint.do" method="post" id ="saveRefund">
+        <table class="info-table">
+            <tr>
+                <th>회원 ID</th>
+                <td>
+                    <input type="text" name="userId" value="<%=loginUser.userId()%>" readonly id ="userId">
+                </td>
+            </tr>
+            <tr id="row-refund-id" style="display: ;" >
+                <th>환불 요청일</th>
+                <td>
+                    <input type="date" name="refundDate" id="refundDateInput" class="form-input" disabled>
+                </td>
+            </tr>
+            <tr>
+                <th>환불 유형</th>
+                <td>
+                    <input type="radio"  name="refundType" value="file" ><label>자료</label>
+                    <input type="radio"  name="refundType" value="point" ><label>포인트(P)</label>
+                </td>
+            </tr>
+            
+            <tr id="row-document-id" style="display:;">
+				  <th>학습 자료 ID</th>
+				  <td>
+				    <select name="fileId" class="form-input">
+				      <option value="1">파일 A</option>
+				      <option value="2">파일 B</option>
+				      <option value="3">파일 C</option>
+				    </select>
+				  </td>
+				</tr>
+            <tr id="row-dpoint-id" style="display:none;">
+                <th>자료 환불 포인트 금액</th>
+                <td>
+                    <input type="number" name = "refundFilePoint" class="form-input" value="" placeholder="1000">
+                </td>
+            </tr>
+               <tr id="row-point-id" style="display:none;">
+                <th>환불 포인트 금액</th>
+                <td>
+                    <input type="number"  id="refundPoint" name = "refundPoint" class="form-input" min=1000 placeholder="1000">
+                </td>
+            </tr>
+            <tr id="row-bankAccount-id" style="display:none ;">
+                <th>환불 계좌</th>
+                <td>
+                    <select name="refundBank" class="form-input" style="width: 20%;">
+				      <option value="국민">국민</option>
+				      <option value="기업">기업</option>
+				      <option value="농협">농협</option>
+				      <option value="신한">신한</option>
+				      <option value="토스뱅크">토스뱅크</option>
+				    </select> 
+				    <input type="number" id="accountNumber" name="accountNumber" class="form-input" style="width: 78%;" placeholder="계좌번호 입력">
+				</td>      
+            </tr>   
+        </table>
+        
+    
+        <div id="completepoint" style="text-align: right; margin-top: 20px; display: none;">
+            <button type="submit" class="btn btn-primary" >
+                <i class="bi bi-check-circle me-1"></i>포인트 환불 신청하기 
+            </button>
         </div>
-    </div>
+        
+        <div id="completefile" style="text-align: right; margin-top: 20px; display: none;">
+            <button type="button" class="btn btn-primary" onclick="refundFile()" >
+                <i class="bi bi-check-circle me-1"></i>파일 환불 신청하기 
+            </button>
+        </div>
+        
+    </form>
+</div>
+
+</div>
 </div>
 
 <script>
-$(document).ready(function() {
-    // 페이지 로드 시 기본 탭(회원정보) 로드
-    loadTabContent('info');
-    
-    // 사이드바 메뉴 클릭 이벤트
-    $('.menu-item').on('click', function() {
-        var $this = $(this);
-        var tabId = $this.data('tab');
-        
-        // 메뉴 활성화 표시
-        $('.menu-item').removeClass('active');
-        $this.addClass('active');
-        
-        // 해당 탭 콘텐츠 로드
-        loadTabContent(tabId);
-    });
-});
+	const refundFile = function(){
+		const change = document.getElementById('saveRefund');
+		change.action = "<%=request.getContextPath()%>/point/refundendfile.do"
+		change.submit();
+	}
+	 
+	document.addEventListener('DOMContentLoaded', function () {
+	  const refundTypeRadios = document.querySelectorAll('input[name="refundType"]');
+	
+	  const documentRow = document.getElementById('row-document-id');
+	  const dPointRow = document.getElementById('row-dpoint-id');
+	  const pointRow = document.getElementById('row-point-id');
+	  const bankAccount = document.getElementById('row-bankAccount-id');
+	  const completepoint = document.getElementById('completepoint');
+	  const completefile = document.getElementById('completefile');
+	  
+	
+	  
+	  documentRow.style.display = 'none';
+	  dPointRow.style.display = 'none';
+	  pointRow.style.display = 'none';
+	  bankAccount.style.display ='none';
+	  completepoint.style.display='none';
+	  completefile.style.display='none';
 
-// 탭 콘텐츠 로드 함수
-function loadTabContent(tabId) {
-    // 로딩 표시
-    $('.main-content').html(`
-        <div class="loading-content">
-            <div class="loading-spinner"></div>
-            <p>페이지를 불러오는 중입니다...</p>
-        </div>
-    `);
-    
-    // AJAX로 해당 탭 페이지 로드
-    $.ajax({
-        url: '<%=request.getContextPath()%>/user/mypage/' + tabId + '.do',
-        type: 'GET',
-        success: function(data) {
-            $('.main-content').html(data);
-        },
-        error: function(xhr, status, error) {
-            $('.main-content').html(`
-                <div class="loading-content">
-                    <i class="bi bi-exclamation-triangle" style="font-size: 48px; color: #dc3545; margin-bottom: 20px;"></i>
-                    <p>페이지를 불러오는데 실패했습니다.</p>
-                    <button class="btn btn-primary" onclick="loadTabContent('` + tabId + `')">다시 시도</button>
-                </div>
-            `);
-        }
-    });
-}
+	
+	  refundTypeRadios.forEach(radio => {
+	    radio.addEventListener('change', () => {
+	      if (radio.value === 'file') {
+	        documentRow.style.display = '';
+	        dPointRow.style.display = '';
+	        completefile.style.display='';
+	        completepoint.style.display='none';
+	        pointRow.style.display = 'none';
+	        bankAccount.style.display='none';
+
+	      } else if (radio.value === 'point') {
+	        documentRow.style.display = 'none';
+	        dPointRow.style.display = 'none';
+	        completefile.style.display='none';
+	        completepoint.style.display='';
+	        pointRow.style.display = '';
+	        bankAccount.style.display='';
+	      }
+	    });
+	  });
+	  
+	  
+	  // 환불 요청일 자동 설정
+	  const dateInput = document.getElementById('refundDateInput');
+	  if (dateInput) {
+	    const today = new Date().toISOString().split('T')[0];
+	    dateInput.value = today;
+	  }
+	});
+	
+	
 </script>

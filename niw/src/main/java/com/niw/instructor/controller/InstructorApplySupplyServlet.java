@@ -59,7 +59,7 @@ public class InstructorApplySupplyServlet extends HttpServlet {
 			return;
 		}
 
-		String path = getServletContext().getRealPath("/resources/upload/instructor/apply/" + user.userId()+"/application");
+		String path = getServletContext().getRealPath("/resources/upload/instructor/apply/" + user.userId());
 //		 String path = "/WEB-INF/resources/upload/instructor/apply/" + user.userId();
 		File folder = new File(path);
 		if (!folder.exists())
