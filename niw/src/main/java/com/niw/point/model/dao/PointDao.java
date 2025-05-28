@@ -2,15 +2,18 @@ package com.niw.point.model.dao;
 
 import java.io.FileReader;
 import java.io.IOException;
-import java.net.URL;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import com.niw.common.JDBCTemplate;
 import com.niw.point.model.dto.Point;
+import com.niw.point.model.dto.PointHistory;
 import com.niw.point.model.dto.PointRefund;
 import com.niw.user.model.dto.User;
 
@@ -31,20 +34,7 @@ public class PointDao {
 			e.printStackTrace();
 		}
 	}
-//	private PointDao() {
-//	    try {
-//	        URL url = PointDao.class.getClassLoader().getResource("sql/point_sql.properties");
-//	        if (url == null) {
-//	            throw new RuntimeException("point_sql.properties 파일을 classpath에서 찾을 수 없습니다.");
-//	        }
-//	        String path = url.getPath();
-//	        try (FileReader fr = new FileReader(path)) {
-//	            sql.load(fr);
-//	        }
-//	    } catch (IOException e) {
-//	        e.printStackTrace();
-//	    }
-//	}
+
 
 	public static PointDao pointDao() {
 		return DAO;
@@ -80,11 +70,13 @@ public class PointDao {
 		try{
 			pstmt =  conn.prepareStatement(sql.getProperty("refundPoint"));
 
-			pstmt.setString(1, p.getUserId());
+			pstmt.setLong(1, p.getRefundId());
+			pstmt.setString(2,p.getUserId());
 			pstmt.setString(3, p.getRefundType());
-			pstmt.setInt(4 , p.getFileId());
+			pstmt.setInt(4 , p.getRefundPoint());
+			pstmt.setInt(5, p.getRefundAmount());
+			pstmt.setString(6, p.getRefundBank());
 			pstmt.setString(7, p.getRefundAccount());
-			
 			result = pstmt.executeUpdate();
 			
 		} catch (SQLException e) {
@@ -99,11 +91,12 @@ public class PointDao {
 	public int refundFileHistory(Connection conn, PointRefund p) {
 		int result = 0;
 		try{
-			pstmt =  conn.prepareStatement(sql.getProperty("refundPoint"));
-			pstmt.setString(1, p.getUserId());
+			pstmt =  conn.prepareStatement(sql.getProperty("refundFile"));
+			pstmt.setLong(1, p.getRefundId());
+			pstmt.setString(2,p.getUserId());
 			pstmt.setString(3, p.getRefundType());
-			pstmt.setInt(4 , p.getFileId());
-			pstmt.setString(7, p.getRefundAccount());
+			pstmt.setLong(4, p.getFileId());
+			pstmt.setInt(5, p.getFilePoint());
 			
 			result = pstmt.executeUpdate();
 			
@@ -116,13 +109,7 @@ public class PointDao {
 		return result;
 	}
 	
-	
-	
-	
-	
-	
-	
-	
+
 	
 	public int chargePoint (Connection conn, String userId, int addpoint) {
 		int result = 0;
@@ -138,6 +125,31 @@ public class PointDao {
 			JDBCTemplate.close(pstmt);
 		}
 		return result;
+	}
+	
+	public List<PointHistory> searchPointHistory (Connection conn,String userId){
+		List<PointHistory> historys = new ArrayList();
+		
+		try {
+			pstmt = conn.prepareStatement("searchPointHistory");
+			rs = pstmt.executeQuery();
+			
+			while(rs.next()) {
+				Date date = rs.getDate("eventdate");
+				String content = rs.getString("content");
+				int amount = rs.getInt("point");
+				int mypoint = rs.getInt("mypoint");
+				PointHistory p = new PointHistory(date,content,amount,mypoint);
+				historys.add(p);
+			}
+		
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			JDBCTemplate.close(rs);
+			JDBCTemplate.close(pstmt);
+		}
+		return historys;
 	}
 
 }

@@ -1,9 +1,7 @@
 package com.niw.point.controller;
 
 import java.io.IOException;
-import java.sql.Date;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -11,6 +9,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.niw.common.CommonTemplate;
 import com.niw.point.model.dto.PointRefund;
 import com.niw.point.model.service.PointService;
 
@@ -20,40 +19,38 @@ import com.niw.point.model.service.PointService;
 @WebServlet("/point/refundendpoint.do")
 public class PointRefundEndServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	private static final double FEE_RATE = 0.1;
        
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
     public PointRefundEndServlet() {
         super();
-        // TODO Auto-generated constructor stub
     }
 
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		
+		
+		long now = System.currentTimeMillis();
+		int rand = (int)(Math.random()*10000);
+		
+		long refundId = Long.parseLong("" + now + String.format("%04d", rand));
 		String userId = request.getParameter("userId");
-		String refunddate = request.getParameter("refundDate");
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-		Date refundDate = null;
-//		try {
-//			 // refundDate = sdf.parse(refunddate);
-//		} catch(ParseException e) {
-//			e.printStackTrace();
-//		}
 		String refundType = request.getParameter("refundType");
-		int refundPoint = Integer.parseInt(request.getParameter("refundPoint"));
-		int refundAmount = (int)(Integer.parseInt(request.getParameter("refundPoint"))*0.9);
+		System.out.println(refundType);
+		
+		System.out.println(request.getParameter("refundPoint"));
+		int refundPoint = (Integer.parseInt(request.getParameter("refundPoint"))) * -1;
+		int refundAmount = ((int)Math.round(refundPoint*(1-FEE_RATE)))*-1;
+		String refundBank = request.getParameter("refundBank");
 		String refundAccount = request.getParameter("accountNumber");
 		
 		PointRefund p = PointRefund.builder()
+				.refundId(refundId)
 				.userId(userId)
-				.refundDate(refundDate)
 				.refundType(refundType)
-				
-				
-
+				.refundPoint(refundPoint)
+				.refundAmount(refundAmount)
+				.refundBank(refundBank)
+				.refundAccount(refundAccount)
 				.build();
 		
 		int result = PointService.ponitService().refundPointHistoy(p);
@@ -65,7 +62,7 @@ public class PointRefundEndServlet extends HttpServlet {
 			System.out.println("포인트 환불 기록 실패");
 			request.setAttribute("message", "환불 요청이 실패했습니다.");
 		}
-		request.getRequestDispatcher("/views/point/refundResult.jsp").forward(request, response);
+		response.sendRedirect(request.getContextPath() + "/point/mypointhistory.do");
 		
 	}
 

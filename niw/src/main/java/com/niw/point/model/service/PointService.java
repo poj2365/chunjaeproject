@@ -1,10 +1,13 @@
 package com.niw.point.model.service;
 
 import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.niw.common.JDBCTemplate;
 import com.niw.point.model.dao.PointDao;
 import com.niw.point.model.dto.Point;
+import com.niw.point.model.dto.PointHistory;
 import com.niw.point.model.dto.PointRefund;
 import com.niw.user.model.dto.User;
 
@@ -45,9 +48,9 @@ public class PointService {
 		return result;
 	}
 	
-	public int refundFile66Histoy(PointRefund p) {
+	public int refundFileHistoy(PointRefund p) {
 		Connection conn = JDBCTemplate.getConnection();
-		int result = dao.refundPointHistory(conn, p);
+		int result = dao.refundFileHistory(conn, p);
 		if (result > 0) {
 			JDBCTemplate.commit(conn);	
 		} else {
@@ -68,6 +71,14 @@ public class PointService {
 		}
 		JDBCTemplate.close(conn);
 		return result;
+	}
+	
+	public List<PointHistory> searchPointHistory(String userId){
+		List<PointHistory> historys = new ArrayList<PointHistory>();
+		Connection conn = JDBCTemplate.getConnection();
+		historys = dao.searchPointHistory(conn,userId);
+		JDBCTemplate.close(conn);
+		return historys;
 	}
 	
 	
