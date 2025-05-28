@@ -10,14 +10,16 @@
 				java.time.Duration"%>
 <link rel="stylesheet" href="<%=request.getContextPath()%>/resources/css/board.css">
 <script src="<%=request.getContextPath()%>/resources/js/board/board.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
 <% 
 	int category = request.getParameter("category") == null? 0 : Integer.parseInt(request.getParameter("category")); 
 	List<Article> articles = (List<Article>) request.getAttribute("articles");
+	User user = (User) request.getSession().getAttribute("loginUser");
 %>
-<section class="row justify-content-between mt-4">
+<section class="row justify-content-between m-4">
 	<!-- 사이드 네비게이터 -->
-	<aside class="card col-lg-2 ms-3 me-3">
+	<aside class="card col-lg-2 ms-3">
 		<div class="card-header">
 			<h5 class="section-title">
 				카테고리
@@ -28,41 +30,41 @@
 							active
 					<%} %>
 				">
-					<a href="javascript:void(0);" onclick="activeChange(event);" data-category="0">전체글</a>
+					<a href="javascript:void(0);" onclick="activeChange(event, '/board/articlelist.do');" data-category="0">전체글</a>
 				</li>
 				<li class="list-group-item <%if(category == 1){ %>
 						active
 					<%} %>
 				">
-					<a href="javascript:void(0);" onclick="activeChange(event);" data-category="1">일반글</a>
+					<a href="javascript:void(0);" onclick="activeChange(event, '/board/articlelist.do');" data-category="1">일반글</a>
 				</li>
 				<li class="list-group-item 
 					<%if(category == 2){ %>
 						active
 					<%} %>
 				">
-					<a href="javascript:void(0);" onclick="activeChange(event);" data-category="2">질문글</a>
+					<a href="javascript:void(0);" onclick="activeChange(event, '/board/articlelist.do');" data-category="2">질문글</a>
 				</li>
 			</ul>
 		</div>			
 	</aside>
 	<!-- 메인보드 -->
-	<article class="col-lg-9 ms-3 me-3">
+	<article class="col-lg-9 article me-3">
 		<!-- 게시글 상단 선택 요소 -->
-		<div class="row flex-row justify-content-between">
+		<div class="row flex-row justify-content-between mt-5">
 			<div class="col-lg-5">
 				<h2> 자유게시판 </h2>
 			</div>
 			<div class="col-lg-7 d-flex justify-content-end align-items-end">
 				<div>
-					<select id="order" class="form-select form-select-sm" onchange="searchArticle()">
+					<select id="order" class="form-select form-select-sm" onchange="searchArticle('1', '/board/articlelist.do')">
 						<option value="0" selected>게시일순</option>
 						<option value="1">추천수순</option>
 						<option value="2">조회수순</option>
 					</select>
 				</div>
 				<div>
-					<select id="numPerPage" class="form-select form-select-sm" onchange="searchArticle()">
+					<select id="numPerPage" class="form-select form-select-sm" onchange="searchArticle('1', '/board/articlelist.do')">
 						<option selected value="10">게시글수</option>
 						<option value="10">10</option>
 						<option value="30">30</option>
@@ -70,7 +72,7 @@
 					</select>
 				</div>
 				<div>
-					<form action="">
+					<form method="post" action="<%=request.getContextPath()%>/board/articlewrite.do" onsubmit="return checkLogin(<%=user!=null%>)">
 						<button type="submit" class="btn btn-primary" style="width:80px">글쓰기</button>
 					</form>
 				</div>
@@ -120,16 +122,16 @@
 								} %>
 							</span>
 							<span class="overflow-hidden">
-								<a href="/board/boarddetail.do?articleId=<%=article.articleId()%>" class="text-decoration-none text-black">
+								<a href="<%=request.getContextPath()%>/board/boarddetail.do?articleId=<%=article.articleId()%>" class="text-decoration-none text-black">
 									<%= article.articleTitle() %>
 								</a>
 							</span>
 						</div>
 						<ul class="list-unstyled row flex-row g-1 col-lg-6">
-							<li class="col-lg-2"><i class="bi-eye"></i> <%= article.articleViews() %></li>
-							<li class="col-lg-2"><i class="bi-hand-thumbs-up"></i> <%= article.articleLikes() %></li>
-							<li class="col-lg-2"><i class="bi-chat"></i> <%= article.commentCount() %></li>
-							<li class="col-lg-6"><%= article.userId()%> &middot; <%
+							<li class="col-lg-2"><i class="bi-eye"><%= article.articleViews() %></i></li>
+							<li class="col-lg-2"><i class="bi-hand-thumbs-up"><%= article.articleLikes() %></i></li>
+							<li class="col-lg-2"><i class="bi-chat"><%= article.commentCount() %></i></li>
+							<li class="col-lg-5"><%= article.userId()%> &middot; <%
 								if(timeFlag){
 									if(hours > 0){%><%=String.valueOf(hours)+"시간전"%>
 									<%}else if(minutes > 0){%> <%= String.valueOf(minutes)+"분전"%>
@@ -138,21 +140,32 @@
 									<%=ldt.toLocalDate()%>
 								<%
 							}%> </li>
+							<li class="col-lg-1">
+								<%if(user != null && user.userId().equals(article.userId())){%>
+									<i class="bi bi-x fw-bold border rounded-2 d-flex justify-content-center align-items-center"
+									   style="width: 24px; height: 24px; cursor: pointer; font-style: normal;"
+									   onclick="deleteArticle('<%= article.articleId() %>', '/board/boardentrance.do?category=0')"></i>
+								<%} %>
+							</li>
 						</ul>						
 					</div>
 					<hr>
 				<%}
-			}%> 
+			} else if(articles != null && articles.isEmpty()){%> 
+				<div class="text-center">
+					<b> 조회된 결과가 없습니다.</b>
+				</div>
+			<% } %>
 				
 		</div>
 		<!-- 게시글 하단 선택요소 -->
 		<div class="row flex-row justify-content-between mt-4">
 			<div class="col-8 ml-4" id="search">
 				<input type="text" placeholder="게시글 검색">
-				<button type="button" class="btn btn-primary" onclick="searchArticle()"> 검색 </button>
+				<button type="button" class="btn btn-primary" onclick="searchFlag('1', '/board/articlelist.do')"> 검색 </button>
 			</div>
 			<div class="col-2">
-				<select id="likes" class="form-select form-select-sm w-auto mr-4" onchange="searchArticle()">
+				<select id="likes" class="form-select form-select-sm w-auto mr-4" onchange="searchArticle('1', '/board/articlelist.do')">
 					<option value="0" selected>추천수</option>
 					<option value="0">전체</option>
 					<option value="5">5개 이상</option>
@@ -169,4 +182,6 @@
 	</article>
 	
 </section>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
 <%@include file="/WEB-INF/views/common/footer.jsp" %>

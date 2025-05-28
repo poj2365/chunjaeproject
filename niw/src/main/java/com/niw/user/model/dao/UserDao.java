@@ -1,4 +1,4 @@
-package com.niw.user.model.dao;
+ package com.niw.user.model.dao;
 
 import static com.niw.common.JDBCTemplate.*;
 

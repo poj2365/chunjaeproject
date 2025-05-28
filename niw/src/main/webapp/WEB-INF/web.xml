@@ -29,5 +29,13 @@
 	<error-page>
 		<error-code>403</error-code>
 		<location>/errorPage?errorCode=403</location>
+
 	</error-page>
+	
+	<context-param>
+    <param-name>org.apache.catalina.webresources.allowLinking</param-name>
+    <param-value>true</param-value>
+</context-param>
+
+
 </web-app>

@@ -78,7 +78,9 @@ User loginUser= (User)session.getAttribute("loginUser");
         </div>
         <div class="col-lg-3 col-md-1 d-none d-md-block">
           <div class="d-flex justify-content-end gap-3">
+          	<% if(loginUser!=null) { %>
           	<button class="blind-btn" onclick="addPoint();"><i class="bi bi-credit-card-fill"></i></button>
+          	<% } %>
             <button class="blind-btn"><i class="bi bi-cart fs-4"></i></button>
             <button class="blind-btn"><i class="bi bi-bell fs-4"></i></button>
           </div>
@@ -97,7 +99,7 @@ User loginUser= (User)session.getAttribute("loginUser");
             <i class="bi bi-chevron-down dropdown-toggle-icon"></i>
           </a>
           <div class="custom-dropdown-menu">
-            <a class="custom-dropdown-item" href="#">초등 학습자료</a>
+            <a class="custom-dropdown-item" href="<%=request.getContextPath()%>/market/marketview.do">초등 학습자료</a>
             <a class="custom-dropdown-item" href="#">중등 학습자료</a>
             <a class="custom-dropdown-item" href="#">고등 학습자료</a>
             <div class="custom-dropdown-divider"></div>

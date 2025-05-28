@@ -10,7 +10,6 @@ public record Article(
 			String userId,
 			String articleTitle,
 			String articleContent,
-			String articleFilePath,
 			Timestamp articleDateTime,
 			Timestamp articleModifiedTime,
 			int articleViews,

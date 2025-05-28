@@ -1,17 +1,14 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%@ page import="com.niw.user.model.dto.User" %>
+<%
+    User loginUser = (User)session.getAttribute("loginUser");
+%>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<!-- jQuery넣어주기 -->
- <!-- <script src="https://cdn.portone.io/v2/browser-sdk.js"></script> -->
 	<script src="https://cdn.iamport.kr/v1/iamport.js"></script>
-<!--  <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    IMP.init("iamporttest"); // ⚠️ 여기에 본인 MID 넣기 (테스트용: iamporttest_3)
-  });
-</script> -->
 <meta charset="UTF-8">
   <title>포인트 충전</title>
   <style>
@@ -107,9 +104,8 @@
 
 <div class="charge-container">
   <h2>포인트 충전</h2>
-
   <div class="point-display">
-    현재 보유 포인트: <strong>2500P</strong>
+    현재 보유 포인트: <strong><%=loginUser.userPoint()%> P</strong>
   </div>
 
   
@@ -139,8 +135,10 @@
 </div>
 
 <script>
-
-   <%-- const buyerId = "<%= loginMember.getUserId() %>"; 로그인이 가능해지면 이거를 사용해서 넘겨주기  --%>
+	
+	function generateOrderNumber() {
+	  return Date.now().toString() + Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+	}
  
   function requestPay() {
     const amount = parseInt(document.getElementById('amount').value);
@@ -149,27 +147,24 @@
       return; 
     }
 
-    const payAmount = Math.floor(amount * 1.1);
-	const userId = "user_0001";
-	
+    const payAmount = Math.floor(amount * 1.1);  
+	const userId = "<%=loginUser.userId()%>";
     const userCode = "imp38113060";
     IMP.init(userCode); 
     
     IMP.request_pay(
       {
         channelKey: "channel-key-0444714e-72d4-48cc-a56d-8cf57cdd64db", // 내가 발급한 채널키
-        merchant_uid: Math.floor(Math.random()*1000000000),
+        merchant_uid: generateOrderNumber(),
         name: "포인트 : " + amount + "P" , // 출력할 상품정보 이름
         pay_method: "card", 
         escrow: false,
         amount: payAmount,
-        buytype : "구매",
+        buytype : "충전",
         description : amount + "P 포인트 구매",
         tax_free: 3000,
-        /* buyer_id : "user_0001", ---> 이곳에 넣어줘도 response에 넘어가지 않는다. */
-        // 
-        buyer_name: "홍길동",
-        buyer_email: "buyer@example.com",
+        buyer_name: "<%=loginUser.userName()%>",
+        buyer_email: "<%=loginUser.userEmail()%>",
         buyer_tel: "02-1670-5176",
         buyer_addr: "성수이로 20길 16",
         buyer_postcode: "04783",
@@ -207,9 +202,11 @@
     	imp_uid: response.imp_uid,
     	merchant_uid: response.merchant_uid,
         buyer_id: userId,
-        amount: amount,
+        amount: amount*1.1, 
         buytype: "구매",
         description: amount + "P 포인트 구매",
+        pointAmount : amount
+
         
       	}) 
       })
@@ -245,10 +242,9 @@
       
     }
   }
+    
   
-  
-  const display = document.getElementById('paymentInfo');
-  display.textContent = '결제할 금액: 0원';
+
 </script>
 
 
