@@ -37,7 +37,6 @@ public enum BoardDao {
 					  .userId(rs.getString("user_id"))
 					  .articleTitle(rs.getString("article_title"))
 					  .articleContent(rs.getString("article_content"))
-					  .articleFilePath(rs.getString("article_filepath"))
 					  .articleDateTime(rs.getTimestamp("article_datetime"))
 					  .articleModifiedTime(rs.getTimestamp("article_modified_time"))
 					  .articleViews(rs.getInt("article_views"))
@@ -174,6 +173,7 @@ public enum BoardDao {
 					  .commentDelete(rs.getInt("comment_delete"))
 					  .commentRef(rs.getInt("comment_ref"))
 					  .commentLevel(rs.getInt("comment_level"))
+					  .userRef(rs.getString("user_ref"))
 					  .build();
 		
 	}
@@ -314,6 +314,7 @@ public enum BoardDao {
 		} catch(SQLException e) {
 			e.printStackTrace();
 		} finally {
+			close(rs);
 			close(pstmt);
 		}
 		return recommendFlag;
@@ -353,5 +354,42 @@ public enum BoardDao {
 			close(pstmt);
 		}
 		return changeArticle;
+	}
+	
+	public int saveComment(Connection conn, String userId, int articleId, String content, int targetId, int level) {
+		int result = 0;
+		try {
+			pstmt = conn.prepareStatement(sqlPro.getProperty("saveComment"));
+			pstmt.setString(1, userId);
+			pstmt.setInt(2, articleId);
+			pstmt.setString(3, content);
+			if(level == 0) pstmt.setNull(4, java.sql.Types.NUMERIC);
+			else pstmt.setInt(4, targetId);
+			pstmt.setInt(5, level);
+			result = pstmt.executeUpdate();
+		} catch(SQLException e) {
+			e.printStackTrace();
+		} finally {
+			close(pstmt);
+		}
+		return result;
+	}
+	
+	public int saveArticle(Connection conn, Article article) {
+		int result = 0;
+		try {
+			pstmt = conn.prepareStatement(sqlPro.getProperty("saveArticle"));
+			pstmt.setString(1, article.userId());
+			pstmt.setString(2, article.articleTitle());
+			pstmt.setString(3, article.articleContent());
+			pstmt.setTimestamp(4, article.articleDateTime());
+			pstmt.setInt(5, article.articleCategory());
+			result = pstmt.executeUpdate();
+		} catch(SQLException e) {
+			e.printStackTrace();
+		} finally {
+			close(pstmt);
+		}
+		return result;
 	}
 }

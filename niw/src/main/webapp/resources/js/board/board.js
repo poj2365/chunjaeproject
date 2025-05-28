@@ -18,7 +18,7 @@ const searchArticle = (cPage, url) => {
 	const numPerPage = $("#numPerPage")[0].value;
 	const likes = $("#likes")[0].value;
 	let searchData = $("#search>input")[0].value;
-	if(sessionStorage.getItem("flag") == null){
+	if(sessionStorage.getItem("flag") != null && sessionStorage.getItem("flag") == true){
 		searchData = "";
 	}
 	const restrictData = {
@@ -111,7 +111,7 @@ const getArticle = (
 					 + likes + "&cPage="
 					 + cPage					 
 		)
-	$a.text(article['articleTitle']);
+	$a.html(article['articleTitle']);
 	$title.append($a);
 	$container.append($title);
 	const $info = $("<ul>").addClass("list-unstyled row flex-row g-1 col-lg-6");
@@ -157,24 +157,47 @@ const timeFormat = (articleDatetime) => {
 	return diffSec + '초전';
 }
 
-const createCommentWriter = () => {
+const createCommentWriter = (level, url, targetId) => {
 	const $wrapper = $("<div>").addClass("mb-3 comment-writer");
-	const $form = $("<form>").attr("action", ""); // 여기 댓글 삽입 서블릿 추가 필요
+	const $form = $("<form>");
+	if(level == 0){
+		$form.attr("action", getContextPath() + "/board/savecomment.do");
+	} else {
+		$form.attr("action", getContextPath() + "/board/savecomment.do");
+	}
 	const $topDiv = $("<div>").addClass("d-flex justify-content-between align-items-center");
 	const $label = $("<label>")
 	    .attr("for", "commentTextarea")
 	    .addClass("form-label")
 	    .text("댓글 작성");
+	const $url = $("<input>")
+		.attr({
+			type: "hidden",
+			name: "url",
+			value: url
+		})
+	const $level = $("<input>")
+		.attr({
+			type: "hidden",
+			name: "level",
+			value: level
+		})
+	const $targetId = $("<input>")
+		.attr({
+			type: "hidden",
+			name: "targetId",
+			value: targetId
+		})
 	const $submit = $("<input>")
 	    .attr({
 	        type: "submit",
 	        value: "작성"
 	    })
 	    .addClass("btn btn-primary");
-	$topDiv.append($label, $submit);
+	$topDiv.append($label, $submit, $url, $level, $targetId);
 	const $textarea = $("<textarea>")
 	    .attr({
-	        name: "comment",
+	        name: "commentTextarea",
 	        id: "commentTextarea",
 	        placeholder: "댓글을 입력하세요",
 	        rows: 3
@@ -187,26 +210,33 @@ const createCommentWriter = () => {
 	return $wrapper;
 }
 
-const writeComment = (e, level) => {
-	const $form = createCommentWriter();
-	if(level == 0){
-		const $container = $(e.target).closest("div.comment-header");
-		if ($container.find(".comment-writer").length > 0) {
-		    $container.find(".comment-writer").remove();
-		} else {
-		    $(".comment-writer").remove();
-		    $container.append($form);
-		    $form.find("textarea").focus();
+const writeComment = (e, level, userId, url) => {
+	if(userId != null && userId.trim() != ""){
+		if(level == 0){
+			const $container = $(e.target).closest("div.comment-header");
+			const targetId = $(e.target).data("target-id");
+			const $form = createCommentWriter(level, url, targetId);
+			if ($container.find(".comment-writer").length > 0) {
+			    $container.find(".comment-writer").remove();
+			} else {
+			    $(".comment-writer").remove();
+			    $container.append($form);
+			    $form.find("textarea").focus();
+			}
+		} else if(level == 1){
+			const $container = $(e.target).closest("div.comment");
+			const targetId = $(e.target).data("target-id");
+			const $form = createCommentWriter(level, url, targetId);
+		    if($container.find(".comment-writer").length > 0){
+		        $container.find(".comment-writer").remove();
+		    } else{
+		        $(".comment-writer").remove();
+		        $container.append($form);
+		        $form.find("textarea").focus();
+		    }
 		}
-	} else if(level == 1){
-		const $container = $(e.target).closest("div.comment");
-        if($container.find(".comment-writer").length > 0){
-            $container.find(".comment-writer").remove();
-        } else{
-            $(".comment-writer").remove();
-            $container.append($form);
-            $form.find("textarea").focus();
-        }
+	} else {
+		alert("로그인이 필요한 기능입니다.");
 	}
 }
 
@@ -366,3 +396,306 @@ const insertRecommend = (e, recType, boardType, userId) => {
 		alert("로그인이 필요한 기능입니다.");
 	}
 }
+
+const checkLogin = (flag) =>{
+	if(!flag){
+		alert("로그인이 필요한 기능입니다.");
+		return false;
+	}
+	return true;
+}
+
+const deleteArticle = (articleId, url) => {
+	const confirm = confirm("정말로 삭제하시겠습니까?");
+	if(confirm){
+		fetch("/board/deletearticle.do", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/x-www-form-urlencoded"
+			},
+			body: "articleId=" + articleId
+		})
+		.then(response => response.text())
+		.then(flag => {
+			location.href = url;
+		})
+	}
+}
+
+
+/* Flatpickr */
+const select = document.getElementById('scheduleSelect');
+const customInput = document.getElementById('customDatetime');
+const now = new Date();
+const fp = flatpickr(customInput, {
+  enableTime: true,
+  dateFormat: "Y-m-d H:i",
+  time_24hr: true,
+  defaultDate: now,
+  minDate: now,
+  onChange: function() {
+    const selected = selectedDates[0];
+    const current = new Date();
+    if (selected < current) {
+        alert("현재 시각 이후 시간만 선택 가능합니다.");
+        scheduleSelect.value = "0";
+        customInput.classList.add('d-none');
+    	}
+    }
+});
+
+select.addEventListener('change', () => {
+  if (select.value === '-1') {
+    customInput.classList.remove('d-none');
+    fp.open();
+  } else {
+    customInput.classList.add('d-none');
+  }
+});
+
+
+/*CKEditor */
+/**
+ * This configuration was generated using the CKEditor 5 Builder. You can modify it anytime using this link:
+ * https://ckeditor.com/ckeditor-5/builder/?redirect=portal#installation/NoNgNARATAdCMAYKQCwGY0IBxQKxZQE5cBGEtKELBEXUghYwrEFE3QqIkZCAawD2yBGGAkwIkeKkBdSAGMARgBNlKEIQgygA
+ */
+
+const {
+	ClassicEditor,
+	Autoformat,
+	AutoImage,
+	Autosave,
+	BlockQuote,
+	Bold,
+	CKBox,
+	CKBoxImageEdit,
+	CloudServices,
+	Emoji,
+	Essentials,
+	Heading,
+	ImageBlock,
+	ImageCaption,
+	ImageInline,
+	ImageInsert,
+	ImageInsertViaUrl,
+	ImageResize,
+	ImageStyle,
+	ImageTextAlternative,
+	ImageToolbar,
+	ImageUpload,
+	Indent,
+	IndentBlock,
+	Italic,
+	Link,
+	LinkImage,
+	List,
+	ListProperties,
+	MediaEmbed,
+	Mention,
+	Paragraph,
+	PasteFromOffice,
+	PictureEditing,
+	Table,
+	TableCaption,
+	TableCellProperties,
+	TableColumnResize,
+	TableProperties,
+	TableToolbar,
+	TextTransformation,
+	TodoList,
+	Underline
+} = window.CKEDITOR;
+
+const LICENSE_KEY =
+	'eyJhbGciOiJFUzI1NiJ9.eyJleHAiOjE3NDk2ODYzOTksImp0aSI6ImQxMTRkMjdiLTFiZmQtNDE4ZS1hMjU0LTRlMTlkOWIwN2E3MiIsInVzYWdlRW5kcG9pbnQiOiJodHRwczovL3Byb3h5LWV2ZW50LmNrZWRpdG9yLmNvbSIsImRpc3RyaWJ1dGlvbkNoYW5uZWwiOlsiY2xvdWQiLCJkcnVwYWwiLCJzaCJdLCJ3aGl0ZUxhYmVsIjp0cnVlLCJsaWNlbnNlVHlwZSI6InRyaWFsIiwiZmVhdHVyZXMiOlsiKiJdLCJ2YyI6ImJmODNjMDMxIn0.uJpM5aOrJM_Hrc4XZNGA-CMpF33lXHZlmpGutt8aeWSI7XUbZxGc_MAQdvgsq6kjjMgHtRQhiEUCcDA7W1nLPg';
+
+const CLOUD_SERVICES_TOKEN_URL =
+	'https://ppqgdiyioua9.cke-cs.com/token/dev/cdb660b731234956a479c7c2b7fd019d528805c23c7b225ee7c5cfffe86d?limit=10';
+
+const editorConfig = {
+	toolbar: {
+		items: [
+			'undo',
+			'redo',
+			'|',
+			'heading',
+			'|',
+			'bold',
+			'italic',
+			'underline',
+			'|',
+			'emoji',
+			'link',
+			'insertImage',
+			'ckbox',
+			'mediaEmbed',
+			'insertTable',
+			'blockQuote',
+			'|',
+			'bulletedList',
+			'numberedList',
+			'todoList',
+			'outdent',
+			'indent'
+		],
+		shouldNotGroupWhenFull: false
+	},
+	plugins: [
+		Autoformat,
+		AutoImage,
+		Autosave,
+		BlockQuote,
+		Bold,
+		CKBox,
+		CKBoxImageEdit,
+		CloudServices,
+		Emoji,
+		Essentials,
+		Heading,
+		ImageBlock,
+		ImageCaption,
+		ImageInline,
+		ImageInsert,
+		ImageInsertViaUrl,
+		ImageResize,
+		ImageStyle,
+		ImageTextAlternative,
+		ImageToolbar,
+		ImageUpload,
+		Indent,
+		IndentBlock,
+		Italic,
+		Link,
+		LinkImage,
+		List,
+		ListProperties,
+		MediaEmbed,
+		Mention,
+		Paragraph,
+		PasteFromOffice,
+		PictureEditing,
+		Table,
+		TableCaption,
+		TableCellProperties,
+		TableColumnResize,
+		TableProperties,
+		TableToolbar,
+		TextTransformation,
+		TodoList,
+		Underline
+	],
+	cloudServices: {
+		tokenUrl: CLOUD_SERVICES_TOKEN_URL
+	},
+	heading: {
+		options: [
+			{
+				model: 'paragraph',
+				title: 'Paragraph',
+				class: 'ck-heading_paragraph'
+			},
+			{
+				model: 'heading1',
+				view: 'h1',
+				title: 'Heading 1',
+				class: 'ck-heading_heading1'
+			},
+			{
+				model: 'heading2',
+				view: 'h2',
+				title: 'Heading 2',
+				class: 'ck-heading_heading2'
+			},
+			{
+				model: 'heading3',
+				view: 'h3',
+				title: 'Heading 3',
+				class: 'ck-heading_heading3'
+			},
+			{
+				model: 'heading4',
+				view: 'h4',
+				title: 'Heading 4',
+				class: 'ck-heading_heading4'
+			},
+			{
+				model: 'heading5',
+				view: 'h5',
+				title: 'Heading 5',
+				class: 'ck-heading_heading5'
+			},
+			{
+				model: 'heading6',
+				view: 'h6',
+				title: 'Heading 6',
+				class: 'ck-heading_heading6'
+			}
+		]
+	},
+	image: {
+		toolbar: [
+			'toggleImageCaption',
+			'imageTextAlternative',
+			'|',
+			'imageStyle:inline',
+			'imageStyle:wrapText',
+			'imageStyle:breakText',
+			'|',
+			'resizeImage',
+			'|',
+			'ckboxImageEdit'
+		]
+	},
+	initialData: "",
+	language: 'ko',
+	licenseKey: LICENSE_KEY,
+	link: {
+		addTargetToExternalLinks: true,
+		defaultProtocol: 'https://',
+		decorators: {
+			toggleDownloadable: {
+				mode: 'manual',
+				label: 'Downloadable',
+				attributes: {
+					download: 'file'
+				}
+			}
+		}
+	},
+	list: {
+		properties: {
+			styles: true,
+			startIndex: true,
+			reversed: true
+		}
+	},
+	mention: {
+		feeds: [
+			{
+				marker: '@',
+				feed: [
+					/* See: https://ckeditor.com/docs/ckeditor5/latest/features/mentions.html */
+				]
+			}
+		]
+	},
+	placeholder: '내용을 입력하세요.',
+	table: {
+		contentToolbar: ['tableColumn', 'tableRow', 'mergeTableCells', 'tableProperties', 'tableCellProperties']
+	}
+};
+
+configUpdateAlert(editorConfig);
+
+ClassicEditor.create(document.querySelector('#editor'), editorConfig)
+			 .then(editor => {
+				$("form").submit(() => {
+					$("#content").val(editor.getData());
+				})
+			 });
+
+/**
+ * This function exists to remind you to update the config needed for premium features.
+ * The function can be safely removed. Make sure to also remove call to this function when doing so.
+ */
+function configUpdateAlert(config) {}

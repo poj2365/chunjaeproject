@@ -20,7 +20,7 @@ if (user != null) {
 	}
 	return;
 }
-%>
+%> 
 <!DOCTYPE html>
 <html lang="ko">
 <head>

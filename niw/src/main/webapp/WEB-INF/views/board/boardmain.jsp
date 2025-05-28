@@ -10,14 +10,16 @@
 				java.time.Duration"%>
 <link rel="stylesheet" href="<%=request.getContextPath()%>/resources/css/board.css">
 <script src="<%=request.getContextPath()%>/resources/js/board/board.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
 <% 
 	int category = request.getParameter("category") == null? 0 : Integer.parseInt(request.getParameter("category")); 
 	List<Article> articles = (List<Article>) request.getAttribute("articles");
+	User user = (User) request.getSession().getAttribute("loginUser");
 %>
-<section class="row justify-content-between mt-4">
+<section class="row justify-content-between m-4">
 	<!-- 사이드 네비게이터 -->
-	<aside class="card col-lg-2 ms-3 me-3">
+	<aside class="card col-lg-2 ms-3">
 		<div class="card-header">
 			<h5 class="section-title">
 				카테고리
@@ -47,9 +49,9 @@
 		</div>			
 	</aside>
 	<!-- 메인보드 -->
-	<article class="col-lg-9 ms-3 me-3">
+	<article class="col-lg-9 article me-3">
 		<!-- 게시글 상단 선택 요소 -->
-		<div class="row flex-row justify-content-between">
+		<div class="row flex-row justify-content-between mt-5">
 			<div class="col-lg-5">
 				<h2> 자유게시판 </h2>
 			</div>
@@ -70,7 +72,7 @@
 					</select>
 				</div>
 				<div>
-					<form action="">
+					<form method="post" action="<%=request.getContextPath()%>/board/articlewrite.do" onsubmit="return checkLogin(<%=user!=null%>)">
 						<button type="submit" class="btn btn-primary" style="width:80px">글쓰기</button>
 					</form>
 				</div>
@@ -129,7 +131,7 @@
 							<li class="col-lg-2"><i class="bi-eye"><%= article.articleViews() %></i></li>
 							<li class="col-lg-2"><i class="bi-hand-thumbs-up"><%= article.articleLikes() %></i></li>
 							<li class="col-lg-2"><i class="bi-chat"><%= article.commentCount() %></i></li>
-							<li class="col-lg-6"><%= article.userId()%> &middot; <%
+							<li class="col-lg-5"><%= article.userId()%> &middot; <%
 								if(timeFlag){
 									if(hours > 0){%><%=String.valueOf(hours)+"시간전"%>
 									<%}else if(minutes > 0){%> <%= String.valueOf(minutes)+"분전"%>
@@ -138,6 +140,13 @@
 									<%=ldt.toLocalDate()%>
 								<%
 							}%> </li>
+							<li class="col-lg-1">
+								<%if(user != null && user.userId().equals(article.userId())){%>
+									<i class="bi bi-x fw-bold border rounded-2 d-flex justify-content-center align-items-center"
+									   style="width: 24px; height: 24px; cursor: pointer; font-style: normal;"
+									   onclick="deleteArticle('<%= article.articleId() %>', '/board/boardentrance.do?category=0')"></i>
+								<%} %>
+							</li>
 						</ul>						
 					</div>
 					<hr>
@@ -173,4 +182,6 @@
 	</article>
 	
 </section>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
 <%@include file="/WEB-INF/views/common/footer.jsp" %>
