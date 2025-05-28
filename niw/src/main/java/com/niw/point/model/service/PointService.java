@@ -45,7 +45,7 @@ public class PointService {
 		return result;
 	}
 	
-	public int refundFile66Histoy(PointRefund p) {
+	public int refundFileHistoy(PointRefund p) {
 		Connection conn = JDBCTemplate.getConnection();
 		int result = dao.refundPointHistory(conn, p);
 		if (result > 0) {

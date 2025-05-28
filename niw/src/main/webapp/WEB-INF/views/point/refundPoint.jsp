@@ -233,12 +233,12 @@ if (loginUser == null) {
 
 <div class="content-section">
     <h3 class="section-title">기본 정보</h3>
-    <form id="edit-user-info">
+    <form action ="<%=request.getContextPath()%>/point/refundendpoint.do" method="post" id ="saveRefund">
         <table class="info-table">
             <tr>
                 <th>회원 ID</th>
                 <td>
-                    <input type="text" name="userId" value="<%=loginUser.userId()%>" disabled>
+                    <input type="text" name="userId" value="<%=loginUser.userId()%>" readonly id ="userId">
                 </td>
             </tr>
             <tr id="row-refund-id" style="display: ;" >
@@ -268,19 +268,19 @@ if (loginUser == null) {
             <tr id="row-dpoint-id" style="display:none;">
                 <th>자료 환불 포인트 금액</th>
                 <td>
-                    <input type="number" name = "refundPoint" class="form-input" value="" placeholder="1000">
+                    <input type="number" name = "refundFilePoint" class="form-input" value="" placeholder="1000">
                 </td>
             </tr>
                <tr id="row-point-id" style="display:none;">
                 <th>환불 포인트 금액</th>
                 <td>
-                    <input type="number"  name = "refundPoint" class="form-input" min=1000 placeholder="1000">
+                    <input type="number"  id="refundPoint" name = "refundPoint" class="form-input" min=1000 placeholder="1000">
                 </td>
             </tr>
             <tr id="row-bankAccount-id" style="display:none ;">
                 <th>환불 계좌</th>
                 <td>
-                    <select name="bank" class="form-input" style="width: 20%;">
+                    <select name="refundBank" class="form-input" style="width: 20%;">
 				      <option value="국민">국민</option>
 				      <option value="기업">기업</option>
 				      <option value="농협">농협</option>
@@ -295,13 +295,13 @@ if (loginUser == null) {
     
         <div id="completepoint" style="text-align: right; margin-top: 20px; display: none;">
             <button type="submit" class="btn btn-primary" >
-                <i class="bi bi-check-circle me-1"></i>포인트 환불 신청하기
+                <i class="bi bi-check-circle me-1"></i>포인트 환불 신청하기 
             </button>
         </div>
         
         <div id="completefile" style="text-align: right; margin-top: 20px; display: none;">
-            <button type="submit" class="btn btn-primary" >
-                <i class="bi bi-check-circle me-1"></i>파일 환불 신청하기
+            <button type="button" class="btn btn-primary" onclick="refundFile()" >
+                <i class="bi bi-check-circle me-1"></i>파일 환불 신청하기 
             </button>
         </div>
         
@@ -312,6 +312,12 @@ if (loginUser == null) {
 </div>
 
 <script>
+	const refundFile = function(){
+		const change = document.getElementById('saveRefund');
+		change.action = "<%=request.getContextPath()%>/point/refundendfile.do"
+		change.submit();
+	}
+	 
 	document.addEventListener('DOMContentLoaded', function () {
 	  const refundTypeRadios = document.querySelectorAll('input[name="refundType"]');
 	
@@ -361,4 +367,6 @@ if (loginUser == null) {
 	    dateInput.value = today;
 	  }
 	});
+	
+	
 </script>
