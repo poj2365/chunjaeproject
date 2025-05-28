@@ -3,13 +3,17 @@ package com.niw.point.model.dao;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import com.niw.common.JDBCTemplate;
 import com.niw.point.model.dto.Point;
+import com.niw.point.model.dto.PointHistory;
 import com.niw.point.model.dto.PointRefund;
 import com.niw.user.model.dto.User;
 
@@ -121,6 +125,31 @@ public class PointDao {
 			JDBCTemplate.close(pstmt);
 		}
 		return result;
+	}
+	
+	public List<PointHistory> searchPointHistory (Connection conn,String userId){
+		List<PointHistory> historys = new ArrayList();
+		
+		try {
+			pstmt = conn.prepareStatement("searchPointHistory");
+			rs = pstmt.executeQuery();
+			
+			while(rs.next()) {
+				Date date = rs.getDate("eventdate");
+				String content = rs.getString("content");
+				int amount = rs.getInt("point");
+				int mypoint = rs.getInt("mypoint");
+				PointHistory p = new PointHistory(date,content,amount,mypoint);
+				historys.add(p);
+			}
+		
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			JDBCTemplate.close(rs);
+			JDBCTemplate.close(pstmt);
+		}
+		return historys;
 	}
 
 }

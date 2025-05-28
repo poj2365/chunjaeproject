@@ -347,7 +347,7 @@ if (loginUser == null) {
         color: var(--bs-blind-dark);
     }
 </style>
-</style>
+
 
 <!-- 메인 컨테이너 -->
 
@@ -365,7 +365,7 @@ if (loginUser == null) {
         <div class="menu-section">
             <div class="menu-title">내 계정</div>
             <ul>
-                <li class="menu-item active" data-tab="info">
+                <li class="menu-item " data-tab="info">
                     <i class="bi bi-person"></i>회원정보 조회/수정
                 </li>
             </ul>
@@ -376,7 +376,7 @@ if (loginUser == null) {
                 <li class="menu-item" data-tab="activity">
                     <i class="bi bi-clock-history"></i>활동 내역
                 </li>
-                <li class="menu-item" data-tab="point">
+                <li class="menu-item active" data-tab="point">
                     <i class="bi bi-coin"></i>포인트 내역
                 </li>
                 <li class="menu-item" data-tab="materials">
@@ -401,7 +401,7 @@ if (loginUser == null) {
 </div>
 
 <div class="content-section">
-    <h3 class="section-title">잔여 포인트 <span class="badge"><%=loginUser.userPoint()%>P</span></h3>
+    <h3 class="section-title">보유 포인트 <span class="badge"><%=loginUser.userPoint()%>P</span></h3>
     
     <!-- 포인트 검색 필터 -->
     <div class="content-section">
@@ -473,17 +473,66 @@ if (loginUser == null) {
                 <span class="point-large"><%=loginUser.userPoint()%>P</span>
                 <button id="refund-request-btn" class="btn btn-secondary" style="float: right;" 
                 onclick="location.assign('<%=request.getContextPath()%>/point/refundpoint.do')">
-                <!-- 실행 -->
-                    <i class="bi bi-cash-coin me-1"></i>환불 신청
+               <i class="bi bi-cash-coin me-1"></i>환불 신청
                 </button>
             </td>
         </tr>
     </table>
     <p class="mt-3 text-muted">※ 환불 시 잔여 포인트의 10%가 수수료로 차감됩니다.</p>
+	</div>
 </div>
 </div>
 
 <script>
+	
+	document.addEventListener('DOMContentLoaded', function() {
+	fetch('<%=request.getContextPath()%>/point/pointhistory.do',{
+		method : 'post',
+		headers : {'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ userId: <%=loginUser.userId()%> })
+	})
+	.then(response=> {
+		if(!response.ok){
+			alert('네트워크에서 오류 발생하였습니다.');
+		}
+			return response.json();
+		})
+		.then(pointHistory=> {
+		const history = document.getElementById('point-history-tbody');
+		history.innerHTML='';
+		
+		if (pointHistory.length==0) {
+			history.innerHTML = `<tr>
+	            					<td colspan="4" style="text-align: center; padding: 50px;">데이터가 없습니다.</td>
+		        				</tr>`
+		} else {
+			pointHistory.forEach(row => {
+		          const tr = document.createElement('tr');
+		          tr.innerHTML = `
+		              <td>${row.date}</td>
+		              <td>${row.type}</td>
+		              <td style="text-align:right;">${row.amount.toLocaleString()}P</td>
+		              <td>${row.description}</td>`;
+		        history.appendChild(tr);  
+		              
+		          
+			});
+		}
+		 
+	})
+	.catch(error=> {
+		const history = document.getElementById('point-history-tbody');
+		history.innerHTML='';
+		history.innerHTML = `<tr>
+			<td colspan="4" style="text-align: center; padding: 50px;">데이터를 불러올 수 없습니다.</td>
+		</tr>`;
+		console.log(error);
+		
+		});
+	});
+		 
+		
 	
 	
 	
