@@ -155,31 +155,21 @@ List<TimeRecord> trList = (List<TimeRecord>) request.getAttribute("trList");
 	color: #888;
 }
 
-.loading-spinner {
-	border: 4px solid #f3f3f3;
-	border-top: 4px solid var(--bs-blind-dark);
-	border-radius: 50%;
-	width: 40px;
-	height: 40px;
-	animation: spin 1s linear infinite;
-	margin-bottom: 20px;
-}
-
-@
-keyframes spin { 0% {
-	transform: rotate(0deg);
-}
-
-100
-%
-{
-transform
-:
-rotate(
-360deg
-);
-}
-}
+    .loading-spinner {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid var(--bs-blind-dark);
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin-bottom: 20px;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
 
 /* 반응형 스타일 */
 @media ( max-width : 768px) {

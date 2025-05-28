@@ -5,6 +5,7 @@
    <%@include file="/WEB-INF/views/common/header.jsp" %>
    <%
    List<StudyGroup> studygroups = (List<StudyGroup>)request.getAttribute("studygroups");
+   int groupLimit = (int)request.getAttribute("groupLimit");
    %>
    <style>
 .board-wrapper {
@@ -235,14 +236,14 @@
         <div class="profile-section">
             <div class="profile-pic">
                 <i class="bi bi-person-circle" style="font-size: 60px; color: #ccc;"></i>
-            </div><% if(loginUser!=null){%>
+            </div>
+            <% if(loginUser!=null){%>
             <div class="user-id"><%=loginUser.userId() %></div>
             <div class="user-name"><%=loginUser.userName() %></div>
             <div class="point-info">포인트:<%=loginUser.userPoint() %> P</div>
             <% }else{%>
             <div class="user-id">Guest</div>
            <%  }%>
-
         </div>
         <div class="menu-section">
             <div class="menu-title">스터디 그룹</div>
@@ -302,9 +303,14 @@
                 <ul class="board-row">
                     <li class="col-no"><%=g.groupNumber()%></li>
                     <li class="col-title">
-                    <span class="badge bg-secondary">모집 완료</span>
+                    <%if(g.status().equals("RECRUITING")) {%>
                     <span class="badge bg-primary">모집중</span>
-                        <a href="<%=request.getContextPath()%>/study/groupview.do?no=<%=g.groupNumber()%>">
+                    <%}else if(g.status().equals("CLOSED")) { %>
+                    <span class="badge bg-secondary">모집 완료</span>
+                    <%}else{ %>
+                    
+                    <%} %>
+                         <a href="<%=request.getContextPath()%>/study/groupview.do?no=<%=g.groupNumber()%>">
                             <%=g.groupName()%>
                         </a>
                     </li>
@@ -320,7 +326,7 @@
             </ul>
         <% } %>
     </div>
-    <% if(loginUser!=null){ %>
+    <% if(loginUser!=null && groupLimit<3){ %>
     <button class="btn btn-secondary" onclick="location.assign('<%=request.getContextPath() %>/study/groupcreateview.do');">그룹 생성</button>
    	<%} %>
    		<div id="pagebar">
@@ -360,7 +366,6 @@
 	       const doc = parser.parseFromString(html, 'text/html');
 	       const newContent = doc.querySelector('.board-wrapper').innerHTML;
 	       const newPagebar = doc.querySelector('#pagebar').innerHTML;
-	    	console.log(newContent);
 	       document.querySelector('.board-wrapper').innerHTML = newContent;
 	       document.querySelector('#pagebar').innerHTML = newPagebar;
 	     });

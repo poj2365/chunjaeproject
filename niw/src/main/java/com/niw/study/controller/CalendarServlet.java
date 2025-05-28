@@ -8,11 +8,14 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import com.niw.study.model.dto.Calendar;
 import com.niw.study.model.dto.TimeRecord;
 import com.niw.study.model.service.CalendarService;
+import com.niw.study.model.service.StudyGroupService;
 import com.niw.study.model.service.TimeRecordService;
+import com.niw.user.model.dto.User;
 
 /**
  * Servlet implementation class CalenderServlet
@@ -33,9 +36,15 @@ public class CalendarServlet extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String userId = "user_0001";
-		List<TimeRecord> trList = TimeRecordService.SERVICE.searchTime(userId);
-		List<Calendar> c = CalendarService.SERVICE.searchCalendar(userId);
+		HttpSession session = request.getSession();
+		User user = (User) session.getAttribute("loginUser");
+		List<Calendar> c = null;
+		List<TimeRecord> trList = null;
+		if(user!=null) {
+			trList = TimeRecordService.SERVICE.searchTime(user.userId());
+			c = CalendarService.SERVICE.searchCalendar(user.userId());
+		}
+		
 		request.setAttribute("calendar", c);
 		request.setAttribute("trList", trList);
 		request.getRequestDispatcher("/WEB-INF/views/study/calender.jsp").forward(request, response);

@@ -11,7 +11,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.google.gson.Gson;
 import com.niw.common.CommonTemplate;
+import com.niw.study.model.dto.GroupMember;
 import com.niw.study.model.dto.StudyGroup;
+import com.niw.study.model.service.GroupMemberService;
 import com.niw.study.model.service.StudyGroupService;
 
 /**
@@ -37,6 +39,13 @@ public class StudyGroupCreateServlet extends HttpServlet {
 		Gson gson = new Gson();
 		StudyGroup g = gson.fromJson(jsonData, StudyGroup.class);
 		int result = StudyGroupService.SERVICE.insertGroup(g);
+		System.out.println(result);
+		if(result>0) {
+			g = StudyGroupService.SERVICE.searchStudyGroupId(g);
+			System.out.println(g);
+			response.setContentType("application/json;charset=utf-8");
+			new Gson().toJson(g,response.getWriter());
+		}
 	}
 
 	/**

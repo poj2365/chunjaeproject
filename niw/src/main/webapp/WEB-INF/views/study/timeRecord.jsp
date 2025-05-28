@@ -295,6 +295,9 @@ List<TimeRecord> trList = (List<TimeRecord>) request.getAttribute("trList");
 			<h4 id="status"></h4><br>
 			<%if(trList != null){%>
 				<h3>내 공부 시간</h3><br>
+				<%if(trList.isEmpty()){ %>
+				<h5>조회된 데이터가 없습니다.</h5>
+				<%} %>
 				<%for(TimeRecord tr : trList){
 				%>
 				
@@ -405,11 +408,14 @@ List<TimeRecord> trList = (List<TimeRecord>) request.getAttribute("trList");
             });
             
             function saveTime(time, startTimeObj, endTimeObj) {
-                status.textContent = '데이터 저장 중...';
-                
+            	status.textContent = '데이터 저장 중...';
+                <%if(loginUser==null){%>
+                alert("데이터 저장에 실패하였습니다. 로그인 후 사용 가능한 기능입니다.");
+                status.textContent = '';
+                <% }else {%>
                 const totalTime = formattedTime(time);
                 const category = "test";
-                const userId = "user_0001";
+                const userId = '<%=loginUser.userId()%>';
 
                 const timeData = {
 					category : category,
@@ -441,6 +447,7 @@ List<TimeRecord> trList = (List<TimeRecord>) request.getAttribute("trList");
                     status.textContent = '데이터 저장 실패: ' + error.message;
                     console.error('저장 오류:', error);
                 });
+                <% }%>
             }
 
             // 페이지 떠날 때 경고

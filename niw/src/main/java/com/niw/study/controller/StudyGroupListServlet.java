@@ -9,9 +9,13 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import com.niw.common.CommonTemplate;
 import com.niw.study.model.dto.StudyGroup;
+import com.niw.study.model.service.GroupMemberService;
 import com.niw.study.model.service.StudyGroupService;
+import com.niw.user.model.dto.User;
 
 /**
  * Servlet implementation class StudyGroupListServelt
@@ -34,7 +38,15 @@ public class StudyGroupListServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-
+		
+		HttpSession session = request.getSession();
+		User user = (User) session.getAttribute("loginUser");
+		int groupLimit = 0;
+		if(user!=null) {
+			groupLimit = StudyGroupService.SERVICE.searchStudyGroupCountId(user.userId());
+		}
+		request.setAttribute("groupLimit", groupLimit);
+		
 		String searchType = request.getParameter("searchType");
 		String keyword = request.getParameter("keyword");
 		List<StudyGroup> studygroups =null;
@@ -49,11 +61,9 @@ public class StudyGroupListServlet extends HttpServlet {
 			totalData = StudyGroupService.SERVICE.searchStudyGroupCount(searchType, keyword);
 			request.setAttribute("searchType", searchType);
 			request.setAttribute("keyword", keyword);
-
 		} else {
 			studygroups = StudyGroupService.SERVICE.searchStudyGroupAll(cPage, numPerpage);
 			totalData = StudyGroupService.SERVICE.studyGroupCount();
-
 		}
 		request.setAttribute("studygroups", studygroups);
 

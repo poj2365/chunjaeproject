@@ -234,9 +234,13 @@ form button:hover {
             <div class="profile-pic">
                 <i class="bi bi-person-circle" style="font-size: 60px; color: #ccc;"></i>
             </div>
-            <div class="user-id"></div>
-            <div class="user-name"></div>
-            <div class="point-info">포인트:P</div>
+ 			<% if(loginUser!=null){%>
+            <div class="user-id"><%=loginUser.userId() %></div>
+            <div class="user-name"><%=loginUser.userName() %></div>
+            <div class="point-info">포인트:<%=loginUser.userPoint() %> P</div>
+            <% }else{%>
+            <div class="user-id">Guest</div>
+           <%  }%>
         </div>
         <div class="menu-section">
             <div class="menu-title">스터디 그룹</div>
@@ -321,8 +325,16 @@ const timeRecordTitle = [
   	        	location.assign("<%=request.getContextPath() %>/study/grouplist.do");
   	        }
   	    });
-
+  	  	
         var calendarEl = document.getElementById('calendar');
+        <% if(loginUser==null){ %>
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            timeZone: 'UTC',
+            initialView: 'dayGridMonth',
+            selectable: true
+          });
+        <% }else{ %>
+        const userId = '<%=loginUser.userId()%>';
         var calendar = new FullCalendar.Calendar(calendarEl, {
             headerToolbar: {
                 left: 'dayGridMonth,listMonth',
@@ -352,7 +364,6 @@ const timeRecordTitle = [
             	  document.getElementById("content").textContent = "";
             	  document.getElementById("start").value = arg.event.startStr;
 
-            	  const userId = "user_0001";
       		   const jsonData = {
     		    		startTime: arg.event.start,
     		    		userId: userId
@@ -407,6 +418,7 @@ const timeRecordTitle = [
 					}%>
             	  ]
         });
+        <% } %>
         calendar.render();
       });
       

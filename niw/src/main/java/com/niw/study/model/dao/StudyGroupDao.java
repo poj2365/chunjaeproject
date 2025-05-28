@@ -51,7 +51,7 @@ public enum StudyGroupDao {
 	
 	private StudyGroup getStudygroup(ResultSet rs) throws SQLException {
 		return new StudyGroup(rs.getInt("group_number"), rs.getString("group_name"), rs.getString("user_id"), rs.getString("group_type"), 
-				rs.getString("join_type"), rs.getDate("create_date"), rs.getString("description"), rs.getInt("group_limit"));
+				rs.getString("join_type"), rs.getDate("create_date"), rs.getString("description"), rs.getInt("group_limit"), rs.getString("status"));
 	}
 
 	public int studyGroupCount(Connection conn) {
@@ -147,8 +147,8 @@ public enum StudyGroupDao {
 			pstmt.setString(4, g.joinType());
 			pstmt.setString(5, g.description());
 			pstmt.setInt(6, g.groupLimit());
-			rs=pstmt.executeQuery();
-			if(rs.next()) result=rs.getInt(1);
+			pstmt.setString(7, g.status());
+			result=pstmt.executeUpdate();
 		}catch (Exception e) {
 			e.printStackTrace();
 		}finally {
@@ -157,6 +157,60 @@ public enum StudyGroupDao {
 		}
 		return result;
 	}
-	
+
+	public StudyGroup searchStudyGroupId(Connection conn, StudyGroup g) {
+		StudyGroup group = null;
+		try {
+			pstmt=conn.prepareStatement(sql.getProperty("searchStudyGroupId"));
+			pstmt.setString(1, g.groupName());
+			pstmt.setString(2, g.userId());
+			rs=pstmt.executeQuery();
+			if(rs.next()) {
+				group=getStudygroup(rs);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally {
+			JDBCTemplate.close(rs);
+			JDBCTemplate.close(pstmt);
+		}
+		return group;
+	}
+
+	public int searchStudyGroupCountId(Connection conn, String userId) {
+		int result = 0;
+		try {
+			pstmt=conn.prepareStatement(sql.getProperty("searchStudyGroupCountId"));
+			pstmt.setString(1, userId);
+			rs=pstmt.executeQuery();
+			if(rs.next()) {
+				result=rs.getInt(1);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally {
+			JDBCTemplate.close(rs);
+			JDBCTemplate.close(pstmt);
+		}
+		return result;
+	}
+
+	public List<StudyGroup> searchStudyGroupUserId(Connection conn, String userId) {
+		List<StudyGroup> studygroups = new ArrayList();
+		try {
+			pstmt=conn.prepareStatement(sql.getProperty("searchStudyGroupUserId"));
+			pstmt.setString(1, userId);
+			rs=pstmt.executeQuery();
+			while(rs.next()) {
+				studygroups.add(getStudygroup(rs));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally {
+			JDBCTemplate.close(rs);
+			JDBCTemplate.close(pstmt);
+		}
+		return studygroups;
+	}
 	
 }

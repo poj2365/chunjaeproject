@@ -45,6 +45,7 @@ public enum StudyGroupService {
 	public int searchStudyGroupCount(String searchType, String keyword) {
 		conn = JDBCTemplate.getConnection();
 		int result = dao.searchStudyGroupCount(conn, searchType, keyword);
+		JDBCTemplate.close(conn);
 		return result;
 	}
 
@@ -52,8 +53,29 @@ public enum StudyGroupService {
 		conn = JDBCTemplate.getConnection();
 		int result = dao.insertGroup(conn, g);
 		JDBCTemplate.close(conn);
+		if(result>0) JDBCTemplate.commit(conn);
+		else JDBCTemplate.rollback(conn);
 		return result;
 	}
-	
+
+	public StudyGroup searchStudyGroupId(StudyGroup g) {
+		conn = JDBCTemplate.getConnection();
+		StudyGroup group = dao.searchStudyGroupId(conn, g);
+		JDBCTemplate.close(conn);
+		return group;
+	}
+	public int searchStudyGroupCountId(String userId) {
+		conn = JDBCTemplate.getConnection();
+		int result = dao.searchStudyGroupCountId(conn, userId);
+		JDBCTemplate.close(conn);
+		return result;
+	}
+
+	public List<StudyGroup> searchStudyGroupUserId(String userId) {
+		conn = JDBCTemplate.getConnection();
+		List<StudyGroup> studygroups = dao.searchStudyGroupUserId(conn, userId);
+		JDBCTemplate.close(conn);
+		return studygroups;
+	}
 	
 }
