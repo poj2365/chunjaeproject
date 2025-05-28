@@ -26,6 +26,14 @@
             --bs-primary-light: #e3f6f7;
             --bs-accent: #ff7d4d;
         }
+        
+        /* 아이디 입력창 크기 조정 */
+        #userid {
+            width: 95% !important;
+            max-width: 590px !important;
+            min-width: 340px !important;
+            border-radius: 6px !important;
+        }
     </style>
     
     <!-- jQuery -->
@@ -147,7 +155,19 @@
             <div class="step-content" id="step-2-content">
                 <h2 class="card-title">회원 정보 입력</h2>
                 
-                <form id="signup-form">
+				<form id="signup-form" method="post">
+                    <!-- 아이디 입력 및 중복검사 -->
+                    <div class="form-group">
+                        <label for="userid" class="form-label">아이디</label>
+                        <div style="display: flex; align-items: center; width: 100%;">
+                            <input type="text" id="userid" name="userid" class="form-input" placeholder="영문, 숫자, _ 사용하여 4-20자 입력가능합니다." required>
+                        </div>
+                        <div id="userid-verified" style="display: none; margin-top: 10px;">
+                            <span class="verified-badge"><i class="bi bi-check-circle"></i> 사용 가능한 아이디입니다</span>
+                        </div>
+                        <div class="invalid-feedback" id="userid-error"></div>
+                    </div>
+                    
                     <!-- 이름 입력 -->
                     <div class="form-group">
                         <label for="name" class="form-label">이름</label>
@@ -293,7 +313,68 @@
     
     <!-- 회원가입 스크립트 -->
     <script>
+    $("#userid").keyup(((request)=>e=>{
+        console.log(request);
+        if(request) clearTimeout(request);
+        request=setTimeout(()=>{
+            console.log(request);
+            const userId=e.target.value.trim();
+            
+            // 길이 체크 먼저 (4자 미만이면 요청하지 않음)
+            if(userId.length < 4) {
+                $(e.target).next().remove();
+                return;
+            }
+            
+            //디바운서 -> 특정 딜레이시간을 발생시켜서 로직실행을 지연시킴
+            fetch("<%=request.getContextPath()%>/user/checkUserId.do?id="+userId)
+            .then(response=>{
+                if(response.ok){
+                    return response.json();
+                }else{
+                    alert("요청실패"+response.status);
+                }
+            }).then(data=>{
+                $(e.target).next().remove();
+                console.log(data);
+                if(data.result){
+                    $(e.target).after($("<span>").text("사용할 수 있는 아이디").css({
+                        "color":"green",
+                        "margin-left":"10px",
+                        "display":"inline-flex",
+                        "align-items":"center",
+                        "font-size":"14px",
+                        "font-weight":"500"
+                    }));
+                }else{
+                    $(e.target).after($("<span>").text("사용할 수 없는 아이디").css({
+                        "color":"red",
+                        "margin-left":"10px",
+                        "display":"inline-flex",
+                        "align-items":"center",
+                        "font-size":"14px",
+                        "font-weight":"500"
+                    }));
+                }
+            })
+        },300);
+    })());
+    
         $(document).ready(function() {
+            // 아이디 입력창 크기 강제 적용 (여러 번 시도)
+            function applyUserIdStyle() {
+                $('#userid').css({
+                    'width': '95%',
+                    'max-width': '590px',
+                    'border-radius': '6px',
+                    'min-width': '340px'
+                });
+            }
+            
+            applyUserIdStyle();
+            setTimeout(applyUserIdStyle, 100);
+            setTimeout(applyUserIdStyle, 500);
+            
             // 진행 단계 관련 요소
             const progressBar = $('#progress-bar');
             const steps = $('.step');
@@ -381,6 +462,19 @@
             }
             
             // 유효성 검사 함수들
+            function validateUserId(userid) {
+                if (!userid || userid.trim().length < 4) {
+                    return '아이디는 4자 이상 입력해주세요.';
+                }
+                if (userid.length > 20) {
+                    return '아이디는 20자 이하로 입력해주세요.';
+                }
+                if (!/^[a-zA-Z0-9_]+$/.test(userid)) {
+                    return '아이디는 영문, 숫자, _만 사용 가능합니다.';
+                }
+                return null;
+            }
+            
             function validateName(name) {
                 if (!name || name.trim().length < 2) {
                     return '이름은 2자 이상 입력해주세요.';
@@ -463,6 +557,23 @@
             }
             
             // 실시간 유효성 검사
+            $('#userid').on('input', function() {
+                // 허용되지 않는 문자 제거 (영문, 숫자, _ 만 허용)
+                $(this).val($(this).val().replace(/[^a-zA-Z0-9_]/g, ''));
+            });
+            
+            $('#userid').on('blur', function() {
+                const userid = $(this).val().trim();
+                const error = validateUserId(userid);
+                if (error) {
+                    $(this).addClass('is-invalid');
+                    $('#userid-error').text(error).show();
+                } else {
+                    $(this).removeClass('is-invalid').addClass('valid');
+                    $('#userid-error').hide();
+                }
+            });
+            
             $('#name').on('blur', function() {
                 const name = $(this).val().trim();
                 const error = validateName(name);
@@ -792,19 +903,29 @@
             });
             
             // 회원가입 완료 버튼 클릭
-            $('#next-step-2-btn').on('click', function() {
+          $('#next-step-2-btn').on('click', function(e) {
+    			e.preventDefault(); 
                 // 전체 유효성 검사
                 if (!validateForm()) {
                     return;
                 }
-                
+          
                 // 회원가입 요청
                 enrollUser();
-            });
+            }); 
             
             // 전체 폼 유효성 검사
             function validateForm() {
                 let isValid = true;
+                
+                // 아이디 검사
+                const userid = $('#userid').val().trim();
+                const useridError = validateUserId(userid);
+                if (useridError) {
+                    showAlert(useridError);
+                    $('#userid').focus();
+                    return false;
+                }
                 
                 // 이름 검사
                 const name = $('#name').val().trim();
@@ -867,12 +988,21 @@
             
             // 회원가입 요청 함수
             function enrollUser() {
+            	//디버깅용 콘솔출력
+            	console.log("=== enrollUser 함수 시작 ===");
+                console.log("userid 값:", $('#userid').val());
+                console.log("name 값:", $('#name').val());
+                console.log("email 값:", $('#email').val());
+                console.log("userType 값:", $('input[name="userType"]:checked').val());
+               
                 showLoading();
                 
                 // FormData 객체 생성 (파일 업로드 포함)
                 const formData = new FormData();
                 
+                
                 // 일반 데이터 추가
+                formData.append('userid', $('#userid').val().trim());
                 formData.append('name', $('#name').val().trim());
                 formData.append('userType', $('input[name="userType"]:checked').val());
                 formData.append('birthYear', $('#birth-year').val().trim());
@@ -907,8 +1037,6 @@
                     dataType: 'json',
                     success: function(response) {
                         showLoading(false);
-                        
-                        if (response.success) {
                             // 회원가입 성공, 3단계로 이동
                             goToStep(3);
                         } else {
