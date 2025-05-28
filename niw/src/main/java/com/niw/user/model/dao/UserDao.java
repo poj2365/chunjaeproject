@@ -25,6 +25,7 @@ public enum UserDao {
 			e.printStackTrace();
 		}
 	}
+	
 	public User searchById(Connection conn, String id) {
 		User user = null;
 		try {
@@ -37,7 +38,6 @@ public enum UserDao {
 		} finally {
 			close(rs);
 			close(pstmt);
-		
 		}
 		return user;
 	}
@@ -45,7 +45,7 @@ public enum UserDao {
 	public User getUser(ResultSet rs) throws SQLException {
 		return User.builder()
 				.userId(rs.getString("USER_ID"))
-				.password(rs.getString("USER_PASSWORD"))
+				.password(rs.getString("USER_PASSWORD"))  // USER_PASSWORD로 수정
 				.userName(rs.getString("USER_NAME"))
 				.userPhone(rs.getString("USER_PHONE"))
 				.userEmail(rs.getString("USER_EMAIL"))
@@ -57,5 +57,46 @@ public enum UserDao {
 				.userAddress(rs.getString("USER_ADDRESS"))
 				.userBirthDate(rs.getDate("USER_BIRTH_DATE"))
 				.build();
+	}
+	
+	public int insertUser(Connection conn, User user) {
+	    int result = 0;
+	   
+	    try {
+	    	System.out.println("=== insertUser 시작 ===");
+	    	System.out.println("SQL: " + sql.getProperty("insertUser"));
+	    	
+	    	pstmt = conn.prepareStatement(sql.getProperty("insertUser"));
+
+	        // 실제 테이블 구조에 맞춰 파라미터 순서 조정
+	        pstmt.setString(1, user.userId());           // USER_ID
+	        pstmt.setString(2, user.userName());         // USER_NAME
+	        pstmt.setString(3, user.userPhone());        // USER_PHONE
+	        pstmt.setString(4, user.userEmail());        // USER_EMAIL
+	        pstmt.setString(5, user.userProfileImage()); // USER_PROFILE_IMAGE
+	        pstmt.setInt(6, user.userPoint());           // USER_POINT
+	        pstmt.setString(7, user.userIntroduce());    // USER_INTRODUCE
+	        pstmt.setDate(8, user.enrollDate());         // ENROLL_DATE
+	        pstmt.setString(9, user.password());         // USER_PASSWORD
+	        pstmt.setString(10, user.userRole());        // USER_ROLE
+	        pstmt.setString(11, user.userAddress());     // USER_ADDRESS
+	        pstmt.setDate(12, user.userBirthDate());     // USER_BIRTH_DATE
+	        
+	        System.out.println("파라미터 설정 완료");
+	        
+	        result = pstmt.executeUpdate();
+	        System.out.println("executeUpdate 결과: " + result);
+	        
+	    } catch (SQLException e) {
+	        System.out.println("=== SQL 오류 발생 ===");
+	        System.out.println("오류 코드: " + e.getErrorCode());
+	        System.out.println("SQL 상태: " + e.getSQLState());
+	        System.out.println("오류 메시지: " + e.getMessage());
+	        e.printStackTrace();
+	    } finally {
+	        close(pstmt);
+	    }
+	    
+	    return result;
 	}
 }

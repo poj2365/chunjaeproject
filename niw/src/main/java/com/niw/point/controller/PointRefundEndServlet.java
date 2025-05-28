@@ -38,8 +38,8 @@ public class PointRefundEndServlet extends HttpServlet {
 		System.out.println(refundType);
 		
 		System.out.println(request.getParameter("refundPoint"));
-		int refundPoint = Integer.parseInt(request.getParameter("refundPoint"));
-		int refundAmount = (int)Math.round(refundPoint*(1-FEE_RATE));
+		int refundPoint = (Integer.parseInt(request.getParameter("refundPoint"))) * -1;
+		int refundAmount = ((int)Math.round(refundPoint*(1-FEE_RATE)))*-1;
 		String refundBank = request.getParameter("refundBank");
 		String refundAccount = request.getParameter("accountNumber");
 		

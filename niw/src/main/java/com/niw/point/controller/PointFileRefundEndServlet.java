@@ -32,8 +32,9 @@ public class PointFileRefundEndServlet extends HttpServlet {
 		String userId = request.getParameter("userId");
 		String refundType = request.getParameter("refundType");
 		long fileId = Long.parseLong(request.getParameter("fileId"));
+		System.out.println(fileId);
 		int filePoint = Integer.parseInt(request.getParameter("refundFilePoint"));
-		
+		System.out.println(filePoint);
 		
 		PointRefund p = PointRefund.builder()
 				.refundId(refundId)
