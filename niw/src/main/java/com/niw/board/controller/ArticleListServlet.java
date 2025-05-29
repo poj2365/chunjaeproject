@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.gson.Gson;
 import com.niw.board.model.dto.Article;
 import com.niw.board.service.BoardService;
+import com.niw.user.model.dto.User;
 
 @WebServlet("/board/articlelist.do")
 public class ArticleListServlet extends HttpServlet {
@@ -87,7 +88,15 @@ public class ArticleListServlet extends HttpServlet {
 		pageBar.append("</li>");
 		pageBar.append("</ul>");
 		List<Article> articles = BoardService.SERVICE.searchArticle(category, searchData, likes, order, cPage, numPerPage, totalData);
-		new Gson().toJson(Map.of("articles",articles, "pageBar", pageBar),response.getWriter());
+		User user = (User) request.getSession().getAttribute("loginUser");
+		String userId = "";
+		String userRole = "GENERAL";
+		if(user != null) {
+			userId = user.userId();
+			userRole = user.userRole();
+		}
+		new Gson().toJson(Map.of("articles",articles, "pageBar", pageBar, "userId", userId, "userRole", userRole),response.getWriter());
+		
 		
 	}
 

@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -26,6 +27,28 @@ public class ArticleDetailServlet extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		int articleId = Integer.parseInt(request.getParameter("articleId"));
+		
+		Cookie[] cookies = request.getCookies();
+	    String cookieView = "";
+	    boolean read = false;
+	    if (cookies != null) {
+	        for (Cookie c : cookies) {
+	            if (c.getName().equals("cookieView")) {
+	            	cookieView = c.getValue();
+	                if (cookieView.contains("|" + articleId + "|")) read = true;
+	            }
+	        }
+	    }
+	    if (!read) {
+	        int result = BoardService.SERVICE.increaseView(articleId);
+	        if(result > 0) {
+		        cookieView += "|" + articleId + "|";
+		        Cookie newCookie = new Cookie("cookieView", cookieView);
+		        newCookie.setMaxAge(60 * 60 * 24 * 7);
+		        newCookie.setPath("/");
+		        response.addCookie(newCookie);
+	        }
+	    }
 		Article article = BoardService.SERVICE.searchArticleById(articleId);
 		List<Comment> comment = BoardService.SERVICE.searchCommentByArticle(articleId);
 		int category = request.getParameter("category") == null? 0 :Integer.parseInt(request.getParameter("category"));

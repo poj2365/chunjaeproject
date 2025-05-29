@@ -15,14 +15,6 @@ import com.niw.board.model.dto.Comment;
 public enum BoardService {
 	SERVICE;
 	
-	public int insertArticle() {
-		Connection conn = getConnection();
-		int result = BoardDao.DAO.insertArticle(conn);
-		if(result > 0) commit(conn);
-		else rollback(conn);
-		close(conn);
-		return result;
-	}
 	
 	public List<Article> searchArticle(int category, String searchData, int likes, String order, int cPage, int numPerPage, int totalData){
 		Connection conn = getConnection();
@@ -154,5 +146,32 @@ public enum BoardService {
 		else rollback(conn);
 		close(conn);
 		return result;
+	}
+	
+	public int increaseView(int articleId) {
+		Connection conn = getConnection();
+		int result = BoardDao.DAO.increaseView(conn, articleId);
+		if(result > 0) commit(conn);
+		else rollback(conn);
+		close(conn);
+		return result;
+	}
+	
+	public int deleteArticle(int articleId) {
+		Connection conn = getConnection();
+		int result = BoardDao.DAO.deleteArticle(conn, articleId);
+		if(result > 0) commit(conn);
+		else rollback(conn);
+		close(conn);
+		return result;		
+	}
+	
+	public int deleteComment(int commentId) {
+		Connection conn = getConnection();
+		int result = BoardDao.DAO.deleteComment(conn, commentId);
+		if(result > 0) commit(conn);
+		else rollback(conn);
+		close(conn);
+		return result;	
 	}
 }

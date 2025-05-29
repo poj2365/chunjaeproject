@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 @Builder
 
 public class PointRefund {
+	
 	private long refundId;
 	private String userId;
 	private Date refundDate;
