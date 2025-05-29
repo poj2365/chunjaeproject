@@ -125,11 +125,11 @@ User loginUser= (User)session.getAttribute("loginUser");
             <i class="bi bi-chevron-down dropdown-toggle-icon"></i>
           </a>
           <div class="custom-dropdown-menu">
-            <a class="custom-dropdown-item" href="<%=request.getContextPath()%>/study/studymain.do">스터디 모집</a>
-            <a class="custom-dropdown-item" href="<%=request.getContextPath()%>/study/mystudygroup.do">스터디 그룹</a>
+            <a class="custom-dropdown-item" href="<%=request.getContextPath()%>/study/grouplist.do">스터디 모집</a>
             <div class="custom-dropdown-divider"></div>
-            <a class="custom-dropdown-item" href="<%=request.getContextPath()%>/study/timerecord.do">타이머</a>
-            <a class="custom-dropdown-item" href="<%=request.getContextPath()%>/study/calender.do">내 공부 시간</a>
+            <a class="custom-dropdown-item" href="<%=request.getContextPath()%>/study/timerecord.do">공부 시간 기록</a>
+            <a class="custom-dropdown-item" href="<%=request.getContextPath()%>/study/timeranking.do">랭킹</a>
+            <a class="custom-dropdown-item" href="<%=request.getContextPath()%>/study/calender.do">스터디 플래너</a>
           </div>
         </li>
       </ul>
