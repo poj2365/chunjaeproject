@@ -64,18 +64,21 @@ public enum StudyGroupService {
 		JDBCTemplate.close(conn);
 		return group;
 	}
-	public int searchStudyGroupCountId(String userId) {
-		conn = JDBCTemplate.getConnection();
-		int result = dao.searchStudyGroupCountId(conn, userId);
-		JDBCTemplate.close(conn);
-		return result;
-	}
 
 	public List<StudyGroup> searchStudyGroupUserId(String userId) {
 		conn = JDBCTemplate.getConnection();
 		List<StudyGroup> studygroups = dao.searchStudyGroupUserId(conn, userId);
 		JDBCTemplate.close(conn);
 		return studygroups;
+	}
+
+	public int updateGroup(StudyGroup g) {
+		conn = JDBCTemplate.getConnection();
+		int result = dao.updateGroup(conn, g);
+		JDBCTemplate.close(conn);
+		if(result>0) JDBCTemplate.commit(conn);
+		else JDBCTemplate.rollback(conn);
+		return result;
 	}
 	
 }

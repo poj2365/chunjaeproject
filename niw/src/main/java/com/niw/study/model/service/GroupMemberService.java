@@ -43,4 +43,11 @@ public enum GroupMemberService {
 		JDBCTemplate.close(conn);
 		return members;
 	}
+
+	public int groupMemberCountId(String userId) {
+		conn = JDBCTemplate.getConnection();
+		int result = dao.groupMemberCountId(conn, userId);
+		JDBCTemplate.close(conn);
+		return result;
+	}
 }

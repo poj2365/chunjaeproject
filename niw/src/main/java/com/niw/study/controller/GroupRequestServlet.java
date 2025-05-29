@@ -1,33 +1,33 @@
 package com.niw.study.controller;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
-import com.niw.common.CommonTemplate;
+import com.google.gson.Gson;
 import com.niw.study.model.dto.GroupMember;
+import com.niw.study.model.dto.GroupRequest;
 import com.niw.study.model.dto.StudyGroup;
 import com.niw.study.model.service.GroupMemberService;
+import com.niw.study.model.service.GroupRequestService;
 import com.niw.study.model.service.StudyGroupService;
-import com.niw.user.model.dto.User;
 
 /**
- * Servlet implementation class StudyGroupViewServlet
+ * Servlet implementation class StudyGroupRequestServlet
  */
-@WebServlet("/study/groupview.do")
-public class StudyGroupViewServlet extends HttpServlet {
+@WebServlet("/study/insertgrouprequest.do")
+public class GroupRequestServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public StudyGroupViewServlet() {
+    public GroupRequestServlet() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -36,25 +36,20 @@ public class StudyGroupViewServlet extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
-		HttpSession session = request.getSession();
-		User user = (User) session.getAttribute("loginUser");
-		int groupLimit = 0;
-		if(user!=null) {
-			groupLimit = GroupMemberService.SERVICE.groupMemberCountId(user.userId());
+		String jsonData = request.getReader().lines().collect(Collectors.joining());
+		Gson gson = new Gson();
+		GroupRequest gr = gson.fromJson(jsonData, GroupRequest.class);
+		GroupMember gm = gson.fromJson(jsonData, GroupMember.class);
+			
+		GroupRequest groupRequest = GroupRequestService.SERVICE.searchGroupRequest(gr);
+		if(groupRequest==null) {
+			int result = GroupRequestService.SERVICE.insertGroupRequest(gr);
+			int insertMember =  GroupMemberService.SERVICE.insertGroupMember(gm);
+		}else {
+			  response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			  response.setContentType("application/json");
+		      return;
 		}
-		request.setAttribute("groupLimit", groupLimit);
-		
-		
-		String groupNo = request.getParameter("no");
-		StudyGroup group = StudyGroupService.SERVICE.searchStudyGroup(groupNo);
-		request.setAttribute("group", group);
-		int groupCnt = GroupMemberService.SERVICE.groupMemberCount(groupNo);
-		request.setAttribute("groupCnt", groupCnt);
-		
-		List<GroupMember> members = GroupMemberService.SERVICE.searchGroupMember(groupNo);
-		request.setAttribute("members", members);
-		request.getRequestDispatcher(CommonTemplate.WEB_VIEWS+"/study/studyGroupView.jsp").forward(request, response);
 	}
 
 	/**

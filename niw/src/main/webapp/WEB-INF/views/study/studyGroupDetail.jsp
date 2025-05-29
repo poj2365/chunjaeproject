@@ -309,7 +309,6 @@ List<GroupMember> members = (List<GroupMember>) request.getAttribute("members");
 				</ul>
 			</div>
 		</div>
-
 		<!-- 메인 컨텐츠 영역 -->
 		<div class="main-content">
 			<%
@@ -336,23 +335,14 @@ List<GroupMember> members = (List<GroupMember>) request.getAttribute("members");
 				%>
 
 			</div>
-
 			<!-- 상세 정보 -->
 			<div class="content-card" id="detailSection">
 				<!-- 화살표 버튼 -->
-				<button class="arrow-button arrow-left btn btn-outline-secondary" id="arrow-button">
-					<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-						fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
-  						<path fill-rule="evenodd"
-							d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8" />
-						</svg>
+				<button class="arrow-button arrow-left btn btn-outline-secondary">
+				<i class="bi bi-arrow-left"></i>
 				</button>
 				<button class="arrow-button arrow-right btn btn-outline-secondary">
-					<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-						fill="currentColor" class="bi bi-arrow-right" viewBox="0 0 16 16">
-  						<path fill-rule="evenodd"
-							d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8" />
-</svg>
+				<i class="bi bi-arrow-right"></i>
 				</button>
 				<%
 				if (groups != null) {
@@ -362,6 +352,12 @@ List<GroupMember> members = (List<GroupMember>) request.getAttribute("members");
 				<div class="group-content" id="group-<%=index%>"
 					style="<%=index == 0 ? "" : "display:none;"%>">
 					<div class="detail-header">
+					<%if(g.status().equals("RECRUITING")) {%>
+                    <span class="badge bg-primary">모집중</span>
+                    <%}else if(g.status().equals("CLOSED")) { %>
+                    <span class="badge bg-secondary">모집 완료</span>
+                    <%}else{ %>
+                    <%} %>
 					<div class="title"><%=g.groupName()%></div>
 					<div class="meta">
 						개설자:
@@ -370,21 +366,39 @@ List<GroupMember> members = (List<GroupMember>) request.getAttribute("members");
 						개설일자:
 						<%=g.createDate()%></div>
 					</div>
-					<span>그룹인원 : <%=members.size()%>명 / <%=g.groupLimit()%>명
+					<% 
+					if(members!=null){
+						int i = 0;
+					for(GroupMember m : members){
+						if(m.groupNumber()==g.groupNumber()){ 
+							i++;
+						}
+					} %>
+					<span>그룹인원 : <%=i%>명 / <%=g.groupLimit()%>명
 					</span><br>
-
+					<%}%>
+					<%if(g.groupType().equals("PUBLIC")) {%>
+					<span>공개 여부 : 공개</span><br>
+					<%}else if(g.groupType().equals("PRIVATE")){ %>
+					<span>공개 여부 : 비공개</span><br>
+					<%} %>
+					<%if(g.joinType().equals("AUTO")) {%>
+					<span>가입 방식 : 자동</span><br>
+					<%}else if(g.joinType().equals("MANUAL")){ %>
+					<span>가입 방식 : 그룹장 승인 필요</span><br>
+					<%} %>
 					<div class="description"><%=g.description()%></div><br>
-					<button id="updateBtn" class="btn btn-outline-danger">
+					<button type="button" onclick="updateGroup(<%=g.groupNumber()%>)" class="btn btn-outline-danger">
 						<i class="bi bi-person-vcard"></i> 그룹 수정하기
 					</button>
-					<button id="deleteBtn" class="btn btn-danger">
+					<button type="button" onclick="deleteGroup(<%=g.groupNumber()%>)" class="btn btn-danger">
 						<i class="bi bi-person-slash"></i> 그룹 삭제하기
 					</button>
-					<button id="deleteBtn" class="btn btn-success">
-						<i class="bi bi-tools"></i> 그룹원 관리
+					<button type="button" onclick="updateGroupMember(<%=g.groupNumber()%>)" class="btn btn-success">
+						<i class="bi bi-gear"></i> 그룹원 관리
 					</button>
-					<button id="deleteBtn" class="btn btn-primary">
-						<i class="bi bi-char"></i> 그룹 채팅
+					<button type="button" onclick="groupChat(<%=g.groupNumber()%>)" class="btn btn-primary">
+						<i class="bi bi-chat-right-text"></i> 그룹 채팅
 					</button>
 				</div>
 				<%
@@ -393,8 +407,16 @@ List<GroupMember> members = (List<GroupMember>) request.getAttribute("members");
 				}
 				%>
 			</div>
+			
 			<!-- 차트 섹션 -->
 			<div class="content-card" id="chartSection">
+				<!-- 화살표 버튼 -->
+				<button class="arrow-button arrow-left btn btn-outline-secondary">
+				<i class="bi bi-arrow-left"></i>
+				</button>
+				<button class="arrow-button arrow-right btn btn-outline-secondary">
+				<i class="bi bi-arrow-right"></i>
+				</button>
 			<div class="ranking-list">
 				<h3>오늘의 공부 시간 랭킹(시간:분:초)</h3>
 				<div class="ranking-item"></div>
@@ -442,32 +464,52 @@ $('.menu-item').on('click', function() {
     	location.assign("<%=request.getContextPath()%>/study/grouplist.do");
     }
 });
-
+	});
 let showingDetail = true;
 
-document.querySelector('.arrow-button').addEventListener('click', () => {
-    showingDetail = !showingDetail;
+document.querySelectorAll('.arrow-button').forEach(button => {
+    button.addEventListener('click', () => {
+        showingDetail = !showingDetail;
 
-    document.getElementById("detailSection").style.display = showingDetail ? "block" : "none";
-    document.getElementById("chartSection").style.display = showingDetail ? "none" : "block";
+        document.getElementById("detailSection").style.display = showingDetail ? "block" : "none";
+        document.getElementById("chartSection").style.display = showingDetail ? "none" : "block";
 
-    if (!showingDetail) {
-        // 현재 선택된 그룹 인덱스 가져오기
-        const activeTab = $('.tab-item.active').data('index');
+        if (!showingDetail) {
+            // 현재 선택된 그룹 인덱스 가져오기
+            const activeTab = $('.tab-item.active').data('index');
 
-        // 이 인덱스를 기반으로 서버에서 차트 데이터를 동적으로 구성할 수 있음 (지금은 샘플 데이터)
-        drawChart(activeTab);
-    }
+            // 이 인덱스를 기반으로 서버에서 차트 데이터를 동적으로 구성할 수 있음 (지금은 샘플 데이터)
+            drawChart(activeTab);
+        }
+    });
 });
+
+function updateGroup(groupNumber){
+  location.assign("<%=request.getContextPath()%>/study/updategroupview.do?no="+groupNumber);
+}
+function deleteGroup(groupNumber){
+	console.log(groupNumber);
+}
+function updateGroupMember(groupNumber){
+	console.log(groupNumber);
+}
+function groupChat(groupNumber){
+	console.log(groupNumber);
+}
 
 function totalMinute(timeStr) {
     const [hours, minutes] = timeStr.split(':').map((v, i) => i < 2 ? Number(v) : null); 
     return hours * 60 + minutes;
 }
 
-function drawChart(groupIndex) {
+let chartInstance = null;
+
     // 그래프
-	fetch("<%=request.getContextPath()%>/study/timerank.do")
+function drawChart(groupIndex) {
+    if (chartInstance) {
+        chartInstance.destroy(); // 기존 차트 제거
+    }
+	fetch("<%=request.getContextPath()%>/study/timerank.do?no="+groupIndex)
  	.then(response => response.json())
  	.then(data => {
      	const labels = data.map(item => item.userId);
@@ -517,7 +559,7 @@ function drawChart(groupIndex) {
 };
 
         
-    });
+    
 </script>
 </section>
 <%@include file="/WEB-INF/views/common/footer.jsp"%>

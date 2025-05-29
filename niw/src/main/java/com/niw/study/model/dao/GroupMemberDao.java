@@ -105,5 +105,21 @@ public enum GroupMemberDao {
 		return members;
 	}
 
+	public int groupMemberCountId(Connection conn, String userId) {
+		int result = 0;
+		try {
+			pstmt=conn.prepareStatement(sql.getProperty("groupMemberCountId"));
+			pstmt.setString(1, userId);
+			rs=pstmt.executeQuery();
+			if(rs.next()) result=rs.getInt(1);
+		}catch (Exception e) {
+			e.printStackTrace();
+		}finally {
+			JDBCTemplate.close(rs);
+			JDBCTemplate.close(pstmt);
+		}
+		return result;
+	}
+
 	
 }

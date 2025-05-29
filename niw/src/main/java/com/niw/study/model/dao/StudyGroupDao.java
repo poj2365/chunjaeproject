@@ -147,7 +147,6 @@ public enum StudyGroupDao {
 			pstmt.setString(4, g.joinType());
 			pstmt.setString(5, g.description());
 			pstmt.setInt(6, g.groupLimit());
-			pstmt.setString(7, g.status());
 			result=pstmt.executeUpdate();
 		}catch (Exception e) {
 			e.printStackTrace();
@@ -177,24 +176,6 @@ public enum StudyGroupDao {
 		return group;
 	}
 
-	public int searchStudyGroupCountId(Connection conn, String userId) {
-		int result = 0;
-		try {
-			pstmt=conn.prepareStatement(sql.getProperty("searchStudyGroupCountId"));
-			pstmt.setString(1, userId);
-			rs=pstmt.executeQuery();
-			if(rs.next()) {
-				result=rs.getInt(1);
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}finally {
-			JDBCTemplate.close(rs);
-			JDBCTemplate.close(pstmt);
-		}
-		return result;
-	}
-
 	public List<StudyGroup> searchStudyGroupUserId(Connection conn, String userId) {
 		List<StudyGroup> studygroups = new ArrayList();
 		try {
@@ -211,6 +192,27 @@ public enum StudyGroupDao {
 			JDBCTemplate.close(pstmt);
 		}
 		return studygroups;
+	}
+
+	public int updateGroup(Connection conn, StudyGroup g) {
+		int result = 0;
+		try {  
+			pstmt=conn.prepareStatement(sql.getProperty("updateGroup"));
+			pstmt.setString(1, g.groupName());
+			pstmt.setString(2, g.groupType());
+			pstmt.setString(3, g.joinType());
+			pstmt.setString(4, g.description());
+			pstmt.setInt(5, g.groupLimit());
+			pstmt.setString(6, g.status());
+			pstmt.setInt(7, g.groupNumber());
+			result=pstmt.executeUpdate();
+		}catch (Exception e) {
+			e.printStackTrace();
+		}finally {
+			JDBCTemplate.close(rs);
+			JDBCTemplate.close(pstmt);
+		}
+		return result;
 	}
 	
 }
