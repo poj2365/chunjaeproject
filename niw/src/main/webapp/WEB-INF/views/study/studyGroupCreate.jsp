@@ -151,42 +151,53 @@
 	font-weight: bold;
 }
 
-    /* 메인 컨텐츠 스타일 */
-    .main-content {
-        flex: 1;
-        background-color: white;
-        border-radius: 12px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        padding: 30px;
-        min-height: 450px;
-    }
-    
-    .loading-content {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 400px;
-        flex-direction: column;
-        color: #888;
-    }
-    
-    .loading-spinner {
-        border: 4px solid #f3f3f3;
-        border-top: 4px solid var(--bs-blind-dark);
-        border-radius: 50%;
-        width: 40px;
-        height: 40px;
-        animation: spin 1s linear infinite;
-        margin-bottom: 20px;
-    }
-    
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-    
-    /* 반응형 스타일 */
-    @media (max-width: 768px) {
+/* 메인 컨텐츠 스타일 */
+.main-content {
+	flex: 1;
+	background-color: white;
+	border-radius: 12px;
+	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+	padding: 30px;
+	min-height: 450px;
+}
+
+.loading-content {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 400px;
+	flex-direction: column;
+	color: #888;
+}
+
+.loading-spinner {
+	border: 4px solid #f3f3f3;
+	border-top: 4px solid var(--bs-blind-dark);
+	border-radius: 50%;
+	width: 40px;
+	height: 40px;
+	animation: spin 1s linear infinite;
+	margin-bottom: 20px;
+}
+
+@
+keyframes spin { 0% {
+	transform: rotate(0deg);
+}
+
+100
+%
+{
+transform
+:
+rotate(
+360deg
+);
+}
+}
+
+/* 반응형 스타일 */
+@media ( max-width : 768px) {
 	.mypage-container {
 		flex-direction: column;
 	}
@@ -220,9 +231,13 @@
 					<i class="bi bi-person-circle"
 						style="font-size: 60px; color: #ccc;"></i>
 				</div>
-				<div class="user-id"></div>
-				<div class="user-name"></div>
-				<div class="point-info">포인트:P</div>
+             <% if(loginUser!=null){%>
+            <div class="user-id"><%=loginUser.userId() %></div>
+            <div class="user-name"><%=loginUser.userName() %></div>
+            <div class="point-info">포인트:<%=loginUser.userPoint() %> P</div>
+            <% }else{%>
+            <div class="user-id">Guest</div>
+           <%  }%>
 			</div>
 			<div class="menu-section">
 				<div class="menu-title">스터디 그룹</div>
@@ -251,10 +266,11 @@
 			</div>
 			<div class="content-section">
 				<h3 class="section-title">스터디 그룹 생성</h3>
+				<p class="form-label">스터디 그룹은 총 3개까지 생성 가능합니다</p> 
 				<div class="form-group">
-					<label class="form-label">그룹 이름</label> <input type="text"
-						class="form-input" name="groupName" id="groupName"
-						placeholder="그룹 이름은 모집글의 제목으로 자동 등록됩니다." required>
+					<label class="form-label">그룹 이름</label> 
+					<input type="text" class="form-input" name="groupName" id="groupName"
+						placeholder="그룹 이름은 모집글의 제목으로 자동 등록됩니다." required />
 				</div>
 				<div class="div-group">
 					<label class="form-label">그룹 종류</label> <select name="groupType"
@@ -289,42 +305,48 @@
 
 				<div class="form-group">
 					<label class="form-label">그룹 소개글</label>
-					<textarea name="description" id="description" rows="8"
-						class="form-input" required>
-시작: 매주 토요일 오후 5시
-종료: 매주 토요일 오후 7시
+					<textarea name="description" id="description" rows="8" class="form-input" required>
+
+시작: ex)매주 토요일 오후 5시
+종료: ex)매주 토요일 오후 7시
 장소: ex)가산디지털단지역 근처 카페
 </textarea>
 				</div>
 				<div style="text-align: right;">
-					<button onclick="groupCreate();" class="btn btn-primary">
+					<button id="createBtn" class="btn btn-primary">
 						<i class="bi bi-person-plus"></i>그룹 생성하기
 					</button>
 				</div>
 			</div>
 		</div>
 	</div>
-	<script>
+</section>
+<script>
 document.addEventListener('DOMContentLoaded', () => {
 
-	// 사이드바 메뉴 클릭 이벤트
-	$('.menu-item').on('click', function() {
-	    var $this = $(this);
-	    var tabId = $this.data('tab');
-	    console.log(tabId);
-	    if(tabId=="calendar"){
-	    	location.assign("<%=request.getContextPath()%>/study/calender.do");
-	    }else if(tabId=="rank"){
-	    	location.assign("<%=request.getContextPath()%>/study/timerecord.do");
-	    }else if(tabId=="studygroup"){
-	    	location.assign("<%=request.getContextPath()%>/study/groupdetail.do");
-	    }else if(tabId=="grouplist"){
-	    	location.assign("<%=request.getContextPath()%>/study/grouplist.do");
-	    }
+    // 사이드바 메뉴 클릭 이벤트
+    $('.menu-item').on('click', function() {
+        var $this = $(this);
+        var tabId = $this.data('tab');
+        if(tabId=="calendar"){
+        	location.assign("<%=request.getContextPath() %>/study/calender.do");
+        }else if(tabId=="record"){
+        	location.assign("<%=request.getContextPath() %>/study/timerecord.do");
+        }else if(tabId=="rank"){
+        	location.assign("<%=request.getContextPath() %>/study/timeranking.do");
+        }else if(tabId=="studygroup"){
+        	location.assign("<%=request.getContextPath() %>/study/groupdetail.do");
+        }else if(tabId=="grouplist"){
+        	location.assign("<%=request.getContextPath() %>/study/grouplist.do");
+        }
+    });
 	
-	const groupCreate = ()=>{
-		console.log("a");
-		const userId = <%=loginUser.userId()%>
+	document.getElementById('createBtn').addEventListener('click', () => {
+		<%if(loginUser==null){%>
+			alert("로그인 후 이용 가능한 메뉴입니다.");
+			location.replace("<%=request.getContextPath()%>");
+		<%}else{ %>
+		const userId = '<%=loginUser.userId()%>';
 		const groupName = document.getElementById('groupName').value;
 		const groupType = document.querySelector('select[name="groupType"]').value;
 		const joinType = document.querySelector('select[name="joinType"]').value;
@@ -338,7 +360,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			    description: description,
 			    groupLimit: groupLimit
 			}
-		console.log(jsonData);
+		
 	fetch("<%=request.getContextPath()%>/study/groupcreate.do",{
 		method: 'POST',
       headers: {
@@ -347,17 +369,42 @@ document.addEventListener('DOMContentLoaded', () => {
       body: JSON.stringify(jsonData)
   }).then(response => {
     if (response.ok) {
-        alert("정상적으로 생성되었습니다.");
+        console.log("그룹이 정상적으로 생성되었습니다.");
+        return response.json();
     }else{
     throw new Error('네트워크 응답이 올바르지 않습니다.');
     }
-    location.assign("<%=request.getContextPath() %>/study/grouplist.do");
-  }).catch(error => {
-      alert("에러 발생: " + error.message);
+  }).then(data=>{
+	  
+		const jsonMemberData = {
+			    groupNumber: data.groupNumber,
+			    userId: userId,
+			    role: "OWNER",
+			    status: "APPROVED"
+			}
+		
+	   return fetch("<%=request.getContextPath()%>/study/groupmembercreate.do",{
+			method: 'POST',
+	      headers: {
+	          'Content-Type': 'application/json'
+	      },
+	      body: JSON.stringify(jsonMemberData)
+	  }).then(response => {
+	    if (response.ok) {
+	        alert("정상적으로 생성되었습니다.");
+	    }else{
+	    throw new Error('네트워크 응답이 올바르지 않습니다.');
+	    }
+	     location.replace("<%=request.getContextPath() %>/study/grouplist.do");
+	  }).catch(error => {
+	      alert("에러 발생: " + error.message);
+	  });
   });
-	};
-});
+	
 
+	
+	});
+});
+<%} %>
 </script>
-</section>
 <%@include file="/WEB-INF/views/common/footer.jsp"%>

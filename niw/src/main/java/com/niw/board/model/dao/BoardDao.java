@@ -48,19 +48,6 @@ public enum BoardDao {
 					  .build();
 	}
 	
-	public int insertArticle(Connection conn) {
-		int result = 0;
-		try {
-			pstmt = conn.prepareStatement(sqlPro.getProperty("insertArticle"));
-			
-			result = pstmt.executeUpdate();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			close(pstmt);
-		}
-		return result;
-	}
 	
 	public List<Article> searchArticle(Connection conn, int category, String searchData, int likes, String order, int cPage, int numPerPage, int totalData){
 		List<Article> articles = new ArrayList<>();
@@ -384,6 +371,49 @@ public enum BoardDao {
 			pstmt.setString(3, article.articleContent());
 			pstmt.setTimestamp(4, article.articleDateTime());
 			pstmt.setInt(5, article.articleCategory());
+			result = pstmt.executeUpdate();
+		} catch(SQLException e) {
+			e.printStackTrace();
+		} finally {
+			close(pstmt);
+		}
+		return result;
+	}
+	
+	public int increaseView(Connection conn, int articleId) {
+		int result = 0;
+		try {
+			pstmt = conn.prepareStatement(sqlPro.getProperty("increaseView"));
+			pstmt.setInt(1, articleId);
+			result = pstmt.executeUpdate();
+		} catch(SQLException e) {
+			e.printStackTrace();
+		} finally {
+			close(pstmt);
+		}
+		return result;
+	}
+	
+	public int deleteArticle(Connection conn, int articleId) {
+		int result = 0;
+		try {
+			pstmt = conn.prepareStatement(sqlPro.getProperty("deleteArticle"));
+			pstmt.setInt(1, articleId);
+			result = pstmt.executeUpdate();
+		} catch(SQLException e) {
+			e.printStackTrace();
+		} finally {
+			close(pstmt);
+		}
+		return result;
+	}
+
+	public int deleteComment(Connection conn, int commentId) {
+		int result = 0;
+		try {
+			pstmt = conn.prepareStatement(sqlPro.getProperty("deleteComment"));
+			pstmt.setInt(1, commentId);
+			pstmt.setInt(2, commentId);
 			result = pstmt.executeUpdate();
 		} catch(SQLException e) {
 			e.printStackTrace();

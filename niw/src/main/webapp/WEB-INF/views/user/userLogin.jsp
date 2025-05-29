@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
+		<%@ include file="/WEB-INF/views/common/header.jsp"%>
 <%
 // 메시지 처리
 String errorMessage = (String) request.getAttribute("errorMessage");
@@ -12,7 +13,7 @@ String redirect = request.getParameter("redirect");
 Object user = session.getAttribute("user");
 
 // 이미 로그인된 사용자 리다이렉트 처리
-if (user != null) {
+if (loginUser != null) {
 	if (redirect != null && !redirect.isEmpty()) {
 		response.sendRedirect(redirect);
 	} else {
@@ -38,7 +39,7 @@ if (user != null) {
 	href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
 </head>
 <body>
-	<%@ include file="/WEB-INF/views/common/header.jsp"%>
+
 
 	<main class="bg-primary-light py-5">
 		<div class="container login-animation">
@@ -109,7 +110,7 @@ if (user != null) {
 							<div class="form-floating mb-3">
 								<input type="text" class="form-control" id="username"
 									name="username" placeholder="아이디"
-									value="<%=username != null ? username : ""%>" required
+									value="<%=saveId != null ? saveId : ""%>" required
 									autocomplete="username"> <label for="username">
 									<i class="bi bi-person me-1"></i>아이디
 								</label>
@@ -131,8 +132,8 @@ if (user != null) {
 								class="d-flex justify-content-between align-items-center mb-4">
 								<div class="form-check">
 									<input class="form-check-input" type="checkbox" id="rememberMe"
-										name="rememberMe"> <label class="form-check-label"
-										for="rememberMe"> 로그인 상태 유지 </label>
+										name="rememberMe" <%=saveId!=null ?"checked":"" %>> <label class="form-check-label"
+										for="rememberMe"> 아이디 저장 </label>
 								</div>
 								<div class="login-options">
 									<a href="<%=request.getContextPath()%>/auth/find-account">아이디/비밀번호

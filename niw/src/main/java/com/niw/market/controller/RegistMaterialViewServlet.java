@@ -1,27 +1,23 @@
-package com.niw.user.controller;
+package com.niw.market.controller;
 
 import java.io.IOException;
-
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
-import com.niw.user.model.dto.User;
 
 /**
- * Servlet implementation class UserEnrollServlet
+ * Servlet implementation class RegistMaterialViewServlet
  */
-@WebServlet("/user/enrollview.do")
-public class UserEnrollViewServlet extends HttpServlet {
+@WebServlet("/market/materialregist.do")
+public class RegistMaterialViewServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public UserEnrollViewServlet() {
+    public RegistMaterialViewServlet() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -30,9 +26,8 @@ public class UserEnrollViewServlet extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
-		
-		request.getRequestDispatcher("/WEB-INF/views/user/userEnroll.jsp").forward(request, response);
+		// TODO Auto-generated method stub
+		request.getRequestDispatcher("/WEB-INF/views/market/materialregist.jsp").forward(request, response);
 	}
 
 	/**

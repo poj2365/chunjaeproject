@@ -23,4 +23,49 @@ public enum UserService {
 		close(conn);
 		return user;
 	}
+	
+
+	public int insertUser(User user) {
+		Connection conn = getConnection();
+		int result = 0;
+		
+		try {
+			result = dao.insertUser(conn, user);
+			
+			if (result > 0) {
+				commit(conn);
+			} else {
+				rollback(conn);
+			}
+			
+		} catch (Exception e) {
+			rollback(conn);
+			e.printStackTrace();
+		} finally {
+			close(conn);
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * 이메일 중복 체크
+	 * @param email 확인할 이메일
+	 * @return 사용 가능하면 true, 중복이면 false
+	 */
+//	public boolean checkEmailAvailable(String email) {
+//		Connection conn = getConnection();
+//		boolean isAvailable = false;
+//		
+//		try {
+//			User user = dao.searchByEmail(conn, email);
+//			isAvailable = (user == null);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		} finally {
+//			close(conn);
+//		}
+//		
+//		return isAvailable;
+//	}
 }

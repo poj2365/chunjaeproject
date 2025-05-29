@@ -2,6 +2,7 @@
 <%@ page import="java.util.*" %>
 <%@ page import="com.niw.user.model.dto.User" %>
 <%@ page import="com.niw.market.model.dto.Material" %>
+<%@ include file="/WEB-INF/views/common/header.jsp" %>
 <%
     // 초기 필터 파라미터들
     String schoolLevel = request.getParameter("schoolLevel");
@@ -18,7 +19,7 @@
     keyword = (keyword != null) ? keyword : "";
 %>
 
-<%@ include file="/WEB-INF/views/common/header.jsp" %>
+
 
 <style>
     /* 기존 CSS 스타일들 유지 */
@@ -879,15 +880,15 @@ function updateGradeButtons() {
     if (['elementary', 'middle', 'high'].includes(currentFilters.schoolLevel)) {
         const maxGrade = currentFilters.schoolLevel === 'elementary' ? 6 : 3;
         let buttonsHtml = `
-            <button type="button" class="grade-btn ${currentFilters.grade === '' ? 'active' : ''}" data-grade="">
+            <button type="button" class="grade-btn \${currentFilters.grade == '' ? 'active' : ''}" data-grade="">
                 <i class="bi bi-list"></i>
             </button>
         `;
         
         for (let i = 1; i <= maxGrade; i++) {
             buttonsHtml += `
-                <button type="button" class="grade-btn ${currentFilters.grade === i.toString() ? 'active' : ''}" data-grade="${i}">
-                    ${i}
+                <button type="button" class="grade-btn \${currentFilters.grade == i.toString() ? 'active' : ''}" data-grade="${i}">
+                    \${i}
                 </button>
             `;
         }
@@ -947,7 +948,7 @@ function updateSelectedFilters() {
             };
             html += `
                 <span class="badge" style="background-color: var(--bs-blind-dark);">
-                    <i class="bi bi-tag-fill me-1"></i>${schoolNames[currentFilters.schoolLevel]}
+                    <i class="bi bi-tag-fill me-1"></i>\${schoolNames[currentFilters.schoolLevel]}
                     <button type="button" class="btn-close btn-close-white ms-2" style="font-size: 0.7rem;" onclick="removeFilter('schoolLevel')"></button>
                 </span>
             `;
@@ -956,7 +957,7 @@ function updateSelectedFilters() {
         if (currentFilters.grade) {
             html += `
                 <span class="badge" style="background-color: var(--bs-accent);">
-                    <i class="bi bi-tag-fill me-1"></i>${currentFilters.grade}학년
+                    <i class="bi bi-tag-fill me-1"></i>\${currentFilters.grade}학년
                     <button type="button" class="btn-close btn-close-white ms-2" style="font-size: 0.7rem;" onclick="removeFilter('grade')"></button>
                 </span>
             `;
@@ -974,7 +975,7 @@ function updateSelectedFilters() {
             };
             html += `
                 <span class="badge" style="background-color: #6f42c1;">
-                    <i class="bi bi-tag-fill me-1"></i>${subjectNames[currentFilters.subject]}
+                    <i class="bi bi-tag-fill me-1"></i>\${subjectNames[currentFilters.subject]}
                     <button type="button" class="btn-close btn-close-white ms-2" style="font-size: 0.7rem;" onclick="removeFilter('subject')"></button>
                 </span>
             `;
@@ -983,7 +984,7 @@ function updateSelectedFilters() {
         if (currentFilters.keyword) {
             html += `
                 <span class="badge" style="background-color: #20c997;">
-                    <i class="bi bi-search me-1"></i>"${currentFilters.keyword}"
+                    <i class="bi bi-search me-1"></i>"\${currentFilters.keyword}"
                     <button type="button" class="btn-close btn-close-white ms-2" style="font-size: 0.7rem;" onclick="removeFilter('keyword')"></button>
                 </span>
             `;
@@ -1091,7 +1092,7 @@ async function loadMaterials(reset = false) {
             ajax: 'true'
         });
         
-        const response = await fetch(`<%=request.getContextPath()%>/materials/list.do?${params}`);
+        const response = await fetch(`<%=request.getContextPath()%>/materials/list.do?\${params}`);
         const data = await response.json();
         
         if (data.success) {
@@ -1192,7 +1193,7 @@ function createMaterialCard(material) {
             previewContent = `
                 <div class="math-formula">
                     <strong>수학 문제집</strong><br>
-                    총 ${material.materialPage}페이지
+                    총 \${material.materialPage}페이지
                 </div>
                 <div class="math-formula">
                     <strong>핵심 공식 수록</strong><br>
@@ -1203,7 +1204,7 @@ function createMaterialCard(material) {
         case 'korean':
             previewContent = `
                 <p><strong>국어 학습자료</strong></p>
-                <p>• 총 ${material.materialPage}페이지</p>
+                <p>• 총 \${material.materialPage}페이지</p>
                 <p>• 체계적 문제 구성</p>
                 <p>• 상세한 해설 포함</p>
             `;
@@ -1214,7 +1215,7 @@ function createMaterialCard(material) {
                     <span><strong>English</strong></span>
                     <span>영어</span>
                 </div>
-                <p style="font-size: 0.7rem;">${material.materialPage}페이지 구성</p>
+                <p style="font-size: 0.7rem;">\${material.materialPage}페이지 구성</p>
             `;
             break;
         case 'science':
@@ -1223,14 +1224,14 @@ function createMaterialCard(material) {
                     과학 실험 가이드
                 </div>
                 <div class="experiment-step">
-                    ${material.materialPage}페이지 분량
+                    \${material.materialPage}페이지 분량
                 </div>
             `;
             break;
         default:
             previewContent = `
-                <p><strong>${material.materialSubject} 학습자료</strong></p>
-                <p>• 총 ${material.materialPage}페이지</p>
+                <p><strong>\${material.materialSubject} 학습자료</strong></p>
+                <p>• 총 \${material.materialPage}페이지</p>
                 <p>• 전문가 제작</p>
                 <p>• 검증된 내용</p>
             `;
@@ -1240,66 +1241,68 @@ function createMaterialCard(material) {
         <div class="col-lg-4 col-md-6 col-12">
             <div class="material-card">
                 <div class="card-image">
-                    <span class="card-badge ${badgeClass}">${badgeText}</span>
-                    <span class="card-price">${material.materialPrice === 0 ? 'FREE' : '₩' + material.materialPrice.toLocaleString()}</span>
+                    <span class="card-badge \${badgeClass}">\${badgeText}</span>
+                    <span class="card-price">\${material.materialPrice == 0 ? 'FREE' : '₩' + material.materialPrice.toLocaleString()}</span>
                     <div class="preview-page-card">
-                        <h4>${material.materialTitle}</h4>
+                        <h4>\${material.materialTitle}</h4>
                         <div class="content">
-                            ${previewContent}
+                            \${previewContent}
                         </div>
                     </div>
                 </div>
                 <div class="card-content">
-                    <h3 class="card-title">${material.materialTitle}</h3>
-                    <p class="card-description">${material.materialDiscription}</p>
+                    <h3 class="card-title">\${material.materialTitle}</h3>
+                    <p class="card-description">\${material.materialDiscription}</p>
                     <div class="card-meta">
-                        <span><i class="bi bi-person-fill me-1"></i>${material.instructorName}</span>
-                        <span><i class="bi bi-calendar3 me-1"></i>${material.materialCreatedDate}</span>
+                        <span><i class="bi bi-person-fill me-1"></i>\${material.instructorName}</span>
+                        <span><i class="bi bi-calendar3 me-1"></i>\${material.materialCreatedDate}</span>
                     </div>
                     
                     <div class="card-stats">
                         <div class="stat-item" title="조회수" data-bs-toggle="tooltip">
                             <i class="bi bi-eye-fill" style="color: #17a2b8;"></i>
-                            <span>${material.materialViewCount.toLocaleString()}</span>
+                            <span>\${material.materialViewCount.toLocaleString()}</span>
                         </div>
                         <div class="stat-item" title="다운로드 수" data-bs-toggle="tooltip">
                             <i class="bi bi-download" style="color: #28a745;"></i>
-                            <span>${material.materialDownloadCount.toLocaleString()}</span>
+                            <span>\${material.materialDownloadCount.toLocaleString()}</span>
                         </div>
                         <div class="stat-item" title="평점" data-bs-toggle="tooltip">
                             <i class="bi bi-star-fill" style="color: #ffd700;"></i>
-                            <span>${material.materialRating.toFixed(1)}</span>
+                            <span>\${material.materialRating.toFixed(1)}</span>
                         </div>
                         <div class="stat-item" title="댓글 수" data-bs-toggle="tooltip">
                             <i class="bi bi-chat-dots" style="color: #6f42c1;"></i>
-                            <span>${material.materialCommentCount.toLocaleString()}</span>
+                            <span>\${material.materialCommentCount.toLocaleString()}</span>
                         </div>
                         <div class="stat-item" title="페이지 수" data-bs-toggle="tooltip">
                             <i class="bi bi-file-earmark-text" style="color: #fd7e14;"></i>
-                            <span>${material.materialPage}p</span>
+                            <span>\${material.materialPage}p</span>
                         </div>
                     </div>
                     
                     <div class="card-extra-info mb-3">
                         <div class="d-flex justify-content-between align-items-center">
                             <div class="material-tags">
-                                <span class="badge bg-light text-dark">${material.materialCategory}</span>
-                                ${material.materialGrade ? `<span class="badge bg-light text-dark">${material.materialGrade}학년</span>` : ''}
+                                <span class="badge bg-light text-dark">\${material.materialCategory}</span>
+                                ${material.materialGrade 
+                                ? `<span class="badge bg-light text-dark">\${material.materialGrade}학년</span>` 
+                                : ''}
                             </div>
                             <div class="popularity-score">
-                                ${(material.materialViewCount * 0.3 + material.materialDownloadCount * 0.4 + material.materialRating * material.materialCommentCount * 0.3) > 1000 ? 
+                                \${(material.materialViewCount * 0.3 + material.materialDownloadCount * 0.4 + material.materialRating * material.materialCommentCount * 0.3) > 1000 ? 
                                     '<i class="bi bi-fire text-danger" title="인기 자료"></i>' : ''}
                             </div>
                         </div>
                     </div>
                     
                     <div class="card-actions">
-                        <button type="button" class="btn-preview" data-material-id="${material.materialId}" data-material-title="${material.materialTitle}">
+                        <button type="button" class="btn-preview" data-material-id="\${material.materialId}" data-material-title="\${material.materialTitle}">
                             <i class="bi bi-eye me-1"></i>미리보기
                         </button>
-                        <a href="<%=request.getContextPath()%>/materials/purchase.do?id=${material.materialId}" class="btn-purchase">
-                            <i class="bi bi-${material.materialPrice === 0 ? 'download' : 'cart-plus'} me-1"></i>
-                            ${material.materialPrice === 0 ? '다운로드' : '구매하기'}
+                        <a href="<%=request.getContextPath()%>/materials/purchase.do?id=\${material.materialId}" class="btn-purchase">
+                            <i class="bi bi-\${material.materialPrice == 0 ? 'download' : 'cart-plus'} me-1"></i>
+                            \${material.materialPrice == 0 ? '다운로드' : '구매하기'}
                         </a>
                     </div>
                 </div>

@@ -1,14 +1,15 @@
+<%@page import="com.niw.study.model.dto.GroupMember"%>
+<%@page import="java.util.List"%>
 <%@page import="com.niw.study.model.dto.StudyGroup"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
    <%@include file="/WEB-INF/views/common/header.jsp" %>
    <%
    	StudyGroup group = (StudyGroup)request.getAttribute("group");
+   List<GroupMember> members = (List<GroupMember>)request.getAttribute("members");
+   int groupCnt = (int)request.getAttribute("groupCnt");
 	%>
-   
    <style>
-   
-
     .detail-header {
       border-bottom: 1px solid #ddd;
       padding-bottom: 10px;
@@ -376,28 +377,25 @@
 
     <div class="members">
       <div class="avatars">
-        <div class="avatar">NullisWell</div>
-        <div class="avatar">대기</div>
-        <div class="avatar">대기</div>
-        <div class="avatar">대기</div>
-        <div class="avatar">대기</div>
-        <span>4명 남음 / 5명</span>
+      	<%for(int i=0;i<group.groupLimit();i++){
+      		if(i==0){ %>
+      		<div class="avatar"><%=group.userId() %></div>
+      <% }else{ %> 
+    	 	<div class="avatar">학습메이트</div>
+      <% }
+      		}%>
+        <span>그룹인원 : <%=groupCnt %>명  / <%=group.groupLimit()%>명</span>
       </div>
-    </div>
-
-    <div class="info">
-      <div class="info-item"><span>시작:</span>2025년 5월 11일 오후 5:00</div>
-      <div class="info-item"><span>종료:</span>2025년 5월 11일 오후 7:00</div>
-      <div class="info-item"><span>장소:</span>연산역 근처 커피숍</div>
-      <div class="info-item"><span>비용:</span>개별 비용</div>
     </div>
 
     <div class="description">
 		<%=group.description() %>
     </div>
+    <%if(group.status().equals("RECRUITING")) {%>
     <div class="apply-button">
         <button onclick="openModal()">참여하기</button>
     </div>
+    <%} %>
   </div>
 
   <div id="applyModal" class="modal">
@@ -439,15 +437,19 @@
 
 
   function openModal() {
-	const userId = <%=loginUser.userId()%>;
-	const groupUserId = <%=group.userId()%>;
-	if(userId== null || userId== undefind){
+	<% if(loginUser==null){%>
 		alert("로그인한 유저만 사용 가능합니다.");
-	}else if(userId==groupUserId){
-		alert("이미 참여중인 그룹입니다.")
-	}else{
-    document.getElementById("applyModal").style.display = "block";
+		location.assign('<%=request.getContextPath()%>/user/loginview.do');
+	<%}else { %>
+	const userId = "<%=loginUser.userId()%>";
+	const groupUserId = "<%=group.userId()%>";
+	if(userId==groupUserId){
+		alert("이미 참여중인 그룹입니다.");
+		return;
 	}
+	<%}%>
+    document.getElementById("applyModal").style.display = "block";
+	
   }
 
   function closeModal() {
@@ -459,7 +461,6 @@
     if (e.key === "Escape") closeModal();
   });
 
-  // 폼 제출 시 예시 처리 (백엔드 연동 전용)
   document.getElementById("applyForm").addEventListener("submit", function (e) {
     e.preventDefault();
     alert("신청이 완료되었습니다!");

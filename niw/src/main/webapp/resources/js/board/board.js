@@ -7,13 +7,13 @@ const activeChange = (e, url) => {
 	$("#category > li").toArray().forEach(li => {
 	    li.classList.remove("active");
 	});
-	$(e.target.parentNode).addClass("active");
+	$(e.target).addClass("active");
 	searchArticle('1', url);
 }
 
 
 const searchArticle = (cPage, url) => {
-	const category = $("#category>li.active>a")[0].getAttribute('data-category');
+	const category = $("#category>li.active")[0].getAttribute('data-category');
 	const order = $("#order")[0].value;
 	const numPerPage = $("#numPerPage")[0].value;
 	const likes = $("#likes")[0].value;
@@ -49,6 +49,8 @@ const searchArticle = (cPage, url) => {
 		const $article = $("#article-container");
 		$article.html("");
 		const articles = data["articles"];
+		const userId = data["userId"];
+		const userRole = data["userRole"];
 		if(articles.length > 0){
 			for(let article of articles){
 				$article.append(getArticle(
@@ -59,7 +61,8 @@ const searchArticle = (cPage, url) => {
 					numPerPage, 
 					likes, 
 					cPage,
-					url
+					userId,
+					userRole
 				)).append($("<hr>"));
 			}
 		} else {
@@ -84,8 +87,10 @@ const getArticle = (
 			numPerPage, 
 			likes, 
 			cPage,
-			url
+			userId,
+			userRole
 	) => {
+	console.log(article);
 	const $form = $("<div>").addClass("row flex-row justify-content-between align-item-center");
 	const $container = $("<div>").addClass("col-lg-6 d-flex align-items-center");
 	const $category = $("<span>").addClass("badge me-3");
@@ -134,10 +139,27 @@ const getArticle = (
 	$comment.append($commentIcon);
 	$info.append($comment);
 	
-	const $date = $("<li>").addClass("col-lg-6");
+	const $date = $("<li>").addClass("col-lg-5");
 	$date.text(article['userId'] + ' \u00B7 ' + timeFormat(article['articleDateTime']));
 	$info.append($date);
 	
+	const $delete = $("<li>").addClass("col-lg-1");
+	const $i = $("<i>", {
+		class: "bi bi-x fw-bold border rounded-2 d-flex justify-content-center align-items-center",
+	    css: {
+	        width: "24px",
+	        height: "24px",
+	        cursor: "pointer",
+	        fontStyle: "normal"
+	    },
+	    click: function () {
+			const articleId = article['articleId'];
+	        deleteArticle(articleId, "/board/boardentrance.do?category=0");
+	    }
+	});
+	if(userId != null && userId.trim() != "" && (article['userId'] == userId || userRole == 'ADMIN')) $delete.append($i);
+	
+	$info.append($delete);
 	$form.append($container).append($info);
 	return $form;
 }
@@ -406,20 +428,67 @@ const checkLogin = (flag) =>{
 }
 
 const deleteArticle = (articleId, url) => {
-	const confirm = confirm("정말로 삭제하시겠습니까?");
-	if(confirm){
-		fetch("/board/deletearticle.do", {
+	const deleteConfirm = confirm("정말로 삭제하시겠습니까?");
+	if(deleteConfirm){
+		fetch(getContextPath() + "/board/deletearticle.do", {
 			method: "POST",
 			headers: {
-				"Content-Type": "application/x-www-form-urlencoded"
+				"Content-type":"application/json;charset=utf-8"
 			},
-			body: "articleId=" + articleId
+			body: JSON.stringify({"articleId":articleId})
 		})
-		.then(response => response.text())
-		.then(flag => {
-			location.href = url;
+		.then(response => {
+			if(response.ok){
+				return response.json();
+			} else {
+				throw new Error('article delete fail');
+			}
+		})
+		.then(data => {
+			const flag = data['flag'];
+			if(flag == '1') alert('삭제가 완료되었습니다.');
+			else alert('삭제가 실패하였습니다. 다시 시도해주세요.');
+			location.href = getContextPath() + url;
 		})
 	}
+}
+
+const updateArticle = () => {
+	
+}
+
+const deleteComment = (commentId, articleId) => {
+	const deleteConfirm = confirm("정말로 삭제하시겠습니까?");
+		if(deleteConfirm){
+			fetch(getContextPath() + "/board/deletecomment.do", {
+				method: "POST",
+				headers: {
+					"Content-type":"application/json;charset=utf-8"
+				},
+				body: JSON.stringify({"commentId":commentId})
+			})
+			.then(response => {
+				if(response.ok){
+					return response.json();
+				} else {
+					throw new Error('comment delete fail');
+				}
+			})
+			.then(data => {
+				const flag = data['flag'];
+				location.href = getContextPath() + '/board/boarddetail.do?articleId=' + articleId;
+				if(flag == '1') {
+					alert('삭제가 완료되었습니다.');
+				}
+				else {
+					alert('삭제가 실패하였습니다. 다시 시도해주세요.');
+				}
+			})
+		}
+}
+
+const updateComment = (commentId, articleId) => {
+	
 }
 
 
@@ -522,7 +591,7 @@ const editorConfig = {
 			'|',
 			'bold',
 			'italic',
-			'underline',
+			'line',
 			'|',
 			'emoji',
 			'link',
