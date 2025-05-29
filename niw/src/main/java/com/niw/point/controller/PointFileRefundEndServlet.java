@@ -25,22 +25,23 @@ public class PointFileRefundEndServlet extends HttpServlet {
 
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
 		long now = System.currentTimeMillis();
 		int rand = (int)(Math.random()*10000);
 		
 		long refundId = Long.parseLong("" + now + String.format("%04d", rand));
 		String userId = request.getParameter("userId");
 		String refundType = request.getParameter("refundType");
-		long fileId = Long.parseLong(request.getParameter("fileId"));
-		System.out.println(fileId);
+		long materialId = Long.parseLong(request.getParameter("fileId"));
+		System.out.println(request.getParameter("refundFilePoint"));
 		int filePoint = Integer.parseInt(request.getParameter("refundFilePoint"));
-		System.out.println(filePoint);
+		
 		
 		PointRefund p = PointRefund.builder()
 				.refundId(refundId)
 				.userId(userId)
 				.refundType(refundType)
-				.fileId(fileId)
+				.fileId(materialId)
 				.filePoint(filePoint)
 				.build();
 		

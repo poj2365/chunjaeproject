@@ -27,8 +27,6 @@ public class PointRefundEndServlet extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
-		
-		
 		long now = System.currentTimeMillis();
 		int rand = (int)(Math.random()*10000);
 		

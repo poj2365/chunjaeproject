@@ -486,7 +486,37 @@ if (loginUser == null) {
 <script>
 	
 	document.addEventListener('DOMContentLoaded', function() {
-	fetch('<%=request.getContextPath()%>/point/pointhistory.do',{
+	$.post('<%=request.getContextPath()%>/point/pointhistory.do',{ userId: '<%=loginUser.userId()%>' })
+	.done(pointHistory=>{
+		const history = document.getElementById('point-history-tbody');
+		history.innerHTML='';
+		
+		if (pointHistory.length==0) {
+			history.innerHTML = `<tr>
+	            					<td colspan="4" style="text-align: center; padding: 50px;">데이터가 없습니다.</td>
+		        				</tr>`
+		} else {
+			pointHistory.forEach(row => {
+		          const tr = document.createElement('tr');
+		          tr.innerHTML = `
+		              <td>${row.date}</td>
+		              <td>${row.type}</td>
+		              <td style="text-align:right;">${row.amount.toLocaleString()}P</td>
+		              <td>${row.description}</td>`;
+		        history.appendChild(tr);  
+		              
+		          
+			});
+		}
+	}) .fail(error=>{
+		const history = document.getElementById('point-history-tbody');
+		history.innerHTML='';
+		history.innerHTML = `<tr>
+			<td colspan="4" style="text-align: center; padding: 50px;">데이터를 불러올 수 없습니다.</td>
+		</tr>`;
+		console.log(error);
+	})
+	<%-- fetch('<%=request.getContextPath()%>/point/pointhistory.do',{
 		method : 'post',
 		headers : {'Content-Type': 'application/json'
     },
@@ -530,7 +560,7 @@ if (loginUser == null) {
 		console.log(error);
 		
 		});
-	});
+	}); --%>
 		 
 		
 	

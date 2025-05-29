@@ -8,8 +8,8 @@ import com.niw.common.JDBCTemplate;
 import com.niw.point.model.dao.PointDao;
 import com.niw.point.model.dto.Point;
 import com.niw.point.model.dto.PointHistory;
+import com.niw.point.model.dto.PointMyFile;
 import com.niw.point.model.dto.PointRefund;
-import com.niw.user.model.dto.User;
 
 public class PointService {
 
@@ -80,6 +80,16 @@ public class PointService {
 		JDBCTemplate.close(conn);
 		return historys;
 	}
+	
+	public List<PointMyFile> showMyFiles(String userId) {
+		List<PointMyFile> files = new ArrayList<PointMyFile>();
+		Connection conn = JDBCTemplate.getConnection();
+		files = dao.showMyFiles(conn,userId);
+		JDBCTemplate.close(conn);
+		return files;
+	}
+
+	
 	
 	
 

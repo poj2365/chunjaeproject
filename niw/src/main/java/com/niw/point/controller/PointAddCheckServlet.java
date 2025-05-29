@@ -34,20 +34,6 @@ public class PointAddCheckServlet extends HttpServlet {
 																																	// Secret키
 	private Properties sql = new Properties();
 
-//    @Over
-//    public void init() throws ServletException {
-	// 한번만 실행되는 메소드
-//        try (InputStream input = getClass().getClassLoader().getResourceAsStream("key.properties")) {
-//            if (input != null) {
-//                sql.load(input);
-//            } else {
-//                System.out.println("key.properties 파일을 찾을 수 없습니다.");
-//            }
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//    }
-
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
@@ -108,9 +94,6 @@ public class PointAddCheckServlet extends HttpServlet {
 				jsonResponse.addProperty("result", "success");
 				jsonResponse.addProperty("message", "결제 성공");
 				
-				
-				
-				
 				long pointId = (long) jsonRequest.get("merchant_uid").getAsLong();
 				String userId = jsonRequest.get("buyer_id").getAsString();
 				int pointPrice = jsonRequest.get("amount").getAsInt();
@@ -128,14 +111,10 @@ public class PointAddCheckServlet extends HttpServlet {
 						.build();
 
 				int result = PointService.ponitService().insertPointHistory(p);
-				System.out.println(result);
 
 				if (result > 0) {
 					int addPoint = p.getPointAmount();
-					System.out.println(addPoint);
 					String pointUserId = p.getUserId();
-					System.out.println(pointUserId);
-
 					int result2 = PointService.ponitService().chargePoint(addPoint, pointUserId);
 					
 					// 새로 갱신 한번해주기
@@ -148,7 +127,7 @@ public class PointAddCheckServlet extends HttpServlet {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			System.out.println("fa");
+			System.out.println("fail");
 			jsonResponse.addProperty("result", "fail");
 			jsonResponse.addProperty("message", "결제 금액 불일치 또는 실패");
 
