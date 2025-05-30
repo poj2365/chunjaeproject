@@ -1,29 +1,26 @@
 package com.niw.study.controller;
 
 import java.io.IOException;
-import java.util.stream.Collectors;
-
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.google.gson.Gson;
-import com.niw.study.model.dto.StudyGroup;
-import com.niw.study.model.service.StudyGroupService;
+import com.niw.study.model.service.GroupMemberService;
+import com.niw.study.model.service.GroupRequestService;
 
 /**
- * Servlet implementation class StudyGroupUpdateServlet
+ * Servlet implementation class GroupMemberRejectServlet
  */
-@WebServlet("/study/updategroup.do")
-public class StudyGroupUpdateServlet extends HttpServlet {
+@WebServlet("/study/rejectmember.do")
+public class GroupMemberRejectServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public StudyGroupUpdateServlet() {
+    public GroupMemberRejectServlet() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -32,11 +29,11 @@ public class StudyGroupUpdateServlet extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String jsonData = request.getReader().lines().collect(Collectors.joining());
-		Gson gson = new Gson();
-		StudyGroup g = gson.fromJson(jsonData, StudyGroup.class);
-		int result = StudyGroupService.SERVICE.updateGroup(g);
-		System.out.println(g);
+		String userId = request.getParameter("MemberId");
+		String groupNumber = request.getParameter("groupNumber");
+		String status = "REJECT";
+		int result = GroupRequestService.SERVICE.updateGroupRequest(userId,groupNumber,status);
+		int deleteMember = GroupMemberService.SERVICE.deleteGroupMemberById(userId,groupNumber);
 	}
 
 	/**

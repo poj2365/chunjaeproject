@@ -7,7 +7,7 @@ import lombok.Builder;
 @Builder
 public record GroupRequest(
 		int requestId, String userId, String userName, String userAddress, String userPhone, String reason, int groupNumber,
-		Date requestDate
+		Date requestDate, String status
 		) {
 
 }

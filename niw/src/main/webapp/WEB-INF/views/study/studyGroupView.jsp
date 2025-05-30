@@ -526,7 +526,6 @@
     }).catch(error=>{
     	alert("이미 신청한 스터디 그룹입니다.");
         closeModal();
-        this.reset();
     });
   });
 </script>

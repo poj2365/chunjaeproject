@@ -275,6 +275,38 @@ List<GroupMember> members = (List<GroupMember>) request.getAttribute("members");
 		width: 100%;
 	}
 }
+
+/* 모달 배경 */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 10;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.4);
+}
+
+/* 모달 본문 */
+.modal-content {
+  background-color: #fff;
+  margin: 10% auto;
+  padding: 20px;
+  border-radius: 10px;
+  width: 400px;
+  position: relative;
+  box-shadow: 0 0 10px #333;
+}
+
+/* 닫기 버튼 */
+.close {
+  position: absolute;
+  top: 10px; right: 15px;
+  font-size: 24px;
+  font-weight: bold;
+  color: #aaa;
+  cursor: pointer;
+}
 </style>
 <section>
 	<!-- 메인 컨테이너 -->
@@ -391,10 +423,11 @@ List<GroupMember> members = (List<GroupMember>) request.getAttribute("members");
 					<button type="button" onclick="updateGroup(<%=g.groupNumber()%>)" class="btn btn-outline-danger">
 						<i class="bi bi-person-vcard"></i> 그룹 수정하기
 					</button>
-					<button type="button" onclick="deleteGroup(<%=g.groupNumber()%>)" class="btn btn-danger">
+					<button type="button" onclick="openModal()" class="btn btn-danger">
 						<i class="bi bi-person-slash"></i> 그룹 삭제하기
 					</button>
-					<button type="button" onclick="updateGroupMember(<%=g.groupNumber()%>)" class="btn btn-success">
+					<input type="hidden" value="<%=g.groupNumber()%>" id="groupNumber">
+					<button type="button" onclick="groupManage(<%=g.groupNumber()%>)" class="btn btn-success">
 						<i class="bi bi-gear"></i> 그룹원 관리
 					</button>
 					<button type="button" onclick="groupChat(<%=g.groupNumber()%>)" class="btn btn-primary">
@@ -431,6 +464,21 @@ List<GroupMember> members = (List<GroupMember>) request.getAttribute("members");
 	<%
 	}
 	%>
+	
+	<!-- 모달 창 -->
+<div id="groupModal" class="modal">
+  <div class="modal-content">
+  <h5 style="text-align:center">삭제한 데이터는 되돌릴 수 없습니다.</h5>
+    <h4 style="text-align:center">정말 삭제하시겠습니까?</h4><br>
+     <button type="button" onclick="deleteGroup()" class="btn btn-danger">
+			삭제
+			</button><br>
+		<button type="button" onclick="closeModal()" class="btn btn-outline-danger">
+			취소
+		</button>
+  </div>
+</div>
+
 	<script>
 	document.addEventListener('DOMContentLoaded', function() {
 
@@ -487,15 +535,43 @@ document.querySelectorAll('.arrow-button').forEach(button => {
 function updateGroup(groupNumber){
   location.assign("<%=request.getContextPath()%>/study/updategroupview.do?no="+groupNumber);
 }
-function deleteGroup(groupNumber){
-	console.log(groupNumber);
+
+function openModal(){
+	document.getElementById('groupModal').style.display = 'block';
 }
-function updateGroupMember(groupNumber){
-	console.log(groupNumber);
+function deleteGroup(){
+	const groupNumber = document.getElementById('groupNumber').value;
+	fetch("<%=request.getContextPath()%>/study/deletegroup.do?groupNumber="+groupNumber)
+    .then(response=>{
+    	if(!response.ok){
+    		throw new Error(error);
+    		return;
+    	}
+    	alert("삭제가 완료되었습니다");
+        closeModal();
+        location.replace("<%=request.getContextPath()%>/study/groupdetail.do");
+    }).catch(error=>{
+    	alert("에러가 발생하였습니다.");
+        closeModal();
+    });
+}
+function groupManage(groupNumber){
+	location.assign("<%=request.getContextPath()%>/study/groupmanageview.do?groupNumber="+groupNumber);
 }
 function groupChat(groupNumber){
 	console.log(groupNumber);
 }
+
+function closeModal() {
+	  document.getElementById('groupModal').style.display = 'none';
+	}
+
+window.onclick = function(event) {
+	  const modal = document.getElementById('groupModal');
+	  if (event.target === modal) {
+	    modal.style.display = 'none';
+	  }
+	}
 
 function totalMinute(timeStr) {
     const [hours, minutes] = timeStr.split(':').map((v, i) => i < 2 ? Number(v) : null); 

@@ -1,6 +1,7 @@
 package com.niw.study.model.service;
 
 import java.sql.Connection;
+import java.util.List;
 
 import com.niw.common.JDBCTemplate;
 import com.niw.study.model.dao.GroupRequestDao;
@@ -28,6 +29,23 @@ public enum GroupRequestService {
 		GroupRequest groupRequest = dao.searchGroupRequest(conn, gr);
 		JDBCTemplate.close(conn);
 		return groupRequest;
+	}
+
+	public List<GroupRequest> searchGroupRequestAll(String groupNumber) {
+		conn = JDBCTemplate.getConnection();
+		List<GroupRequest> groupRequests = dao.searchGroupRequestAll(conn, groupNumber);
+		JDBCTemplate.close(conn);
+		return groupRequests;
+	}
+
+
+	public int updateGroupRequest(String userId, String groupNumber, String status) {
+		conn = JDBCTemplate.getConnection();
+		int result = dao.updateGroupRequest(conn, userId, groupNumber, status);
+		JDBCTemplate.close(conn);
+		if(result>0) JDBCTemplate.commit(conn);
+		else JDBCTemplate.rollback(conn);
+		return result;
 	}
 	
 	

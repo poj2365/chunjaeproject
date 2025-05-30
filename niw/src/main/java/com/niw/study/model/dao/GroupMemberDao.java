@@ -120,6 +120,54 @@ public enum GroupMemberDao {
 		}
 		return result;
 	}
+	
+	public int deleteGroupMember(Connection conn, String groupNumber) {
+		int result = 0;
+		try {  
+			pstmt=conn.prepareStatement(sql.getProperty("deleteGroupMember"));
+			pstmt.setInt(1, Integer.parseInt(groupNumber));
+			result=pstmt.executeUpdate();
+		}catch (Exception e) {
+			e.printStackTrace();
+		}finally {
+			JDBCTemplate.close(rs);
+			JDBCTemplate.close(pstmt);
+		}
+		return result;
+	}
+
+	public int deleteGroupMemberById(Connection conn, String userId, String groupNumber) {
+		int result = 0;
+		try {
+			pstmt=conn.prepareStatement(sql.getProperty("deleteGroupMemberById"));
+			pstmt.setString(1, userId);
+			pstmt.setInt(2, Integer.parseInt(groupNumber));
+			result = pstmt.executeUpdate();
+		}catch (Exception e) {
+			e.printStackTrace();
+		}finally {
+			JDBCTemplate.close(rs);
+			JDBCTemplate.close(pstmt);
+		}
+		return result;
+	}
+
+	public int updateGroupMember(Connection conn, String userId, String groupNumber, String status) {
+		int result = 0;
+		try {
+			pstmt=conn.prepareStatement(sql.getProperty("updateGroupMember"));
+			pstmt.setString(1, status);
+			pstmt.setString(2, userId);
+			pstmt.setInt(3, Integer.parseInt(groupNumber));
+			result = pstmt.executeUpdate();
+		}catch (Exception e) {
+			e.printStackTrace();
+		}finally {
+			JDBCTemplate.close(rs);
+			JDBCTemplate.close(pstmt);
+		}
+		return result;
+	}
 
 	
 }

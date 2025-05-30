@@ -125,7 +125,6 @@ public enum StudyGroupDao {
 				pstmt=conn.prepareStatement(sql.getProperty("searchStudyGroupCount"));
 				pstmt.setString(1, keyword);
 			}
-			
 			rs=pstmt.executeQuery();
 			if(rs.next()) result=rs.getInt(1);
 		}catch (Exception e) {
@@ -215,4 +214,19 @@ public enum StudyGroupDao {
 		return result;
 	}
 	
+	public int deleteGroup(Connection conn, String groupNumber) {
+		int result = 0;
+		try {  
+			pstmt=conn.prepareStatement(sql.getProperty("deleteGroup"));
+			pstmt.setInt(1, Integer.parseInt(groupNumber));
+			result=pstmt.executeUpdate();
+		}catch (Exception e) {
+			e.printStackTrace();
+		}finally {
+			JDBCTemplate.close(rs);
+			JDBCTemplate.close(pstmt);
+		}
+		return result;
+	}
+
 }
