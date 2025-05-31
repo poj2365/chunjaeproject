@@ -346,6 +346,11 @@ if (loginUser == null) {
         font-weight: bold;
         color: var(--bs-blind-dark);
     }
+    td {
+	  color: #222 !important;
+	  background: #fff !important;
+	  font-size: 18px !important;
+	}
 </style>
 
 
@@ -486,26 +491,40 @@ if (loginUser == null) {
 <script>
 	
 	document.addEventListener('DOMContentLoaded', function() {
-	$.post('<%=request.getContextPath()%>/point/pointhistory.do',{ userId: '<%=loginUser.userId()%>' })
-	.done(pointHistory=>{
+	$.post('<%=request.getContextPath()%>/point/pointhistory.do',{ userId: '<%=loginUser.userId()%>' }) 
+	// jquery $.post ajax요청임
+	.done(response=>{
+		console.log(response);
 		const history = document.getElementById('point-history-tbody');
 		history.innerHTML='';
 		
-		if (pointHistory.length==0) {
+		if (response.length==0) {
 			history.innerHTML = `<tr>
 	            					<td colspan="4" style="text-align: center; padding: 50px;">데이터가 없습니다.</td>
 		        				</tr>`
 		} else {
-			pointHistory.forEach(row => {
-		          const tr = document.createElement('tr');
-		          tr.innerHTML = `
-		              <td>${row.date}</td>
-		              <td>${row.type}</td>
-		              <td style="text-align:right;">${row.amount.toLocaleString()}P</td>
-		              <td>${row.description}</td>`;
-		        history.appendChild(tr);  
-		              
-		          
+			response.forEach(row => {
+			    const tr = document.createElement('tr');
+			    
+			    const tdDate = document.createElement('td');
+			    tdDate.textContent = row["date"];
+			    
+			    const tdContent = document.createElement('td');
+			    tdContent.textContent = row["content"];
+			    
+			    const tdChangePoint = document.createElement('td');
+			    tdChangePoint.style.textAlign = 'right';
+			    tdChangePoint.textContent = row["changePoint"] + 'P';
+			    
+			    const tdMyPoint = document.createElement('td');
+			    tdMyPoint.textContent = row["myPoint"];
+			    
+			    tr.appendChild(tdDate);
+			    tr.appendChild(tdContent);
+			    tr.appendChild(tdChangePoint);
+			    tr.appendChild(tdMyPoint);
+			    
+			    history.appendChild(tr);
 			});
 		}
 	}) .fail(error=>{
@@ -515,53 +534,9 @@ if (loginUser == null) {
 			<td colspan="4" style="text-align: center; padding: 50px;">데이터를 불러올 수 없습니다.</td>
 		</tr>`;
 		console.log(error);
-	})
-	<%-- fetch('<%=request.getContextPath()%>/point/pointhistory.do',{
-		method : 'post',
-		headers : {'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ userId: <%=loginUser.userId()%> })
-	})
-	.then(response=> {
-		if(!response.ok){
-			alert('네트워크에서 오류 발생하였습니다.');
-		}
-			return response.json();
-		})
-		.then(pointHistory=> {
-		const history = document.getElementById('point-history-tbody');
-		history.innerHTML='';
-		
-		if (pointHistory.length==0) {
-			history.innerHTML = `<tr>
-	            					<td colspan="4" style="text-align: center; padding: 50px;">데이터가 없습니다.</td>
-		        				</tr>`
-		} else {
-			pointHistory.forEach(row => {
-		          const tr = document.createElement('tr');
-		          tr.innerHTML = `
-		              <td>${row.date}</td>
-		              <td>${row.type}</td>
-		              <td style="text-align:right;">${row.amount.toLocaleString()}P</td>
-		              <td>${row.description}</td>`;
-		        history.appendChild(tr);  
-		              
-		          
-			});
-		}
-		 
-	})
-	.catch(error=> {
-		const history = document.getElementById('point-history-tbody');
-		history.innerHTML='';
-		history.innerHTML = `<tr>
-			<td colspan="4" style="text-align: center; padding: 50px;">데이터를 불러올 수 없습니다.</td>
-		</tr>`;
-		console.log(error);
-		
-		});
-	}); --%>
-		 
+	});
+	
+	});
 		
 	
 	

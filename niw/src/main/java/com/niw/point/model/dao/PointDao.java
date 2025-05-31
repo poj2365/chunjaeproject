@@ -138,14 +138,14 @@ public class PointDao {
 		List<PointHistory> historys = new ArrayList();
 		int amount=0;
 		try {
-			pstmt = conn.prepareStatement("pointHistory");
+			pstmt = conn.prepareStatement(sql.getProperty("myPointHistory"));
 			pstmt.setString(1, userId);
 			pstmt.setString(2, userId);
 			pstmt.setString(3, userId);
 			rs = pstmt.executeQuery();
 			
 			while(rs.next()) {
-				Date date = rs.getDate("event_date");
+				Date date = rs.getDate("EVENT_TIME");
 				String content = rs.getString("description") + " " +rs.getString("event_type");
 				if(rs.getString("event_type").equals("구매")) {
 					 amount = rs.getInt("change_point") * -1;

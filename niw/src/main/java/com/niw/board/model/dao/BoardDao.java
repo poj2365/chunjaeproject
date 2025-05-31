@@ -14,6 +14,7 @@ import java.util.Properties;
 
 import com.niw.board.model.dto.Article;
 import com.niw.board.model.dto.Comment;
+import com.niw.board.model.dto.Notice;
 
 public enum BoardDao {
 	DAO;
@@ -394,6 +395,23 @@ public enum BoardDao {
 		return result;
 	}
 	
+	public int updateArticle(Connection conn, Article article) {
+		int result = 0;
+		try {
+			pstmt = conn.prepareStatement(sqlPro.getProperty("updateArticle"));
+			pstmt.setString(1, article.articleTitle());
+			pstmt.setInt(2, article.articleCategory());
+			pstmt.setString(3, article.articleContent());
+			pstmt.setInt(4, article.articleId());			
+			result = pstmt.executeUpdate();
+		} catch(SQLException e) {
+			e.printStackTrace();
+		} finally {
+			close(pstmt);
+		}
+		return result;
+	}
+	
 	public int deleteArticle(Connection conn, int articleId) {
 		int result = 0;
 		try {
@@ -408,6 +426,21 @@ public enum BoardDao {
 		return result;
 	}
 
+	public int updateComment(Connection conn, Comment comment) {
+		int result = 0;
+		try {
+			pstmt = conn.prepareStatement(sqlPro.getProperty("updateComment"));
+			pstmt.setString(1, comment.commentContent());
+			pstmt.setInt(2, comment.commentId());
+			result = pstmt.executeUpdate();
+		} catch(SQLException e) {
+			e.printStackTrace();
+		} finally {
+			close(pstmt);
+		}
+		return result;
+	}
+	
 	public int deleteComment(Connection conn, int commentId) {
 		int result = 0;
 		try {
@@ -422,4 +455,50 @@ public enum BoardDao {
 		}
 		return result;
 	}
+	
+	public List<Notice> searchNotice(Connection conn){
+		List<Notice> notices = new ArrayList<>();
+		try {
+			pstmt = conn.prepareStatement(sqlPro.getProperty("searchNotice"));
+			rs = pstmt.executeQuery();
+			while(rs.next()) {
+				notices.add(Notice.builder()
+								  .noticeId(rs.getInt("notice_id"))
+								  .noticeTitle(rs.getString("notice_title"))
+								  .build());
+			}
+		} catch(SQLException e) {
+			e.printStackTrace();
+		} finally {
+			close(rs);
+			close(pstmt);
+		}
+		return notices;
+	}
+	
+	
+	public Notice searchNoticeById(Connection conn, int noticeId){
+		Notice notice = null;
+		try {
+			pstmt = conn.prepareStatement(sqlPro.getProperty("searchNoticeById"));
+			pstmt.setInt(1, noticeId);
+			rs = pstmt.executeQuery();
+			while(rs.next()) {
+				notice = Notice.builder()
+								.noticeId(rs.getInt("notice_id"))
+								.noticeTitle(rs.getString("notice_title"))
+								.noticeContent(rs.getString("notice_content"))
+								.build();
+			}
+		} catch(SQLException e) {
+			e.printStackTrace();
+		} finally {
+			close(rs);
+			close(pstmt);
+		}
+		return notice;
+	}
+	
+	
+
 }
