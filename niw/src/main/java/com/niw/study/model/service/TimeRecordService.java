@@ -41,4 +41,11 @@ public enum TimeRecordService {
 		JDBCTemplate.close(conn);
 		return trList;
 	}
+
+	public List<TimeRecord> searchTimeTodayGroup(String groupNumber, LocalDateTime startDate, LocalDateTime endDate) {
+		Connection conn = JDBCTemplate.getConnection();
+		List<TimeRecord> trList = dao.searchTimeTodayGroup(conn,groupNumber, startDate,endDate);
+		JDBCTemplate.close(conn);
+		return trList;
+	}
 }

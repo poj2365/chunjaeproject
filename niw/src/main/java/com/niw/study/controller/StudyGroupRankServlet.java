@@ -1,6 +1,9 @@
 package com.niw.study.controller;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -8,25 +11,22 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
-import com.niw.study.model.dto.GroupMember;
-import com.niw.study.model.dto.StudyGroup;
-import com.niw.study.model.service.GroupMemberService;
-import com.niw.study.model.service.StudyGroupService;
-import com.niw.user.model.dto.User;
+import com.google.gson.Gson;
+import com.niw.study.model.dto.TimeRecord;
+import com.niw.study.model.service.TimeRecordService;
 
 /**
- * Servlet implementation class StudyGroupDetail
+ * Servlet implementation class StudyGroupRankServlet
  */
-@WebServlet("/study/groupdetail.do")
-public class StudyGroupDetail extends HttpServlet {
+@WebServlet("/study/grouprank.do")
+public class StudyGroupRankServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public StudyGroupDetail() {
+    public StudyGroupRankServlet() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -35,19 +35,20 @@ public class StudyGroupDetail extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		String groupNumber = request.getParameter("groupNumber");
+		LocalDate today = LocalDate.now(); // 오늘 날짜
+		LocalDateTime startDate = today.atStartOfDay();
+		LocalDateTime endDate = startDate.plusDays(1);
+
+		List<TimeRecord> trListGroup = TimeRecordService.SERVICE.searchTimeTodayGroup(groupNumber,startDate, endDate);
 		
-		HttpSession session = request.getSession();
-		User user = (User) session.getAttribute("loginUser");
-		if(user!=null) {			
-			List<StudyGroup> groups = StudyGroupService.SERVICE.searchStudyGroupUserId(user.userId());
-			request.setAttribute("groups", groups);
-			List<GroupMember> members = GroupMemberService.SERVICE.searchGroupMemberId(user.userId());
-			request.setAttribute("members", members);
-			System.out.println(groups);
-			System.out.println(members);
-		}
+		System.out.println(groupNumber);
+		System.out.println(startDate);
+		System.out.println(endDate);
+		System.out.println(trListGroup);
+		response.setContentType("application/json;charset=utf-8");
+		new Gson().toJson(trListGroup,response.getWriter());
 		
-		request.getRequestDispatcher("/WEB-INF/views/study/studyGroupDetail.jsp").forward(request, response);
 	}
 
 	/**
