@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.niw.board.model.dto.Article;
+import com.niw.board.model.dto.Notice;
 import com.niw.board.service.BoardService;
 
 @WebServlet("/board/boardentrance.do")
@@ -104,6 +105,9 @@ public class BoardEntranceServlet extends HttpServlet {
 		pageBar.append("</li>");
 		pageBar.append("</ul>");
 		/**/
+		
+		List<Notice> notices = BoardService.SERVICE.searchNotice();
+		request.setAttribute("notices", notices);
 		request.setAttribute("pageBar", pageBar);
 		List<Article> articles = BoardService.SERVICE.searchArticle(category, "", 0, "ARTICLE_DATETIME", cPage, numPerPage, totalData);
 		request.setAttribute("articles", articles);

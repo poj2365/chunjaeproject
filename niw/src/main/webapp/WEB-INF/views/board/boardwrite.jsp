@@ -2,9 +2,6 @@
     pageEncoding="UTF-8"%>
 <%@include file="/WEB-INF/views/common/header.jsp" %>
 
-<% 
-	int category = request.getParameter("category") == null? 0 : Integer.parseInt(request.getParameter("category")); 
-%>
 <link rel="stylesheet" href="<%=request.getContextPath()%>/resources/css/board.css">
 <link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/45.1.0/ckeditor5.css" crossorigin>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
@@ -73,6 +70,9 @@
 			</form>
 	</article>
 </section>
+<script>
+	const CKEDITOR_INITIAL_DATA = "";
+</script>
 <script src="https://cdn.ckeditor.com/ckeditor5/45.1.0/ckeditor5.umd.js" crossorigin></script>
 <script src="https://cdn.ckeditor.com/ckeditor5/45.1.0/translations/ko.umd.js" crossorigin></script>
 <script src="https://cdn.ckbox.io/ckbox/2.6.1/ckbox.js" crossorigin></script>

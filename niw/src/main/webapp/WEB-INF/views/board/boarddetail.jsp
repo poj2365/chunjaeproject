@@ -3,6 +3,7 @@
 <%@include file="/WEB-INF/views/common/header.jsp" %>
 <%@ page import="com.niw.board.model.dto.Article, 
 				com.niw.board.model.dto.Comment, 
+				com.niw.board.model.dto.Notice,
 				java.util.List,
 				java.time.LocalDateTime,
 				java.time.Duration"%>
@@ -29,6 +30,7 @@
 	List<Integer> likedComment = (List<Integer>) request.getAttribute("likedComment");
 	List<Integer> dislikedComment = (List<Integer>) request.getAttribute("dislikedComment");
 	String queryUrl = request.getQueryString();
+	List<Notice> notices = (List<Notice>) request.getAttribute("notices");
 %>
 <section class="mypage-container row flex-row m-4">
 	<!-- 사이드 네비게이터 -->
@@ -173,7 +175,7 @@
 					<div class="col-lg-4 d-flex justify-content-end text-end">
 						<%if(user != null && !user.userId().trim().equals("") && (user.userId().equals(article.userId()) || user.userRole().equals("ADMIN"))) {%>
 							<button class="btn btn-danger me-1" onclick="deleteArticle('<%= article.articleId() %>', '/board/boardentrance.do?category=0')"> 삭제 </button>
-							<button class="btn btn-primary me-1" onclick="updateArticle('<%= article.articleId() %>')"> 수정 </button>
+							<button class="btn btn-primary me-1" onclick="location.assign('<%=request.getContextPath()%>/board/modifyarticle.do?articleId=<%=article.articleId() %>')"> 수정 </button>
 						<%} %>
 						<form action="" method="get">
 	    	                <button type="button" class="btn btn-danger me-1" <%= report == 0? "" : "disabled" %> data-bs-toggle="modal" data-bs-target="#reportModal"
@@ -240,7 +242,7 @@
 						<div>
 			                <span><%= comments.get(i).userId() %></span>
 			            </div>
-			            <div class="text-break">
+			            <div class="text-break comment-content">
 			            	<%= comments.get(i).commentContent()%>
 			            </div>
 			            <div class="d-flex justify-content-between align-items-center">
@@ -258,7 +260,7 @@
 									    <%= cldt.toString().split("T")[0] + " " + cldt.toString().split("T")[1].split(":")[0] + ":" + cldt.toString().split("T")[1].split(":")[1] %>
 									<%}%>
 									<%if(comments.get(i).commentModified() == 0) {%>
-										수정됨
+										(수정됨)
 									<%} %>
 			                    </span>
 			                    <span class="col-lg-1  me-3" 
@@ -279,7 +281,7 @@
 			                <div class="d-flex justify-content-between align-items-center">
 				                <%if(user != null && !user.userId().trim().equals("") && (user.userId().equals(article.userId()) || user.userRole().equals("ADMIN"))) {%>
 									<button class="btn btn-danger me-1" onclick="deleteComment('<%= comments.get(i).commentId() %>', '<%=article.articleId() %>')"> 삭제 </button>
-									<button class="btn btn-primary me-1" onclick="updateComment('<%= comments.get(i).commentId() %>')"> 수정 </button>
+									<button class="btn btn-primary me-1" onclick="updateComment(event, '<%= comments.get(i).commentId() %>', '<%= article.articleId() %>')"> 수정 </button>
 								<%} %>
 		                        <form action="" method="get">
 			                        <button <%= reportedComment.get(i) == 0? "" : "disabled" %> type="button" class="btn btn-danger me-1" data-bs-toggle="modal"
@@ -298,7 +300,7 @@
 						<div>
 			                <span style="color:blue"> @<%=comments.get(i).userRef() %> </span> <span><%= comments.get(i).userId() %></span>
 			            </div>
-			            <div class="text-break">
+			            <div class="text-break comment-content">
 			            	<%= comments.get(i).commentContent()%>
 			            </div>
 			            <div class="d-flex justify-content-between align-items-center">
@@ -316,7 +318,7 @@
 									    <%= cldt.toString().split("T")[0] + " " + cldt.toString().split("T")[1].split(":")[0] + ":" + cldt.toString().split("T")[1].split(":")[1] %>
 									<%}%>
 									<%if(comments.get(i).commentModified() == 0) {%>
-										수정됨
+										(수정됨)
 									<%} %>
 			                    </span>
 			                    <span class="col-lg-1  me-3" 
@@ -337,11 +339,11 @@
 			                <div class="d-flex justify-content-between align-items-center">
 			                	<%if(user != null && !user.userId().trim().equals("") && (user.userId().equals(article.userId()) || user.userRole().equals("ADMIN"))) {%>
 									<button class="btn btn-danger me-1" onclick="deleteComment('<%= comments.get(i).commentId()%>', '<%=article.articleId() %>')"> 삭제 </button>
-									<button class="btn btn-primary me-1" onclick="updateComment('<%= comments.get(i).commentId() %>')"> 수정 </button>
+									<button class="btn btn-primary me-1" onclick="updateComment(event, '<%= comments.get(i).commentId() %>', '<%= article.articleId() %>')"> 수정 </button>
 								<%} %>
 		                        <form action="" method="get">
 			                        <button <%= reportedComment.get(i) == 0? "" : "disabled" %> type="button" class="btn btn-danger me-1" data-bs-toggle="modal" data-bs-target="#reportModal"
-			                         data-user-id="<%=user == null? "" : user.userId()%>" data-target-id="<%= comments.get(i).commentId()%>" data-target-type="COMMENTS">
+			                         data-user-id="<%=user == null? "" : user.userId()%>" data-target-id="<%= comments.get(i).commentId() %>" data-target-type="COMMENTS">
 			                            신고
 			                        </button>
 			                	</form>
@@ -379,6 +381,26 @@
 			</div>
 			<hr>
 			<!-- ajax article list -->
+			<div id="notice-container">
+				<%if(notices != null && !notices.isEmpty()) {
+						for(Notice notice : notices){%>
+							<div class="row flex-row justify-content-between align-items-center">
+								<div class="col-lg-8 d-flex align-items-center">
+									<span class="badge bg-danger me-3">공지</span>
+									<span class="overflow-hidden">
+										<a href="<%=request.getContextPath()%>/board/noticedetail.do?noticeId=<%=notice.noticeId()%>" class="text-decoration-none text-black">
+											<%= notice.noticeTitle() %>
+										</a>
+									</span>
+								</div>
+								<ul class="list-unstyled row flex-row g-1 col-lg-3">
+									<li><b>관리자</b> </li>
+								</ul>
+							</div>
+							<hr>
+						<%}
+					}%>
+			</div>
 			<div id="article-container">
 				<%for(Article a : articles){ 
 					boolean tFlag = false;
@@ -520,6 +542,7 @@
 	<!-- 신고 폼 끝 -->
 	
 </section>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="<%=request.getContextPath()%>/resources/js/board/board.js"></script>
 
 <script>
@@ -531,4 +554,5 @@
 		$("#reportTargetType").val($reportButton.getAttribute('data-target-type'));
 	});
 </script>
+
 <%@include file="/WEB-INF/views/common/footer.jsp" %>
