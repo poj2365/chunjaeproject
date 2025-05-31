@@ -326,7 +326,7 @@
             </ul>
         <% } %>
     </div>
-    <% if(loginUser!=null && groupLimit<3){ %>
+    <% if(loginUser!=null && groupLimit<=3){ %>
     <button class="btn btn-secondary" onclick="location.assign('<%=request.getContextPath() %>/study/groupcreateview.do');">그룹 생성</button>
    	<%} %>
    		<div id="pagebar">

@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.niw.common.JDBCTemplate;
 import com.niw.study.model.dao.StudyGroupDao;
+import com.niw.study.model.dto.GroupRequest;
 import com.niw.study.model.dto.StudyGroup;
 
 public enum StudyGroupService {
@@ -75,10 +76,19 @@ public enum StudyGroupService {
 	public int updateGroup(StudyGroup g) {
 		conn = JDBCTemplate.getConnection();
 		int result = dao.updateGroup(conn, g);
-		JDBCTemplate.close(conn);
 		if(result>0) JDBCTemplate.commit(conn);
 		else JDBCTemplate.rollback(conn);
+		JDBCTemplate.close(conn);
 		return result;
 	}
-	
+
+	public int deleteGroup(String groupNumber) {
+		conn = JDBCTemplate.getConnection();
+		int result = dao.deleteGroup(conn, groupNumber);
+		if(result>0) JDBCTemplate.commit(conn);
+		else JDBCTemplate.rollback(conn);
+		JDBCTemplate.close(conn);
+		return result;
+	}
+
 }

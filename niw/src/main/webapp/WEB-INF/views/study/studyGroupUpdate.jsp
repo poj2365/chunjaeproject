@@ -354,6 +354,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 	
 	document.getElementById('updateBtn').addEventListener('click', () => {
+		const groupNumber = document.getElementById('groupNumber').value;
 		const groupName = document.getElementById('groupName').value;
 		const groupType = document.querySelector('select[name="groupType"]').value;
 		const joinType = document.querySelector('select[name="joinType"]').value;
@@ -361,6 +362,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		const groupLimit = document.getElementById('groupLimit').value;
 		const status = document.querySelector('select[name="status"]').value;
 		const jsonData = {
+				groupNumber,
 			    groupName,
 			    groupType,
 			    joinType,
@@ -378,7 +380,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }).then(response => {
     if (response.ok) {
         console.log("그룹이 정상적으로 수정되었습니다.");
-        return response.json();
     }else{
     	throw new Error('네트워크 응답이 올바르지 않습니다.');
     	return;
