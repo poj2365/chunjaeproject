@@ -3,7 +3,9 @@ package com.niw.market.model.dto;
 import java.sql.Date;
 import java.util.List;
 
+import lombok.Builder;
 
+@Builder
 public record Material(
 		int materialId,
 		String userId,
@@ -30,6 +32,7 @@ public record Material(
 		double materialRating,
 		int materialCommentCount
 		) {
+
 	
 
 	

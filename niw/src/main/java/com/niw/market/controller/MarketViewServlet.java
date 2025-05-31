@@ -12,7 +12,7 @@ import com.niw.common.CommonTemplate;
 /**
  * Servlet implementation class MarketViewServlet
  */
-@WebServlet("/market/marketview.do")
+@WebServlet("/market/lista.do")
 public class MarketViewServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
@@ -29,6 +29,7 @@ public class MarketViewServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
+		System.out.println("??");
 		request.getRequestDispatcher(CommonTemplate.WEB_VIEWS + "/market/marketview.jsp").forward(request, response);
 	}
 
