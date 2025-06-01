@@ -357,7 +357,8 @@ List<GroupMember> members = (List<GroupMember>) request.getAttribute("members");
 					for (StudyGroup g : groups) {
 				%>
 				<div class="tab-item <%=index == 0 ? "active" : ""%>"
-					data-index="<%=index%>">
+					data-index="<%=index%>"
+					data-group-number="<%=g.groupNumber()%>">
 					<%=g.groupName()%>
 				</div>
 				<%
@@ -369,6 +370,11 @@ List<GroupMember> members = (List<GroupMember>) request.getAttribute("members");
 			</div>
 			<!-- 상세 정보 -->
 			<div class="content-card" id="detailSection">
+							<%
+				if (groups != null) {
+					int index = 0;
+					for (StudyGroup g : groups) {
+				%>
 				<!-- 화살표 버튼 -->
 				<button class="arrow-button arrow-left btn btn-outline-secondary">
 				<i class="bi bi-arrow-left"></i>
@@ -376,11 +382,6 @@ List<GroupMember> members = (List<GroupMember>) request.getAttribute("members");
 				<button class="arrow-button arrow-right btn btn-outline-secondary">
 				<i class="bi bi-arrow-right"></i>
 				</button>
-				<%
-				if (groups != null) {
-					int index = 0;
-					for (StudyGroup g : groups) {
-				%>
 				<div class="group-content" id="group-<%=index%>"
 					style="<%=index == 0 ? "" : "display:none;"%>">
 					<div class="detail-header">
@@ -420,16 +421,21 @@ List<GroupMember> members = (List<GroupMember>) request.getAttribute("members");
 					<span>가입 방식 : 그룹장 승인 필요</span><br>
 					<%} %>
 					<div class="description"><%=g.description()%></div><br>
+					<%if(g.userId().equals(loginUser.userId())) {%>
 					<button type="button" onclick="updateGroup(<%=g.groupNumber()%>)" class="btn btn-outline-danger">
 						<i class="bi bi-person-vcard"></i> 그룹 수정하기
 					</button>
-					<button type="button" onclick="openModal()" class="btn btn-danger">
+					<button type="button" onclick="openModal(<%=g.groupNumber()%>)" class="btn btn-danger">
 						<i class="bi bi-person-slash"></i> 그룹 삭제하기
 					</button>
-					<input type="hidden" value="<%=g.groupNumber()%>" id="groupNumber">
 					<button type="button" onclick="groupManage(<%=g.groupNumber()%>)" class="btn btn-success">
 						<i class="bi bi-gear"></i> 그룹원 관리
 					</button>
+					<%}else{ %>
+					<button type="button" onclick="openModal2(<%=g.groupNumber()%>)" class="btn btn-danger">
+						<i class="bi bi-person-slash"></i> 그룹 탈퇴하기
+					</button>
+					<%} %>
 					<button type="button" onclick="groupChat(<%=g.groupNumber()%>)" class="btn btn-primary">
 						<i class="bi bi-chat-right-text"></i> 그룹 채팅
 					</button>
@@ -450,12 +456,12 @@ List<GroupMember> members = (List<GroupMember>) request.getAttribute("members");
 				<button class="arrow-button arrow-right btn btn-outline-secondary">
 				<i class="bi bi-arrow-right"></i>
 				</button>
-			<div class="ranking-list">
 				<h3>오늘의 공부 시간 랭킹(시간:분:초)</h3>
+			<div class="ranking-list">
 				<div class="ranking-item"></div>
-			</div>
+			</div><br>
 				<div class="chart-container">
-				<h3>스터디그룹별 공부 시간</h3>
+				<h3>우리 스터디그룹의 공부 시간</h3>
 					<canvas id="studyChart"></canvas>
 				</div>
 			</div>
@@ -471,6 +477,20 @@ List<GroupMember> members = (List<GroupMember>) request.getAttribute("members");
   <h5 style="text-align:center">삭제한 데이터는 되돌릴 수 없습니다.</h5>
     <h4 style="text-align:center">정말 삭제하시겠습니까?</h4><br>
      <button type="button" onclick="deleteGroup()" class="btn btn-danger">
+			삭제
+			</button><br>
+		<button type="button" onclick="closeModal()" class="btn btn-outline-danger">
+			취소
+		</button>
+  </div>
+</div>
+
+	<!-- 모달 창 -->
+<div id="groupOutModal" class="modal">
+  <div class="modal-content">
+		<h5 style="text-align:center">탈퇴한 데이터는 되돌릴 수 없습니다.</h5>
+    <h4 style="text-align:center">정말 탈퇴하시겠습니까?</h4><br>
+     <button type="button" onclick="deleteGroupMember()" class="btn btn-danger">
 			삭제
 			</button><br>
 		<button type="button" onclick="closeModal()" class="btn btn-outline-danger">
@@ -524,24 +544,31 @@ document.querySelectorAll('.arrow-button').forEach(button => {
 
         if (!showingDetail) {
             // 현재 선택된 그룹 인덱스 가져오기
-            const activeTab = $('.tab-item.active').data('index');
-
-            // 이 인덱스를 기반으로 서버에서 차트 데이터를 동적으로 구성할 수 있음 (지금은 샘플 데이터)
-            drawChart(activeTab);
+        	const activeTab = document.querySelector('.tab-item.active');
+        	const groupNumber = activeTab.dataset.groupNumber;
+        	drawChart(activeTab.dataset.index, groupNumber);
         }
     });
 });
+
+let selectedGroupNumber = null;
 
 function updateGroup(groupNumber){
   location.assign("<%=request.getContextPath()%>/study/updategroupview.do?no="+groupNumber);
 }
 
-function openModal(){
+function openModal(groupNumber){
+	selectedGroupNumber = groupNumber;
 	document.getElementById('groupModal').style.display = 'block';
 }
+
+function openModal2(groupNumber){
+	selectedGroupNumber = groupNumber;
+	document.getElementById('groupOutModal').style.display = 'block';
+}
 function deleteGroup(){
-	const groupNumber = document.getElementById('groupNumber').value;
-	fetch("<%=request.getContextPath()%>/study/deletegroup.do?groupNumber="+groupNumber)
+	if(!selectedGroupNumber)return;
+	fetch("<%=request.getContextPath()%>/study/deletegroup.do?groupNumber="+selectedGroupNumber)
     .then(response=>{
     	if(!response.ok){
     		throw new Error(error);
@@ -555,15 +582,40 @@ function deleteGroup(){
         closeModal();
     });
 }
+
+function deleteGroupMember(){
+	<% if (loginUser != null) { %>
+	const userId = "<%=loginUser.userId()%>";
+	<% } else { %>
+	alert("로그인이 필요합니다.");
+	return;
+	<% } %>
+		  if(!selectedGroupNumber)return;
+	fetch("<%=request.getContextPath()%>/study/deletegroupmember.do?userId=" + userId + "&groupNumber=" + selectedGroupNumber)
+	 .then(response=>{
+    	if(!response.ok){
+    		throw new Error(error);
+    		return;
+    	}
+    	alert("탈퇴가 완료되었습니다");
+        closeModal();
+        location.replace("<%=request.getContextPath()%>/study/groupdetail.do");
+    }).catch(error=>{
+    	alert("에러가 발생하였습니다.");
+        closeModal();
+    });
+}
+
 function groupManage(groupNumber){
 	location.assign("<%=request.getContextPath()%>/study/groupmanageview.do?groupNumber="+groupNumber);
 }
 function groupChat(groupNumber){
-	console.log(groupNumber);
+	location.assign("<%=request.getContextPath()%>/study/groupchat.do?groupNumber="+groupNumber);
 }
 
 function closeModal() {
 	  document.getElementById('groupModal').style.display = 'none';
+	  document.getElementById('groupOutModal').style.display = 'none';
 	}
 
 window.onclick = function(event) {
@@ -581,17 +633,19 @@ function totalMinute(timeStr) {
 let chartInstance = null;
 
     // 그래프
-function drawChart(groupIndex) {
+function drawChart(groupIndex,groupNumber) {
     if (chartInstance) {
         chartInstance.destroy(); // 기존 차트 제거
     }
-	fetch("<%=request.getContextPath()%>/study/timerank.do?no="+groupIndex)
+    console.log(groupIndex);
+    console.log(groupNumber);
+	fetch("<%=request.getContextPath()%>/study/grouprank.do?groupNumber="+groupNumber)
  	.then(response => response.json())
  	.then(data => {
      	const labels = data.map(item => item.userId);
 	 	const totalTime = data.map(item => totalMinute(item.totalTime));
      // Chart 생성
-     new Chart(document.getElementById('studyChart').getContext('2d'), {
+     chartInstance = new Chart(document.getElementById('studyChart').getContext('2d'), {
          type: 'bar',
          data: {
              labels: labels,
@@ -616,6 +670,7 @@ function drawChart(groupIndex) {
 
      // 랭킹 표시
      const rankingList = document.querySelector('.ranking-list');
+     rankingList.innerHTML = "";
 
      data.forEach((item, index) => {
     	 if(index<5){

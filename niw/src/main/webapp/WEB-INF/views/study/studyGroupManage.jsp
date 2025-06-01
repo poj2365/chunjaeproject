@@ -27,7 +27,6 @@ List<GroupMember> members = (List<GroupMember>) request.getAttribute("members");
 	font-size: 14px;
 }
 
-
 .content-card {
 	position: relative;
 	width: 100%;
@@ -36,7 +35,6 @@ List<GroupMember> members = (List<GroupMember>) request.getAttribute("members");
 	margin-top: 30px;
 	margin-bottom: 30px;
 }
-
 
 .tabs {
 	display: flex;
@@ -61,7 +59,6 @@ List<GroupMember> members = (List<GroupMember>) request.getAttribute("members");
 	color: var(--bs-blind-dark);
 	border-bottom: 2px solid var(--bs-blind-dark);
 }
-
 
 /* 마이페이지 전용 스타일 */
 .mypage-container {
@@ -193,11 +190,6 @@ List<GroupMember> members = (List<GroupMember>) request.getAttribute("members");
 	margin-bottom: 20px;
 }
 
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-    
 /* 반응형 스타일 */
 @media ( max-width : 768px) {
 	.mypage-container {
@@ -208,36 +200,44 @@ List<GroupMember> members = (List<GroupMember>) request.getAttribute("members");
 	}
 }
 
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
 /* 모달 배경 */
 .modal {
-  display: none;
-  position: fixed;
-  z-index: 10;
-  left: 0; top: 0;
-  width: 100%; height: 100%;
-  overflow: auto;
-  background-color: rgba(0,0,0,0.4);
+	display: none;
+	position: fixed;
+	z-index: 10;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	overflow: auto;
+	background-color: rgba(0, 0, 0, 0.4);
 }
 
 /* 모달 본문 */
 .modal-content {
-  background-color: #fff;
-  margin: 10% auto;
-  padding: 20px;
-  border-radius: 10px;
-  width: 400px;
-  position: relative;
-  box-shadow: 0 0 10px #333;
+	background-color: #fff;
+	margin: 10% auto;
+	padding: 20px;
+	border-radius: 10px;
+	width: 400px;
+	position: relative;
+	box-shadow: 0 0 10px #333;
 }
 
 /* 닫기 버튼 */
 .close {
-  position: absolute;
-  top: 10px; right: 15px;
-  font-size: 24px;
-  font-weight: bold;
-  color: #aaa;
-  cursor: pointer;
+	position: absolute;
+	top: 10px;
+	right: 15px;
+	font-size: 24px;
+	font-weight: bold;
+	color: #aaa;
+	cursor: pointer;
 }
 
 </style>
@@ -284,136 +284,153 @@ List<GroupMember> members = (List<GroupMember>) request.getAttribute("members");
 			} else {
 			%>
 			<div class="tabs">
-				<div class="tab-item active" data-tab="posts">그룹 신청 내역</div>
-    			<div class="tab-item" data-tab="comments">그룹 멤버 관리</div>
+				<div class="tab-item active" data-tab="request">그룹 신청 내역</div>
+				<div class="tab-item" data-tab="member">그룹 멤버 관리</div>
 			</div>
 			<!-- 상세 정보 -->
-			<div class="content-card" id="detailSection">
-<div class="container mt-4">
-  <h3 class="mb-4 text-center">신청자 목록</h3>
-    <h6 class="mb-4 text-center">신청자를 클릭하면 해당 신청자를 그룹 멤버에 추가할 수 있습니다.</h6>
-  <div class="table-responsive">
-    <table class="table table-bordered table-hover align-middle text-center shadow-sm">
-      <thead class="table-success">
-        <tr>
-          <th>그룹 번호</th>
-          <th>이름</th>
-          <th>주소</th>
-          <th>연락처</th>
-          <th>신청한 이유</th>
-          <th>신청일</th>
-          <th>상태</th>
-        </tr>
-      </thead>
-      <tbody>
-         <% if(groupRequests==null){ %>
-         <td colspan="5"><h5 class="mb-4 text-center">신청한 사용자가 없습니다.</h5></td>
-      	<%}else{ %>
-          <% for(GroupRequest gr : groupRequests){ %>
-          <tr style="cursor: pointer;" onclick="insertGroup(<%=gr.userId()%>)">
-          	<td><%=gr.groupNumber() %></td>
-            <td><%=gr.userName() %></td>
-            <td><%=gr.userAddress() %></td>
-            <td><%=gr.userPhone()%></td>
-            <td><%=gr.reason() %></td>
-            <td><%=gr.requestDate() %></td>
-              <%if(gr.status().equals("APPROVED")) {%>
-            <td>승인</td>
-            <%}else if(gr.status().equals("WAIT")){ %>
-            <td>대기</td>
-            <%}else if(gr.status().equals("REJECT")){ %>
-            <td>거절</td>
-            <%}else{ %>
-            <td></td>
-            <%} %>
-          </tr>
-          <%}
-          }%>
-      </tbody>
-    </table>
-  </div>
-</div>
+			<div class="content-card">
+				<div class="container mt-4" id="requestSection">
+					<h3 class="mb-4 text-center">신청자 목록</h3>
+					<h6 class="mb-4 text-center">신청자를 클릭하면 해당 신청자를 그룹 멤버에 추가할 수
+						있습니다.</h6>
+					<div class="table-responsive">
+						<table
+							class="table table-bordered table-hover align-middle text-center shadow-sm">
+							<thead class="table-success">
+								<tr>
+									<th>그룹 번호</th>
+									<th>이름</th>
+									<th>주소</th>
+									<th>연락처</th>
+									<th>신청한 이유</th>
+									<th>신청일</th>
+									<th>상태</th>
+								</tr>
+							</thead>
+							<tbody>
+								<% if(groupRequests==null || groupRequests.isEmpty()){ %>
+								<tr>
+									<td colspan="7"><h5 class="mb-4 text-center">신청한 사용자가
+											없습니다.</h5></td>
+								</tr>
+								<%}else{ %>
+								<% for(GroupRequest gr : groupRequests){ %>
+								<tr style="cursor: pointer;"
+									onclick="insertGroup('<%=gr.userId()%>')">
+									<td><%=gr.groupNumber() %></td>
+									<td><%=gr.userName() %></td>
+									<td><%=gr.userAddress() %></td>
+									<td><%=gr.userPhone()%></td>
+									<td><%=gr.reason() %></td>
+									<td><%=gr.requestDate() %></td>
+									<%if(gr.status().equals("APPROVED")) {%>
+									<td>승인</td>
+									<%}else if(gr.status().equals("WAIT")){ %>
+									<td>대기</td>
+									<%}else if(gr.status().equals("REJECT")){ %>
+									<td>거절</td>
+									<%}else{ %>
+									<td></td>
+									<%} %>
+								</tr>
+								<%}
+        						 }%>
+							</tbody>
+						</table>
+					</div>
+				</div>
 
-<div class="container mt-4">
-  <h3 class="mb-4 text-center">그룹 멤버 목록</h3>
-  <h6 class="mb-4 text-center">멤버를 클릭하면 해당 멤버를 추방할 수 있습니다.</h6>
-  <div class="table-responsive">
-    <table class="table table-bordered table-hover align-middle text-center shadow-sm">
-      <thead class="table-success">
-        <tr>
-          <th>아이디</th>
-          <th>직책</th>
-          <th>상태</th>
-          <th>가입일</th>
-        </tr>
-      </thead>
-      <tbody>         
-      <% if(members==null){ %>
-         <td colspan="5"><h5 class="mb-4 text-center">그룹 멤버가 없습니다.</h5></td>
-      	<%}else{ %>
-          <% for(GroupMember gm : members){ %>
-          <tr style="cursor: pointer;" onclick="groupManage(<%=gm.userId() %>)">
-            <td><%=gm.userId() %></td>
-            <%if(gm.role().equals("OWNER")) {%>
-            <td>그룹장</td>
-            <%}else{ %>
-            <td>회원</td>
-            <%} %>
-            <%if(gm.status().equals("APPROVED")) {%>
-            <td>승인</td>
-            <%}else if(gm.status().equals("WAIT")){ %>
-            <td>대기</td>
-            <%} %>
-            <td><%=gm.joinDate() %></td>
-          </tr>
-          <% } 
-          }%>
-      </tbody>
-    </table>
-  </div>
-</div>
-<% } %>
+				<div class="container mt-4" id="memberSection" style="display:none;">
+					<h3 class="mb-4 text-center">그룹 멤버 목록</h3>
+					<h6 class="mb-4 text-center">멤버를 클릭하면 해당 멤버를 추방할 수 있습니다.</h6>
+					<div class="table-responsive">
+						<table
+							class="table table-bordered table-hover align-middle text-center shadow-sm">
+							<thead class="table-success">
+								<tr>
+									<th>아이디</th>
+									<th>직책</th>
+									<th>상태</th>
+									<th>가입일</th>
+								</tr>
+							</thead>
+							<tbody>
+								<% if(members==null || members.isEmpty()){ %>
+								<tr>
+									<td colspan="4"><h5 class="mb-4 text-center">그룹 멤버가
+											없습니다.</h5></td>
+								</tr>
+								<%}else{ %>
+								<% for(GroupMember gm : members){ %>
+								<tr style="cursor: pointer;"
+									onclick="groupManage('<%=gm.userId() %>')">
+									<td><%=gm.userId() %></td>
+									<%if(gm.role().equals("OWNER")) {%>
+									<td>그룹장</td>
+									<%}else{ %>
+									<td>회원</td>
+									<%} %>
+									<%if(gm.status().equals("APPROVED")) {%>
+									<td>승인</td>
+									<%}else if(gm.status().equals("WAIT")){ %>
+									<td>대기</td>
+									<%} %>
+									<td><%=gm.joinDate() %></td>
+								</tr>
+								<% } 
+         						 }%>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+			<% } %>
+		</div>
+	</div>
+	<!-- 모달 창 -->
+	<div id="groupInsertModal" class="modal">
+		<div class="modal-content">
+			<h4 style="text-align: center">해당 사용자를 그룹에 추가하시겠습니까?</h4>
+			<br>
+			<button type="button" onclick="updateGroupMember()"
+				class="btn btn-success">승인</button>
+			<br>
+			<button type="button" onclick="rejectMember()" class="btn btn-danger">
+				거절</button>
+			<br>
+			<button type="button" onclick="closeModal()"
+				class="btn btn-outline-danger">취소</button>
+		</div>
+	</div>
 
 	<!-- 모달 창 -->
-<div id="groupInsertModal" class="modal">
-  <div class="modal-content">
-    <h4 style="text-align:center">해당 사용자를 그룹에 추가하시겠습니까?</h4><br>
-     <button type="button" onclick="updateGroupMember()" class="btn btn-success">
-			승인
-			</button><br>
-		<button type="button" onclick="rejectMember()" class="btn btn-danger">
-			거절
-		</button><br>
-		<button type="button" onclick="closeModal()" class="btn btn-outline-danger">
-			취소
-		</button>
-  </div>
-</div>
-
-	<!-- 모달 창 -->
-<div id="groupModal" class="modal">
-  <div class="modal-content">
-  <h5 style="text-align:center">멤버를 추방하면 되돌릴 수 없습니다.</h5>
-    <h4 style="text-align:center">정말로 추방하시겠습니까?</h4><br>
-     <button type="button" onclick="deleteGroupMember()" class="btn btn-danger">
-			추방
-			</button><br>
-		<button type="button" onclick="closeModal()" class="btn btn-outline-danger">
-			취소
-		</button>
-  </div>
-</div>
-<script>
+	<div id="groupModal" class="modal">
+		<div class="modal-content">
+			<h5 style="text-align: center">멤버를 추방하면 되돌릴 수 없습니다.</h5>
+			<h4 style="text-align: center">정말로 추방하시겠습니까?</h4>
+			<br>
+			<button type="button" onclick="deleteGroupMember()"
+				class="btn btn-danger">추방</button>
+			<br>
+			<button type="button" onclick="closeModal()"
+				class="btn btn-outline-danger">취소</button>
+		</div>
+	</div>
+	<script>
 	document.addEventListener('DOMContentLoaded', function() {
-
 	$('.tab-item').on('click', function() {
-	    var index = $(this).data('index');
+	    var tab = $(this).data('tab');
 
 	    $('.tab-item').removeClass('active');
 	    $(this).addClass('active');
 
-	    document.getElementById("detailSection").style.display = "block";
-	    document.getElementById("chartSection").style.display = "none";
+	    if (tab === 'request') {
+	        $('#requestSection').show();
+	        $('#memberSection').hide();
+	    } else {
+	        $('#requestSection').hide();
+	        $('#memberSection').show();
+	    }
 	});
 
 // 사이드바 메뉴 클릭 이벤트
@@ -437,8 +454,10 @@ $('.menu-item').on('click', function() {
 
 	  function groupManage(userId){
 		  selectedUserId = userId;
-		  <% if(loginUser!=null){%>
+		  <% if (loginUser != null) { %>
 		  const loginUser = "<%=loginUser.userId()%>";
+		  <% } else { %>
+		  const loginUser = null;
 		  <% } %>
 		  if(loginUser!=userId){
 			  document.getElementById('groupModal').style.display = 'block';
@@ -448,8 +467,8 @@ $('.menu-item').on('click', function() {
 		function deleteGroupMember(){
 			if (!selectedUserId) return;
 				const groupNumber = "<%=groupNumber%>";
-			fetch(`<%=request.getContextPath()%>/study/deletegroupmember.do?memberId=\${selectedUserId}&groupNumber=\${groupNumber}`)
-		    .then(response=>{
+		    fetch("<%=request.getContextPath()%>/study/deletegroupmember.do?userId=" + selectedUserId + "&groupNumber=" + groupNumber)
+			.then(response=>{
 		    	if(!response.ok){
 		    		throw new Error("에러가 발생하였습니다.");
 		    		return;
@@ -471,8 +490,8 @@ $('.menu-item').on('click', function() {
 		function rejectMember(){
 			if (!selectedUserId) return;
 			const groupNumber = "<%=groupNumber%>";
-			fetch(`<%=request.getContextPath()%>/study/rejectmember.do?memberId=\${selectedUserId}&groupNumber=\${groupNumber}`)
-		    .then(response=>{
+		    fetch("<%=request.getContextPath()%>/study/rejectmember.do?userId=" + selectedUserId + "&groupNumber=" + groupNumber)
+			.then(response=>{
 		    	if(!response.ok){
 		    		throw new Error("에러가 발생하였습니다.");
 		    		return;
@@ -489,7 +508,7 @@ $('.menu-item').on('click', function() {
 		function updateGroupMember(){
 			if (!selectedUserId) return;
 			const groupNumber = "<%=groupNumber%>";
-			fetch(`<%=request.getContextPath()%>/study/updategroupmember.do?memberId=\${selectedUserId}&groupNumber=\${groupNumber}`)
+			fetch("<%=request.getContextPath()%>/study/updategroupmember.do?userId=" + selectedUserId + "&groupNumber=" + groupNumber)
 		    .then(response=>{
 		    	if(!response.ok){
 		    		throw new Error("에러가 발생하였습니다.");

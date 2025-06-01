@@ -29,7 +29,7 @@ public class GroupMemberUpdateServlet extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String userId = request.getParameter("MemberId");
+		String userId = request.getParameter("userId");
 		String groupNumber = request.getParameter("groupNumber");
 		String status = "APPROVED";
 		int result = GroupRequestService.SERVICE.updateGroupRequest(userId,groupNumber,status);

@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.niw.common.CommonTemplate;
 import com.niw.study.model.dto.GroupMember;
 import com.niw.study.model.dto.GroupRequest;
 import com.niw.study.model.service.GroupMemberService;
@@ -37,16 +38,13 @@ public class StudyGroupManageViewServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		String groupNumber = request.getParameter("groupNumber");
-		request.setAttribute("groupNumber", groupNumber);
+		request.setAttribute("groupNumber", Integer.parseInt(groupNumber));
 		List<GroupMember> members = GroupMemberService.SERVICE.searchGroupMember(groupNumber);
 		request.setAttribute("members", members);
 		List<GroupRequest> groupRequests = GroupRequestService.SERVICE.searchGroupRequestAll(groupNumber);
 		request.setAttribute("groupRequests", groupRequests);
-		System.out.println(groupNumber);
-		System.out.println(members);
-		System.out.println(groupRequests);
 		
-		request.getRequestDispatcher("/WEB-INF/views/study/studyGroupManage.jsp").forward(request, response);
+		request.getRequestDispatcher(CommonTemplate.WEB_VIEWS+"/study/studyGroupManage.jsp").forward(request, response);
 
 	}
 
