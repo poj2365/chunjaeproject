@@ -18,6 +18,7 @@ public enum TimeRecordService {
 		int result = dao.insertTime(conn,tr);
 		if(result>0) JDBCTemplate.commit(conn);
 		else JDBCTemplate.rollback(conn);
+		JDBCTemplate.close(conn);
 		return result;
 	}
 

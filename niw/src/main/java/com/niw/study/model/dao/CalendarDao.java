@@ -50,7 +50,7 @@ public enum CalendarDao {
 
 	private Calendar getCalendar(ResultSet rs) throws SQLException {
 		return new Calendar(rs.getInt("calendar_no"), rs.getString("calendar_name"), rs.getString("calendar_content"),
-				rs.getDate("start_time"), rs.getDate("end_time"),rs.getString("user_id"));
+				rs.getTimestamp("start_time"), rs.getTimestamp("end_time"),rs.getString("user_id"));
 	}
 
 	public int insertCalendar(Connection conn, Calendar c) {
@@ -59,8 +59,8 @@ public enum CalendarDao {
 			pstmt = conn.prepareStatement(sql.getProperty("insertCalendar"));
 			pstmt.setString(1, c.calendarName());
 			pstmt.setString(2, c.calendarContent());
-			pstmt.setTimestamp(3, new Timestamp(c.startTime().getTime()));
-			pstmt.setTimestamp(4, new Timestamp(c.endTime().getTime()));
+			pstmt.setTimestamp(3, c.startTime());
+			pstmt.setTimestamp(4, c.endTime());
 			pstmt.setString(5, c.userId());
 			result = pstmt.executeUpdate();
 		} catch (SQLException e) {
@@ -93,8 +93,8 @@ public enum CalendarDao {
 			pstmt = conn.prepareStatement(sql.getProperty("updateCalendar"));
 			pstmt.setString(1, c.calendarName());
 			pstmt.setString(2, c.calendarContent());
-			pstmt.setTimestamp(3, new Timestamp(c.startTime().getTime()));
-			pstmt.setTimestamp(4, new Timestamp(c.endTime().getTime()));
+			pstmt.setTimestamp(3, c.startTime());
+			pstmt.setTimestamp(4, c.endTime());
 			pstmt.setString(5, c.userId());
 			pstmt.setInt(6, c.calendarNo());
 			result = pstmt.executeUpdate();

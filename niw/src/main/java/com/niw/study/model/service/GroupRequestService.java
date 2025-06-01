@@ -17,9 +17,9 @@ public enum GroupRequestService {
 	public int insertGroupRequest(GroupRequest gr) {
 		conn = JDBCTemplate.getConnection();
 		int result = dao.insertGroupRequest(conn, gr);
-		JDBCTemplate.close(conn);
 		if(result>0) JDBCTemplate.commit(conn);
 		else JDBCTemplate.rollback(conn);
+		JDBCTemplate.close(conn);
 		return result;
 	}
 
@@ -42,9 +42,9 @@ public enum GroupRequestService {
 	public int updateGroupRequest(String userId, String groupNumber, String status) {
 		conn = JDBCTemplate.getConnection();
 		int result = dao.updateGroupRequest(conn, userId, groupNumber, status);
-		JDBCTemplate.close(conn);
 		if(result>0) JDBCTemplate.commit(conn);
 		else JDBCTemplate.rollback(conn);
+		JDBCTemplate.close(conn);
 		return result;
 	}
 	
