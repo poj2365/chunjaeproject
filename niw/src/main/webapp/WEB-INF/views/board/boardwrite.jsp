@@ -5,11 +5,41 @@
 <link rel="stylesheet" href="<%=request.getContextPath()%>/resources/css/board.css">
 <link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/45.1.0/ckeditor5.css" crossorigin>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-<section class="row justify-content-between m-4">
-	<aside class="card col-lg-2 ms-3">
-	
-	</aside>
-	<article class="col-lg-9 me-3 article">
+<section class="mypage-container row flex-row m-4">
+	<!-- 사이드 네비게이터 -->
+	<aside class="sidebar col-lg-2">
+        <div class="profile-section">
+            <div class="profile-pic">
+                <i class="bi bi-person-circle" style="font-size: 60px; color: #ccc;"></i>
+            </div>
+            <% if(loginUser!=null){%>
+	            <div class="user-id"><%=loginUser.userId() %></div>
+	            <div class="user-name"><%=loginUser.userName() %></div>
+	            <div class="point-info">포인트:<%=loginUser.userPoint() %> P</div>
+            <% }else{%>
+            	<div class="user-id">Guest</div>
+            <% }%>
+        </div>
+        <div class="menu-section">
+            <div class="menu-title" >카테고리</div>
+            <ul id="category">
+                <li class="menu-item cursor-pointer" 
+                	onclick="location.assign('<%=request.getContextPath() %>/board/boardentrance.do?category=0')" data-category="0">
+                    전체글
+                </li>
+                <li class="menu-item cursor-pointer" 
+                	onclick="location.assign('<%=request.getContextPath() %>/board/boardentrance.do?category=1')" data-category="1">
+                    일반글
+                </li>
+                <li class="menu-item cursor-pointer" 
+                	onclick="location.assign('<%=request.getContextPath() %>/board/boardentrance.do?category=2')" data-category="2">
+                    질문글
+                </li>
+            </ul>
+        </div>
+    </aside>
+	<!-- 메인보드 -->
+	<article class="main-content col-lg-8">	
 		<form action="<%=request.getContextPath()%>/board/savearticle.do" method="post">
 			<div>
 				<div class="d-flex flex-row justify-content-between align-items-center mb-3">
@@ -46,9 +76,44 @@
 			</form>
 	</article>
 </section>
+<script>
+	const CKEDITOR_INITIAL_DATA = "";
+</script>
 <script src="https://cdn.ckeditor.com/ckeditor5/45.1.0/ckeditor5.umd.js" crossorigin></script>
 <script src="https://cdn.ckeditor.com/ckeditor5/45.1.0/translations/ko.umd.js" crossorigin></script>
 <script src="https://cdn.ckbox.io/ckbox/2.6.1/ckbox.js" crossorigin></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="<%=request.getContextPath()%>/resources/js/board/board.js"></script>
+<script>
+	/* Flatpickr */
+	const select = document.getElementById('scheduleSelect');
+	const customInput = document.getElementById('customDatetime');
+	const now = new Date();
+	const fp = flatpickr(customInput, {
+	  enableTime: true,
+	  dateFormat: "Y-m-d H:i",
+	  time_24hr: true,
+	  defaultDate: now,
+	  minDate: now,
+	  onChange: function() {
+	    const selected = selectedDates[0];
+	    const current = new Date();
+	    if (selected < current) {
+	        alert("현재 시각 이후 시간만 선택 가능합니다.");
+	        scheduleSelect.value = "0";
+	        customInput.classList.add('d-none');
+	    	}
+	    }
+	});
+	
+	select.addEventListener('change', () => {
+	  if (select.value === '-1') {
+	    customInput.classList.remove('d-none');
+	    fp.open();
+	  } else {
+	    customInput.classList.add('d-none');
+	  }
+	});
+</script>
+
 <%@include file="/WEB-INF/views/common/footer.jsp" %>

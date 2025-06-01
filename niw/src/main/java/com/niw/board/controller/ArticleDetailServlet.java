@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -13,6 +14,7 @@ import javax.servlet.http.HttpSession;
 
 import com.niw.board.model.dto.Article;
 import com.niw.board.model.dto.Comment;
+import com.niw.board.model.dto.Notice;
 import com.niw.board.service.BoardService;
 import com.niw.user.model.dto.User;
 
@@ -26,6 +28,28 @@ public class ArticleDetailServlet extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		int articleId = Integer.parseInt(request.getParameter("articleId"));
+		
+		Cookie[] cookies = request.getCookies();
+	    String cookieView = "";
+	    boolean read = false;
+	    if (cookies != null) {
+	        for (Cookie c : cookies) {
+	            if (c.getName().equals("cookieView")) {
+	            	cookieView = c.getValue();
+	                if (cookieView.contains("|" + articleId + "|")) read = true;
+	            }
+	        }
+	    }
+	    if (!read) {
+	        int result = BoardService.SERVICE.increaseView(articleId);
+	        if(result > 0) {
+		        cookieView += "|" + articleId + "|";
+		        Cookie newCookie = new Cookie("cookieView", cookieView);
+		        newCookie.setMaxAge(60 * 60 * 24 * 7);
+		        newCookie.setPath("/");
+		        response.addCookie(newCookie);
+	        }
+	    }
 		Article article = BoardService.SERVICE.searchArticleById(articleId);
 		List<Comment> comment = BoardService.SERVICE.searchCommentByArticle(articleId);
 		int category = request.getParameter("category") == null? 0 :Integer.parseInt(request.getParameter("category"));
@@ -104,7 +128,8 @@ public class ArticleDetailServlet extends HttpServlet {
 		while(reportedComment.size() < comment.size()) reportedComment.add(0);
 		while(likedComment.size() < comment.size()) likedComment.add(0);
 		while(dislikedComment.size() < comment.size()) dislikedComment.add(0);
-		
+		List<Notice> notices = BoardService.SERVICE.searchNotice();
+		request.setAttribute("notices", notices);
 		request.setAttribute("bookmark", bookmark);
 		request.setAttribute("report", report);
 		request.setAttribute("likedArticle", likedArticle);

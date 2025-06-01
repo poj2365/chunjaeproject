@@ -36,12 +36,7 @@ public class CalendarSaveServlet extends HttpServlet {
 		String jsonData = request.getReader().lines().collect(Collectors.joining());
 		Gson gson = new Gson();
 		Calendar c = gson.fromJson(jsonData, Calendar.class);
-//		Calendar c = Calendar.builder()
-//				.calendarName(name)
-//				.calendarContent(content)
-//				.startTime(start)
-//				.endTime(end)
-//				.build();
+
 		int result = CalendarService.SERVICE.insertCalendar(c);
 	}
 

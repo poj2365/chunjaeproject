@@ -43,7 +43,8 @@ public class StudyGroupDetail extends HttpServlet {
 			request.setAttribute("groups", groups);
 			List<GroupMember> members = GroupMemberService.SERVICE.searchGroupMemberId(user.userId());
 			request.setAttribute("members", members);
-			
+			System.out.println(groups);
+			System.out.println(members);
 		}
 		
 		request.getRequestDispatcher("/WEB-INF/views/study/studyGroupDetail.jsp").forward(request, response);

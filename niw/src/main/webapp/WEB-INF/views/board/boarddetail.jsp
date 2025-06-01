@@ -3,17 +3,18 @@
 <%@include file="/WEB-INF/views/common/header.jsp" %>
 <%@ page import="com.niw.board.model.dto.Article, 
 				com.niw.board.model.dto.Comment, 
+				com.niw.board.model.dto.Notice,
 				java.util.List,
 				java.time.LocalDateTime,
 				java.time.Duration"%>
-
+<link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/45.1.0/ckeditor5.css" crossorigin>
 <link rel="stylesheet" href="<%=request.getContextPath()%>/resources/css/board.css">
-<script src="<%=request.getContextPath()%>/resources/js/board/board.js"></script>
 
 <% 
 	Article article = (Article) request.getAttribute("article"); 
 	List<Comment> comments = (List<Comment>) request.getAttribute("comments");
-	int category = (int) request.getAttribute("category");
+	int category = request.getParameter("category") == null? 0 : Integer.parseInt(request.getParameter("category"));
+	
 	int order = (int) request.getAttribute("order");
 	int numPerPage = (int) request.getAttribute("numPerPage");
 	int likes = (int) request.getAttribute("likes");
@@ -29,28 +30,44 @@
 	List<Integer> likedComment = (List<Integer>) request.getAttribute("likedComment");
 	List<Integer> dislikedComment = (List<Integer>) request.getAttribute("dislikedComment");
 	String queryUrl = request.getQueryString();
+	List<Notice> notices = (List<Notice>) request.getAttribute("notices");
 %>
-<section class="row justify-content-between m-4">
-	<aside class="card col-lg-2 ms-3">
-		<div class="card-header">
-			<h5 class="section-title">
-				카테고리
-			</h5><br>
-			<ul id="category" class="list-group list-group-flush">
-				<li class="list-group-item <%= category == 0? "active":"" %>">
-					<a href="<%=request.getContextPath() %>/board/boardentrance.do?category=0" data-category="0">전체글</a>
-				</li>
-				<li class="list-group-item <%= category == 1? "active":""%>">
-					<a href="<%=request.getContextPath() %>/board/boardentrance.do?category=1" data-category="1">일반글</a>
-				</li>
-				<li class="list-group-item <%= category == 2? "active":""%>">
-					<a href="<%=request.getContextPath() %>/board/boardentrance.do?category=2" data-category="2">질문글</a>
-				</li>
-			</ul>
-		</div>			
-	</aside>
-	<article class="col-lg-9 me-3">
-		<div class="article">
+<section class="mypage-container row flex-row m-4">
+	<!-- 사이드 네비게이터 -->
+	<aside class="sidebar col-lg-2">
+        <div class="profile-section">
+            <div class="profile-pic">
+                <i class="bi bi-person-circle" style="font-size: 60px; color: #ccc;"></i>
+            </div>
+            <% if(loginUser!=null){%>
+	            <div class="user-id"><%=loginUser.userId() %></div>
+	            <div class="user-name"><%=loginUser.userName() %></div>
+	            <div class="point-info">포인트:<%=loginUser.userPoint() %> P</div>
+            <% }else{%>
+            	<div class="user-id">Guest</div>
+            <% }%>
+        </div>
+        <div class="menu-section">
+            <div class="menu-title" >카테고리</div>
+            <ul id="category">
+                <li class="menu-item cursor-pointer <%=category == 0? "active":"" %>" 
+                	onclick="location.assign('<%=request.getContextPath() %>/board/boardentrance.do?category=0')" data-category="0">
+                    전체글
+                </li>
+                <li class="menu-item cursor-pointer <%=category == 1? "active":"" %>" 
+                	onclick="location.assign('<%=request.getContextPath() %>/board/boardentrance.do?category=1')" data-category="1">
+                    일반글
+                </li>
+                <li class="menu-item cursor-pointer <%=category == 2? "active":"" %>" 
+                	onclick="location.assign('<%=request.getContextPath() %>/board/boardentrance.do?category=2')" data-category="2">
+                    질문글
+                </li>
+            </ul>
+        </div>
+    </aside>
+	<!-- 메인보드 -->
+	<article class="main-content col-lg-8">
+		<div class="">
 			<div class="d-flex flex-column">
 			<%
 				boolean timeFlag = false, mtimeFlag = false;
@@ -146,14 +163,14 @@
 								</span>
 							</i>
 						</div>
-						<div class="col-lg-3">
+						<div class="col-lg-2">
 							<i class="bi-eye">
 								<span class="d-inline-block">
 									<%= article.articleViews() %>
 								</span>
 							</i>
 						</div>
-						<div class="col-lg-3">
+						<div class="col-lg-2">
 							<i class="bi-chat">
 								<span class="d-inline-block">
 									<%= article.commentCount() %>
@@ -161,7 +178,11 @@
 							</i>
 						</div>
 					</div>
-					<div class="col-lg-2 d-flex justify-content-end text-end">
+					<div class="col-lg-4 d-flex justify-content-end text-end">
+						<%if(user != null && !user.userId().trim().equals("") && (user.userId().equals(article.userId()) || user.userRole().equals("ADMIN"))) {%>
+							<button class="btn btn-danger me-1" onclick="deleteArticle('<%= article.articleId() %>', '/board/boardentrance.do?category=0')"> 삭제 </button>
+							<button class="btn btn-primary me-1" onclick="location.assign('<%=request.getContextPath()%>/board/modifyarticle.do?articleId=<%=article.articleId() %>')"> 수정 </button>
+						<%} %>
 						<form action="" method="get">
 	    	                <button type="button" class="btn btn-danger me-1" <%= report == 0? "" : "disabled" %> data-bs-toggle="modal" data-bs-target="#reportModal"
 	    	                 data-user-id="<%=user == null? "" : user.userId()%>" data-target-id="<%= article.articleId()%>" data-target-type="ARTICLE">
@@ -185,11 +206,11 @@
 					<span class="col-lg-1 border p-3 rounded text-center me-3"
 						  onclick="insertRecommend(event, '1', 'ARTICLE', '<%= user == null? "" : user.userId()%>')" 
 						  data-target-id="<%= article.articleId()%>">
-						<i class=" <%= likedArticle == 0? "bi-hand-thumbs-up" : "bi-hand-thumbs-up-fill" %> cursor-pointer">
+						<i class="cursor-pointer <%= likedArticle == 0? "bi-hand-thumbs-up" : "bi-hand-thumbs-up-fill" %> cursor-pointer">
 							<%= article.articleLikes() %>
 						</i>
 					</span>
-					<span class="col-lg-1  border p-3 rounded text-center" onclick="insertRecommend(event, '0', 'ARTICLE', '<%= user == null? "" : user.userId()%>')" data-target-id="<%= article.articleId()%>">
+					<span class="cursor-pointer col-lg-1  border p-3 rounded text-center" onclick="insertRecommend(event, '0', 'ARTICLE', '<%= user == null? "" : user.userId()%>')" data-target-id="<%= article.articleId()%>">
 						<i class="<%= dislikedArticle == 0? "bi-hand-thumbs-down" : "bi-hand-thumbs-down-fill" %> cursor-pointer">
 							<%= article.articleDislikes() %>
 						</i>
@@ -200,7 +221,7 @@
 			<div class="comment-header">
 	            <div class="row flex-row justify-content-between align-items-center">
 	                <div class="col-lg-3">
-	                    <h5> 댓글 <%= article.commentCount() %></h5>
+	                    <h5> 댓글 <span><%= article.commentCount() %></span></h5>
 	                </div>
 	                <div class="col-lg-1 text-end">
 	                    <button class="btn btn-primary" data-target-id="<%=article.articleId() %>"
@@ -212,35 +233,62 @@
 	            <hr>
 	        </div>
 	         <% for(int i = 0; i < comments.size(); i++) { 
+	        	boolean cFlag = false;
+				long chours = 0, cminutes = 0, cseconds = 0;
+				LocalDateTime cldt = comments.get(i).commentDateTime().toLocalDateTime();
+				if(cldt.toLocalDate().equals(now.toLocalDate())){
+					cFlag = true;
+					Duration duration = Duration.between(cldt, now);
+					chours = duration.toHours();
+					cminutes = duration.toMinutes() % 60;
+					cseconds = duration.toSeconds() % 60;
+				}
 	        	if(comments.get(i).commentLevel() == 0) {%>
 					<div class="comment level-0">
 						<div>
 			                <span><%= comments.get(i).userId() %></span>
 			            </div>
-			            <div class="text-break">
+			            <div class="text-break comment-content">
 			            	<%= comments.get(i).commentContent()%>
 			            </div>
 			            <div class="d-flex justify-content-between align-items-center">
 			                <div style="color: gray;">
 			                    <span class="col-lg-2 me-3">
-			                    	<%= comments.get(i).commentDateTime() %>
+			                    	<%if (cFlag) {
+									    if (chours > 0) {%>
+									        <%= chours + "시간전" %>
+									<%} else if (cminutes > 0) {	%>
+									        <%= cminutes + "분전" %>
+									<%} else {%>
+									        <%= cseconds + "초전" %>
+									<%}
+									} else {%>
+									    <%= cldt.toString().split("T")[0] + " " + cldt.toString().split("T")[1].split(":")[0] + ":" + cldt.toString().split("T")[1].split(":")[1] %>
+									<%}%>
+									<%if(comments.get(i).commentModified() == 0) {%>
+										(수정됨)
+									<%} %>
 			                    </span>
 			                    <span class="col-lg-1  me-3" 
 			                    	  onclick="insertRecommend(event, '1', 'COMMENTS', '<%= user == null? "" : user.userId()%>')"
 			                    	  data-target-id="<%= comments.get(i).commentId()%>">
-			                    	<i class=" <%= likedComment.get(i) == 0? "bi-hand-thumbs-up" : "bi-hand-thumbs-up-fill" %> cursor-pointer">
+			                    	<i class="cursor-pointer <%= likedComment.get(i) == 0? "bi-hand-thumbs-up" : "bi-hand-thumbs-up-fill" %> cursor-pointer">
 										<%= comments.get(i).commentLikes() %>
 									</i> 
 			                    </span>
 			                    <span class="col-lg-1 " 
 			                    	  onclick="insertRecommend(event, '0', 'COMMENTS', '<%= user == null? "" : user.userId()%>')"
 	               	               	  data-target-id="<%= comments.get(i).commentId()%>">		                    	  
-			                    	<i class="<%=dislikedComment.get(i) == 0? "bi-hand-thumbs-down" : "bi-hand-thumbs-down-fill" %> cursor-pointer">
+			                    	<i class="cursor-pointer <%=dislikedComment.get(i) == 0? "bi-hand-thumbs-down" : "bi-hand-thumbs-down-fill" %> cursor-pointer">
 										<%= comments.get(i).commentDislikes() %>
 									</i>
 			                    </span>
 			                </div>
 			                <div class="d-flex justify-content-between align-items-center">
+				                <%if(user != null && !user.userId().trim().equals("") && (user.userId().equals(article.userId()) || user.userRole().equals("ADMIN"))) {%>
+									<button class="btn btn-danger me-1" onclick="deleteComment('<%= comments.get(i).commentId() %>', '<%=article.articleId() %>')"> 삭제 </button>
+									<button class="btn btn-primary me-1" onclick="updateComment(event, '<%= comments.get(i).commentId() %>', '<%= article.articleId() %>')"> 수정 </button>
+								<%} %>
 		                        <form action="" method="get">
 			                        <button <%= reportedComment.get(i) == 0? "" : "disabled" %> type="button" class="btn btn-danger me-1" data-bs-toggle="modal"
 			                         data-bs-target="#reportModal" data-user-id="<%=user == null? "" : user.userId()%>" data-target-id="<%= comments.get(i).commentId()%>" data-target-type="COMMENTS">
@@ -258,33 +306,50 @@
 						<div>
 			                <span style="color:blue"> @<%=comments.get(i).userRef() %> </span> <span><%= comments.get(i).userId() %></span>
 			            </div>
-			            <div class="text-break">
+			            <div class="text-break comment-content">
 			            	<%= comments.get(i).commentContent()%>
 			            </div>
 			            <div class="d-flex justify-content-between align-items-center">
 			                <div style="color: gray;">
 			                    <span class="col-lg-2 me-3">
-			                    	<%= comments.get(i).commentDateTime() %>
+			                    	<%if (cFlag) {
+									    if (chours > 0) {%>
+									        <%= chours + "시간전" %>
+									<%} else if (cminutes > 0) {	%>
+									        <%= cminutes + "분전" %>
+									<%} else {%>
+									        <%= cseconds + "초전" %>
+									<%}
+									} else {%>
+									    <%= cldt.toString().split("T")[0] + " " + cldt.toString().split("T")[1].split(":")[0] + ":" + cldt.toString().split("T")[1].split(":")[1] %>
+									<%}%>
+									<%if(comments.get(i).commentModified() == 0) {%>
+										(수정됨)
+									<%} %>
 			                    </span>
 			                    <span class="col-lg-1  me-3" 
 			                    	  onclick="insertRecommend(event, '1', 'COMMENTS', '<%= user == null? "" : user.userId()%>')"
 			                    	  data-target-id="<%= comments.get(i).commentId()%>">
-			                    	<i class=" <%= likedComment.get(i) == 0? "bi-hand-thumbs-up" : "bi-hand-thumbs-up-fill" %> cursor-pointer">
+			                    	<i class="cursor-pointer <%= likedComment.get(i) == 0? "bi-hand-thumbs-up" : "bi-hand-thumbs-up-fill" %> cursor-pointer">
 										<%= comments.get(i).commentLikes() %>
 									</i> 
 			                    </span>
 			                    <span class="col-lg-1 " 
 			                    	  onclick="insertRecommend(event, '0', 'COMMENTS', '<%= user == null? "" : user.userId()%>')"
 	               	               	  data-target-id="<%= comments.get(i).commentId()%>">		                    	  
-			                    	<i class="<%=dislikedComment.get(i) == 0? "bi-hand-thumbs-down" : "bi-hand-thumbs-down-fill" %> cursor-pointer">
+			                    	<i class="cursor-pointer <%=dislikedComment.get(i) == 0? "bi-hand-thumbs-down" : "bi-hand-thumbs-down-fill" %> cursor-pointer">
 										<%= comments.get(i).commentDislikes() %>
 									</i>
 			                    </span>
 			                </div>
 			                <div class="d-flex justify-content-between align-items-center">
+			                	<%if(user != null && !user.userId().trim().equals("") && (user.userId().equals(article.userId()) || user.userRole().equals("ADMIN"))) {%>
+									<button class="btn btn-danger me-1" onclick="deleteComment('<%= comments.get(i).commentId()%>', '<%=article.articleId() %>')"> 삭제 </button>
+									<button class="btn btn-primary me-1" onclick="updateComment(event, '<%= comments.get(i).commentId() %>', '<%= article.articleId() %>')"> 수정 </button>
+								<%} %>
 		                        <form action="" method="get">
 			                        <button <%= reportedComment.get(i) == 0? "" : "disabled" %> type="button" class="btn btn-danger me-1" data-bs-toggle="modal" data-bs-target="#reportModal"
-			                         data-user-id="<%=user == null? "" : user.userId()%>" data-target-id="<%= comments.get(i).commentId()%>" data-target-type="COMMENTS">
+			                         data-user-id="<%=user == null? "" : user.userId()%>" data-target-id="<%= comments.get(i).commentId() %>" data-target-type="COMMENTS">
 			                            신고
 			                        </button>
 			                	</form>
@@ -297,7 +362,7 @@
 				<% } %>
 			<%} %>
 		</div>
-		<div class="article mt-5 mb-5">
+		<div class=" mt-5 mb-5">
 			<div class="d-flex justify-content-end align-items-end">
 				<div>
 					<select id="order" class="form-select form-select-sm" onchange="searchArticle('<%=cPage%>', '/board/underarticle.do')">
@@ -322,6 +387,26 @@
 			</div>
 			<hr>
 			<!-- ajax article list -->
+			<div id="notice-container">
+				<%if(notices != null && !notices.isEmpty()) {
+						for(Notice notice : notices){%>
+							<div class="row flex-row justify-content-between align-items-center">
+								<div class="col-lg-8 d-flex align-items-center">
+									<span class="badge bg-danger me-3">공지</span>
+									<span class="overflow-hidden">
+										<a href="<%=request.getContextPath()%>/board/noticedetail.do?noticeId=<%=notice.noticeId()%>" class="text-decoration-none text-black">
+											<%= notice.noticeTitle() %>
+										</a>
+									</span>
+								</div>
+								<ul class="list-unstyled row flex-row g-1 col-lg-3">
+									<li><b>관리자</b> </li>
+								</ul>
+							</div>
+							<hr>
+						<%}
+					}%>
+			</div>
 			<div id="article-container">
 				<%for(Article a : articles){ 
 					boolean tFlag = false;
@@ -378,7 +463,7 @@
 						<li class="col-lg-2"><i class="bi-eye"><%= a.articleViews() %></i></li>
 						<li class="col-lg-2"><i class="bi-hand-thumbs-up"><%= a.articleLikes() %></i></li>
 						<li class="col-lg-2"><i class="bi-chat"><%= a.commentCount() %></i></li>
-						<li class="col-lg-6"><%= article.userId()%> &middot; <%
+						<li class="col-lg-5"><%= a.userId()%> &middot; <%
 							if(tFlag){
 								if(h > 0){%><%=String.valueOf(h)+"시간전"%>
 								<%} else if(m > 0){%> <%= String.valueOf(m)+"분전"%>
@@ -387,6 +472,13 @@
 								<%=uldt.toLocalDate()%>
 							<%
 						}%> </li>
+						<li class="col-lg-1">
+							<%if(user != null && (user.userId().equals(a.userId()) || user.userRole().equals("ADMIN"))){%>
+								<i class="bi bi-x fw-bold border rounded-2 d-flex justify-content-center align-items-center"
+								   style="width: 24px; height: 24px; cursor: pointer; font-style: normal;"
+								   onclick="deleteArticle('<%= a.articleId() %>', '/board/boardentrance.do?category=0')"></i>
+							<%} %>
+						</li>
 					</ul>
 					</div>
 					<hr>
@@ -456,6 +548,19 @@
 	<!-- 신고 폼 끝 -->
 	
 </section>
+<script src="https://cdn.ckeditor.com/ckeditor5/45.1.0/ckeditor5.umd.js" crossorigin></script>
+<script src="https://cdn.ckeditor.com/ckeditor5/45.1.0/translations/ko.umd.js" crossorigin></script>
+<script src="https://cdn.ckbox.io/ckbox/2.6.1/ckbox.js" crossorigin></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="<%=request.getContextPath()%>/resources/js/board/board.js"></script>
+
+<script>
+	document.addEventListener("DOMContentLoaded", function () {
+	  document.querySelectorAll("iframe").forEach(e => {
+	    e.classList.add("fixed-embed");
+	  });
+	});
+</script>
 <script>
 	let $reportButton = null;
 	$("#reportModal").on('show.bs.modal', (e) => {
@@ -464,5 +569,24 @@
 		$("#reportTargetId").val($reportButton.getAttribute('data-target-id'));
 		$("#reportTargetType").val($reportButton.getAttribute('data-target-type'));
 	});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  document.querySelectorAll("oembed[url]").forEach(el => {
+    const url = el.getAttribute("url");
+    if (url.includes("youtube.com") || url.includes("youtu.be")) {
+      const videoId = new URL(url).searchParams.get("v") ||
+                      url.split("/").pop();
+      const iframe = document.createElement("iframe");
+      iframe.src = "https://www.youtube.com/embed/" + videoId;
+      iframe.width = "100%";
+      iframe.height = "500";
+      iframe.frameBorder = "0";
+      iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+      iframe.allowFullscreen = true;
+      el.replaceWith(iframe);
+    }
+  });
+});
 </script>
 <%@include file="/WEB-INF/views/common/footer.jsp" %>

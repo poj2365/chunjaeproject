@@ -409,7 +409,7 @@ function loadActivityData(tabId) {
             $(listSelector).html(`
                 <div style="text-align: center; padding: 50px; color: #dc3545;">
                     데이터를 불러오는데 실패했습니다.
-                    <br><button class="btn btn-sm btn-primary mt-2" onclick="loadActivityData('${tabId}')">다시 시도</button>
+                    <br><button class="btn btn-sm btn-primary mt-2" onclick="loadActivityData('\${tabId}')">다시 시도</button>
                 </div>
             `);
         }
@@ -430,7 +430,7 @@ function loadGeneralActivityData(response, listSelector, paginationSelector, tab
     } else {
         $(listSelector).html(`
             <div style="text-align: center; padding: 50px; color: #888;">
-                ${getEmptyMessage(tabId)}
+                \${getEmptyMessage(tabId)}
             </div>
         `);
         $(paginationSelector).html('');
@@ -545,16 +545,16 @@ function createActivityPagination(totalPages, currentPage, selector) {
     var endPage = Math.min(totalPages, currentPage + 2);
     
     if (currentPage > 1) {
-        pagination += `<div class="page-item"><a href="#" class="page-link" data-page="${currentPage - 1}">‹</a></div>`;
+        pagination += `<div class="page-item"><a href="#" class="page-link" data-page="\${currentPage - 1}">‹</a></div>`;
     }
     
     for (var i = startPage; i <= endPage; i++) {
         var activeClass = i === currentPage ? 'active' : '';
-        pagination += `<div class="page-item ${activeClass}"><a href="#" class="page-link" data-page="${i}">${i}</a></div>`;
+        pagination += `<div class="page-item \${activeClass}"><a href="#" class="page-link" data-page="\${i}">\${i}</a></div>`;
     }
     
     if (currentPage < totalPages) {
-        pagination += `<div class="page-item"><a href="#" class="page-link" data-page="${currentPage + 1}">›</a></div>`;
+        pagination += `<div class="page-item"><a href="#" class="page-link" data-page="\${currentPage + 1}">›</a></div>`;
     }
     
     $(selector).html(pagination);

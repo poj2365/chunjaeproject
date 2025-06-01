@@ -36,6 +36,16 @@ public class StudyGroupViewServlet extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		HttpSession session = request.getSession();
+		User user = (User) session.getAttribute("loginUser");
+		int groupLimit = 0;
+		if(user!=null) {
+			groupLimit = GroupMemberService.SERVICE.groupMemberCountId(user.userId());
+		}
+		request.setAttribute("groupLimit", groupLimit);
+		
+		
 		String groupNo = request.getParameter("no");
 		StudyGroup group = StudyGroupService.SERVICE.searchStudyGroup(groupNo);
 		request.setAttribute("group", group);

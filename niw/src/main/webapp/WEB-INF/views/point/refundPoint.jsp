@@ -258,17 +258,14 @@ if (loginUser == null) {
             <tr id="row-document-id" style="display:;">
 				  <th>학습 자료 ID</th>
 				  <td>
-				    <select name="fileId" class="form-input">
-				      <option value="1">파일 A</option>
-				      <option value="2">파일 B</option>
-				      <option value="3">파일 C</option>
+				    <select name="fileId" class="form-input" id="fileId">
 				    </select>
 				  </td>
 				</tr>
             <tr id="row-dpoint-id" style="display:none;">
                 <th>자료 환불 포인트 금액</th>
                 <td>
-                    <input type="number" name = "refundFilePoint" class="form-input" value="" placeholder="1000">
+                    <input type="number" name = "refundFilePoint" class="form-input" value="" placeholder="1000" id="refundFilePoint" readonly>
                 </td>
             </tr>
                <tr id="row-point-id" style="display:none;">
@@ -312,61 +309,96 @@ if (loginUser == null) {
 </div>
 
 <script>
-	const refundFile = function(){
-		const change = document.getElementById('saveRefund');
-		change.action = "<%=request.getContextPath()%>/point/refundendfile.do"
-		change.submit();
-	}
-	 
-	document.addEventListener('DOMContentLoaded', function () {
-	  const refundTypeRadios = document.querySelectorAll('input[name="refundType"]');
-	
-	  const documentRow = document.getElementById('row-document-id');
-	  const dPointRow = document.getElementById('row-dpoint-id');
-	  const pointRow = document.getElementById('row-point-id');
-	  const bankAccount = document.getElementById('row-bankAccount-id');
-	  const completepoint = document.getElementById('completepoint');
-	  const completefile = document.getElementById('completefile');
-	  
-	
-	  
-	  documentRow.style.display = 'none';
-	  dPointRow.style.display = 'none';
-	  pointRow.style.display = 'none';
-	  bankAccount.style.display ='none';
-	  completepoint.style.display='none';
-	  completefile.style.display='none';
 
-	
-	  refundTypeRadios.forEach(radio => {
-	    radio.addEventListener('change', () => {
-	      if (radio.value === 'file') {
-	        documentRow.style.display = '';
-	        dPointRow.style.display = '';
-	        completefile.style.display='';
-	        completepoint.style.display='none';
-	        pointRow.style.display = 'none';
-	        bankAccount.style.display='none';
 
-	      } else if (radio.value === 'point') {
-	        documentRow.style.display = 'none';
-	        dPointRow.style.display = 'none';
-	        completefile.style.display='none';
-	        completepoint.style.display='';
-	        pointRow.style.display = '';
-	        bankAccount.style.display='';
-	      }
-	    });
-	  });
-	  
-	  
-	  // 환불 요청일 자동 설정
-	  const dateInput = document.getElementById('refundDateInput');
-	  if (dateInput) {
-	    const today = new Date().toISOString().split('T')[0];
-	    dateInput.value = today;
-	  }
-	});
+document.addEventListener('DOMContentLoaded', function () {
+    $.post('<%=request.getContextPath()%>/point/pointfilelist.do', { userId: '<%=loginUser.userId()%>' })
+    .done(myFiles => {
+        const myFile = document.getElementById('fileId');
+        myFile.innerHTML = "";
+        
+        if (myFiles.length == 0) {
+            myFile.innerHTML = `<option>파일이 존재하지 않습니다</option>`;
+            document.getElementById('refundFilePoint').value = '';
+        } else {
+            myFiles.forEach(file => {
+                const option = document.createElement('option');
+                
+                option.textContent = file.materialName;
+                console.log(file.materialName);
+                option.value = file.materialId;
+                console.log(file.materialId);
+                myFile.appendChild(option);
+            });
+            if (myFiles.length > 0) {
+                document.getElementById('refundFilePoint').value = myFiles[0].materialPrice;
+            }
+            myFile.addEventListener('change', function() {
+                const index = myFile.selectedIndex;
+                if (index >= 0) {
+                    document.getElementById('refundFilePoint').value = myFiles[index].materialPrice;
+                }
+            });
+        }
+    })
+    .fail(error => {
+        const myFile = document.getElementById('fileId');
+        myFile.innerHTML = `<option>데이터를 불러올 수 없습니다.</option>`;
+        document.getElementById('refundFilePoint').value = '';
+        console.log(error);
+    });
+
+    // 환불 유형별로 폼 제어
+    const refundTypeRadios = document.querySelectorAll('input[name="refundType"]');
+    const documentRow = document.getElementById('row-document-id');
+    const dPointRow = document.getElementById('row-dpoint-id');
+    const pointRow = document.getElementById('row-point-id');
+    const bankAccount = document.getElementById('row-bankAccount-id');
+    const completepoint = document.getElementById('completepoint');
+    const completefile = document.getElementById('completefile');
+
+    documentRow.style.display = 'none';
+    dPointRow.style.display = 'none';
+    pointRow.style.display = 'none';
+    bankAccount.style.display ='none';
+    completepoint.style.display='none';
+    completefile.style.display='none';
+
+    refundTypeRadios.forEach(radio => {
+        radio.addEventListener('change', () => {
+            if (radio.value === 'file') {
+                documentRow.style.display = '';
+                dPointRow.style.display = '';
+                completefile.style.display = '';
+                completepoint.style.display = 'none';
+                pointRow.style.display = 'none';
+                bankAccount.style.display = 'none';
+            } else if (radio.value === 'point') {
+                documentRow.style.display = 'none';
+                dPointRow.style.display = 'none';
+                completefile.style.display = 'none';
+                completepoint.style.display = '';
+                pointRow.style.display = '';
+                bankAccount.style.display = '';
+            }
+        });
+    });
+
+    // 환불 요청일 오늘 날짜 자동 설정
+    const dateInput = document.getElementById('refundDateInput');
+    if (dateInput) {
+        const today = new Date().toISOString().split('T')[0];
+        dateInput.value = today;
+    }
+
+    // 환불 파일 전송 함수 (글로벌로)
+    window.refundFile = function(){
+        const change = document.getElementById('saveRefund');
+        change.action = "<%=request.getContextPath()%>/point/refundendfile.do";
+        change.submit();
+    }
+});
+
 	
 	
 </script>

@@ -99,13 +99,16 @@ User loginUser= (User)session.getAttribute("loginUser");
             <i class="bi bi-chevron-down dropdown-toggle-icon"></i>
           </a>
           <div class="custom-dropdown-menu">
-            <a class="custom-dropdown-item" href="<%=request.getContextPath()%>/market/marketview.do">초등 학습자료</a>
-            <a class="custom-dropdown-item" href="#">중등 학습자료</a>
-            <a class="custom-dropdown-item" href="#">고등 학습자료</a>
+            <a class="custom-dropdown-item" href="<%=request.getContextPath()%>/market/list.do?category=초등">초등 학습자료</a>
+            <a class="custom-dropdown-item" href="<%=request.getContextPath()%>/market/list.do?category=중등">중등 학습자료</a>
+            <a class="custom-dropdown-item" href="<%=request.getContextPath()%>/market/list.do?category=고등">고등 학습자료</a>
             <div class="custom-dropdown-divider"></div>
-            <a class="custom-dropdown-item" href="#">교사용 자료</a>
-            <a class="custom-dropdown-item" href="#">입시자료</a>
-            <a class="custom-dropdown-item" href="#">일반자료</a>
+            <a class="custom-dropdown-item" href="<%=request.getContextPath()%>/market/list.do">전체 자료</a>
+            <a class="custom-dropdown-item" href="<%=request.getContextPath()%>/market/list.do?category=전체&subject=국어">국어 자료</a>
+            <a class="custom-dropdown-item" href="<%=request.getContextPath()%>/market/list.do?category=전체&subject=수학">수학 자료</a>
+            <a class="custom-dropdown-item" href="<%=request.getContextPath()%>/market/list.do?category=전체&subject=영어">영어 자료</a>
+            <a class="custom-dropdown-item" href="<%=request.getContextPath()%>/market/list.do?category=전체&subject=사회">사회 자료</a>
+            <a class="custom-dropdown-item" href="<%=request.getContextPath()%>/market/list.do?category=전체&subject=과학">과학 자료</a>
           </div>
         </li>
         <li class="nav-item">
@@ -125,11 +128,11 @@ User loginUser= (User)session.getAttribute("loginUser");
             <i class="bi bi-chevron-down dropdown-toggle-icon"></i>
           </a>
           <div class="custom-dropdown-menu">
-            <a class="custom-dropdown-item" href="<%=request.getContextPath()%>/study/studymain.do">스터디 모집</a>
-            <a class="custom-dropdown-item" href="<%=request.getContextPath()%>/study/mystudygroup.do">스터디 그룹</a>
+            <a class="custom-dropdown-item" href="<%=request.getContextPath()%>/study/grouplist.do">스터디 모집</a>
             <div class="custom-dropdown-divider"></div>
-            <a class="custom-dropdown-item" href="<%=request.getContextPath()%>/study/timerecord.do">타이머</a>
-            <a class="custom-dropdown-item" href="<%=request.getContextPath()%>/study/calender.do">내 공부 시간</a>
+            <a class="custom-dropdown-item" href="<%=request.getContextPath()%>/study/timerecord.do">공부 시간 기록</a>
+            <a class="custom-dropdown-item" href="<%=request.getContextPath()%>/study/timeranking.do">랭킹</a>
+            <a class="custom-dropdown-item" href="<%=request.getContextPath()%>/study/calender.do">스터디 플래너</a>
           </div>
         </li>
       </ul>

@@ -14,6 +14,7 @@ import java.util.Properties;
 import com.niw.common.JDBCTemplate;
 import com.niw.point.model.dto.Point;
 import com.niw.point.model.dto.PointHistory;
+import com.niw.point.model.dto.PointMyFile;
 import com.niw.point.model.dto.PointRefund;
 import com.niw.user.model.dto.User;
 
@@ -44,8 +45,13 @@ public class PointDao {
 		int result =0;
 		
 		try {
-
-			System.out.println(sql.getProperty("insertPointHistory"));
+			pstmt= conn.prepareStatement(sql.getProperty("searchUserPoint"));
+			pstmt.setString(1,p.getUserId());
+			rs = pstmt.executeQuery();
+			int myPoint =0;
+			if(rs.next()) {
+				myPoint = rs.getInt("user_point");
+			}
 			pstmt =  conn.prepareStatement(sql.getProperty("insertPointHistory"));// -> 이게 왜 null?
 			pstmt.setLong(1, p.getPointId());
 			pstmt.setString(2, p.getUserId());
@@ -53,7 +59,7 @@ public class PointDao {
 			pstmt.setInt(4, p.getPrice());
 			pstmt.setString(5, p.getPointDescription());
 			pstmt.setString(6, p.getPortOneId());
-			
+			pstmt.setInt(7, myPoint+p.getPointAmount());;
 			result =pstmt.executeUpdate();
 			
 		} catch (SQLException e) {
@@ -96,7 +102,6 @@ public class PointDao {
 			pstmt.setString(2,p.getUserId());
 			pstmt.setString(3, p.getRefundType());
 			pstmt.setLong(4, p.getFileId());
-			pstmt.setInt(5, p.getFilePoint());
 			
 			result = pstmt.executeUpdate();
 			
@@ -114,10 +119,12 @@ public class PointDao {
 	public int chargePoint (Connection conn, String userId, int addpoint) {
 		int result = 0;
 		try {
+			
 			pstmt = conn.prepareStatement(sql.getProperty("addPoint"));
 			pstmt.setInt(1,addpoint);
 			pstmt.setString(2, userId);
 			result = pstmt.executeUpdate();
+//			pstmt = conn.prepareStatement();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
@@ -129,16 +136,24 @@ public class PointDao {
 	
 	public List<PointHistory> searchPointHistory (Connection conn,String userId){
 		List<PointHistory> historys = new ArrayList();
-		
+		int amount=0;
 		try {
-			pstmt = conn.prepareStatement("searchPointHistory");
+			pstmt = conn.prepareStatement(sql.getProperty("myPointHistory"));
+			pstmt.setString(1, userId);
+			pstmt.setString(2, userId);
+			pstmt.setString(3, userId);
 			rs = pstmt.executeQuery();
 			
 			while(rs.next()) {
-				Date date = rs.getDate("eventdate");
-				String content = rs.getString("content");
-				int amount = rs.getInt("point");
-				int mypoint = rs.getInt("mypoint");
+				Date date = rs.getDate("EVENT_TIME");
+				String content = rs.getString("description") + " " +rs.getString("event_type");
+				if(rs.getString("event_type").equals("구매")) {
+					 amount = rs.getInt("change_point") * -1;
+				} else {
+					 amount = rs.getInt("change_point");
+				}
+				int mypoint = rs.getInt("remain_point");
+				
 				PointHistory p = new PointHistory(date,content,amount,mypoint);
 				historys.add(p);
 			}
@@ -150,6 +165,30 @@ public class PointDao {
 			JDBCTemplate.close(pstmt);
 		}
 		return historys;
+	}
+	
+	public List<PointMyFile> showMyFiles (Connection conn,String userId){
+		List<PointMyFile> files = new ArrayList<PointMyFile>();
+		try {
+			pstmt = conn.prepareStatement(sql.getProperty("showMyFile"));
+			System.out.println(sql.getProperty("showMyFile"));
+			pstmt.setString(1, userId);
+			rs= pstmt.executeQuery();
+			
+			while(rs.next()) {
+				long materialId = rs.getLong("material_id");
+				String materialName = rs.getString("material_title");
+				int materialPrice = rs.getInt("material_price");
+				PointMyFile file = new PointMyFile(materialName,materialId,materialPrice);
+				files.add(file);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			JDBCTemplate.close(rs);
+			JDBCTemplate.close(pstmt);
+		}
+		return files;
 	}
 
 }

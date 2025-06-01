@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.gson.Gson;
 import com.niw.point.model.dto.PointHistory;
 import com.niw.point.model.service.PointService;
 
@@ -25,9 +26,8 @@ public class PointHistoryServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
 		List<PointHistory> historys = PointService.ponitService().searchPointHistory(request.getParameter("userId"));
-		request.setAttribute("historys", historys);
-		request.getRequestDispatcher("/WEB-INF/views/point/myPoint.jsp").forward(request, response);
-		
+		response.setContentType("application/json; charset=UTF-8");
+	    new Gson().toJson(historys, response.getWriter());
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

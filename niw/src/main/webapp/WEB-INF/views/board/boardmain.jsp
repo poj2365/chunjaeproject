@@ -4,52 +4,55 @@
 <%@include file="/WEB-INF/views/common/header.jsp" %>
 <%@ page import="java.util.List, 
 				com.niw.board.model.dto.Article,
+				com.niw.board.model.dto.Notice,
 				java.time.LocalDateTime,
 				java.sql.Timestamp,
 				java.time.LocalDate,
 				java.time.Duration"%>
 <link rel="stylesheet" href="<%=request.getContextPath()%>/resources/css/board.css">
-<script src="<%=request.getContextPath()%>/resources/js/board/board.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
 <% 
 	int category = request.getParameter("category") == null? 0 : Integer.parseInt(request.getParameter("category")); 
 	List<Article> articles = (List<Article>) request.getAttribute("articles");
 	User user = (User) request.getSession().getAttribute("loginUser");
+	List<Notice> notices = (List<Notice>) request.getAttribute("notices");
 %>
-<section class="row justify-content-between m-4">
+<section class="mypage-container row flex-row m-4">
 	<!-- 사이드 네비게이터 -->
-	<aside class="card col-lg-2 ms-3">
-		<div class="card-header">
-			<h5 class="section-title">
-				카테고리
-			</h5><br>
-			<ul id="category" class="list-group list-group-flush">
-				<li class="list-group-item 
-					<%if(category == 0){ %>
-							active
-					<%} %>
-				">
-					<a href="javascript:void(0);" onclick="activeChange(event, '/board/articlelist.do');" data-category="0">전체글</a>
-				</li>
-				<li class="list-group-item <%if(category == 1){ %>
-						active
-					<%} %>
-				">
-					<a href="javascript:void(0);" onclick="activeChange(event, '/board/articlelist.do');" data-category="1">일반글</a>
-				</li>
-				<li class="list-group-item 
-					<%if(category == 2){ %>
-						active
-					<%} %>
-				">
-					<a href="javascript:void(0);" onclick="activeChange(event, '/board/articlelist.do');" data-category="2">질문글</a>
-				</li>
-			</ul>
-		</div>			
-	</aside>
+	<aside class="sidebar col-lg-2">
+        <div class="profile-section">
+            <div class="profile-pic">
+                <i class="bi bi-person-circle" style="font-size: 60px; color: #ccc;"></i>
+            </div>
+            <% if(loginUser!=null){%>
+	            <div class="user-id"><%=loginUser.userId() %></div>
+	            <div class="user-name"><%=loginUser.userName() %></div>
+	            <div class="point-info">포인트:<%=loginUser.userPoint() %> P</div>
+            <% }else{%>
+            	<div class="user-id">Guest</div>
+            <% }%>
+        </div>
+        <div class="menu-section">
+            <div class="menu-title" >카테고리</div>
+            <ul id="category">
+                <li class="menu-item cursor-pointer <%=category == 0? "active":"" %>" 
+                	onclick="activeChange(event, '/board/articlelist.do')" data-category="0">
+                    전체글
+                </li>
+                <li class="menu-item cursor-pointer <%=category == 1? "active":"" %>" 
+                	onclick="activeChange(event, '/board/articlelist.do')" data-category="1">
+                    일반글
+                </li>
+                <li class="menu-item cursor-pointer <%=category == 2? "active":"" %>" 
+                	onclick="activeChange(event, '/board/articlelist.do')" data-category="2">
+                    질문글
+                </li>
+            </ul>
+        </div>
+    </aside>
 	<!-- 메인보드 -->
-	<article class="col-lg-9 article me-3">
+	<article class="main-content col-lg-8">
 		<!-- 게시글 상단 선택 요소 -->
 		<div class="row flex-row justify-content-between mt-5">
 			<div class="col-lg-5">
@@ -80,6 +83,26 @@
 		</div>
 		<hr>
 		<!-- 게시글 리스트 컨테이너 -->
+		<div id="notice-container">
+			<%if(notices != null && !notices.isEmpty()) {
+					for(Notice notice : notices){%>
+						<div class="row flex-row justify-content-between align-items-center">
+							<div class="col-lg-8 d-flex align-items-center">
+								<span class="badge bg-danger me-3">공지</span>
+								<span class="overflow-hidden">
+									<a href="<%=request.getContextPath()%>/board/noticedetail.do?noticeId=<%=notice.noticeId()%>" class="text-decoration-none text-black">
+										<%= notice.noticeTitle() %>
+									</a>
+								</span>
+							</div>
+							<ul class="list-unstyled row flex-row g-1 col-lg-3">
+								<li><b>관리자</b> </li>
+							</ul>
+						</div>
+						<hr>
+					<%}
+				}%>
+		</div>
 		<div id="article-container">
 			<%if(articles != null && !articles.isEmpty()) {
 				for(Article article : articles){
@@ -141,7 +164,7 @@
 								<%
 							}%> </li>
 							<li class="col-lg-1">
-								<%if(user != null && user.userId().equals(article.userId())){%>
+								<%if(user != null && (user.userId().equals(article.userId()) || user.userRole().equals("ADMIN"))){%>
 									<i class="bi bi-x fw-bold border rounded-2 d-flex justify-content-center align-items-center"
 									   style="width: 24px; height: 24px; cursor: pointer; font-style: normal;"
 									   onclick="deleteArticle('<%= article.articleId() %>', '/board/boardentrance.do?category=0')"></i>
@@ -182,6 +205,15 @@
 	</article>
 	
 </section>
+<script>
+	const CKEDITOR_INITIAL_DATA = "";
+</script>
+<script src="https://cdn.ckeditor.com/ckeditor5/45.1.0/ckeditor5.umd.js" crossorigin></script>
+<script src="https://cdn.ckeditor.com/ckeditor5/45.1.0/translations/ko.umd.js" crossorigin></script>
+<script src="https://cdn.ckbox.io/ckbox/2.6.1/ckbox.js" crossorigin></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="<%=request.getContextPath()%>/resources/js/board/board.js"></script>
+
 
 <%@include file="/WEB-INF/views/common/footer.jsp" %>
+			
