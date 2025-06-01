@@ -106,7 +106,7 @@ public class IdPwFindController extends HttpServlet {
             
             if (foundUserId != null && !foundUserId.trim().isEmpty()) {
                 // 아이디 마스킹 처리 (보안)
-                String maskedUserId = maskUserId(foundUserId);
+                String maskedUserId = foundUserId;
                 
                 result.put("success", true);
                 result.put("userId", maskedUserId);
@@ -194,6 +194,9 @@ public class IdPwFindController extends HttpServlet {
     /**
      * 비밀번호 초기화 처리
      */
+    /**
+     * 비밀번호 변경 처리
+     */
     private void handlePasswordReset(HttpServletRequest request, HttpServletResponse response, 
             Map<String, Object> result) throws Exception {
         
@@ -209,28 +212,38 @@ public class IdPwFindController extends HttpServlet {
                 return;
             }
             
+            // 새 비밀번호 가져오기
+            String newPassword = request.getParameter("newPassword");
+            
+            // 최소한의 서버 검증 (보안상 필요)
+            if (newPassword == null || newPassword.trim().isEmpty()) {
+                result.put("success", false);
+                result.put("message", "새 비밀번호를 입력해주세요.");
+                return;
+            }
+            
             try {
-                // 비밀번호를 abcd1234!로 초기화
-                boolean resetSuccess = userService.resetUserPassword(verifiedUserId);
+                // 사용자가 입력한 새 비밀번호로 변경
+                boolean updateSuccess = userService.updateUserPassword(verifiedUserId, newPassword);
                 
-                if (resetSuccess) {
+                if (updateSuccess) {
                     // 세션 정리
                     session.removeAttribute("verifiedUserId");
                     
                     result.put("success", true);
-                    result.put("message", "비밀번호가 abcd1234!로 초기화되었습니다.");
+                    result.put("message", "비밀번호가 성공적으로 변경되었습니다.");
                     
-                    System.out.println("비밀번호 초기화 성공: " + verifiedUserId);
+                    System.out.println("비밀번호 변경 성공: " + verifiedUserId);
                     
                 } else {
                     result.put("success", false);
-                    result.put("message", "비밀번호 초기화에 실패했습니다.");
+                    result.put("message", "비밀번호 변경에 실패했습니다.");
                 }
                 
             } catch (Exception e) {
                 e.printStackTrace();
                 result.put("success", false);
-                result.put("message", "비밀번호 초기화 중 오류가 발생했습니다.");
+                result.put("message", "비밀번호 변경 중 오류가 발생했습니다.");
             }
             
         } else {
@@ -243,17 +256,17 @@ public class IdPwFindController extends HttpServlet {
      * 아이디 마스킹 처리 (보안)
      * 예: hong1234dong -> hong***dong
      */
-    private String maskUserId(String userId) {
-        if (userId == null || userId.length() <= 3) {
-            return userId;
-        }
-        
-        if (userId.length() <= 6) {
-            return userId.substring(0, 2) + "***" + userId.substring(userId.length() - 1);
-        } else {
-            return userId.substring(0, 3) + "***" + userId.substring(userId.length() - 2);
-        }
-    }
+//    private String maskUserId(String userId) {
+//        if (userId == null || userId.length() <= 3) {
+//            return userId;
+//        }
+//        
+//        if (userId.length() <= 6) {
+//            return userId.substring(0, 2) + "***" + userId.substring(userId.length() - 1);
+//        } else {
+//            return userId.substring(0, 3) + "***" + userId.substring(userId.length() - 2);
+//        }
+//    }
     
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 

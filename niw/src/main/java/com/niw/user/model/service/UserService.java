@@ -89,19 +89,16 @@ public enum UserService {
 	    
 	    return userEmail;
 	}
-
+	
 	/**
-	 * 사용자 비밀번호 초기화 (abcd1234!로 변경)
-	 * @param userId 사용자 아이디
-	 * @return 성공 시 true, 실패 시 false
+	 * 사용자 비밀번호 변경 (사용자가 입력한 새 비밀번호로)
 	 */
-	public boolean resetUserPassword(String userId) {
+	public boolean updateUserPassword(String userId, String newPassword) {
 	    Connection conn = getConnection();
 	    int result = 0;
 	    
 	    try {
-	        // 비밀번호를 abcd1234!로 초기화
-	        result = dao.updateUserPassword(conn, userId, "abcd1234!");
+	        result = dao.updateUserPassword(conn, userId, newPassword);
 	        
 	        if (result > 0) {
 	            commit(conn);
