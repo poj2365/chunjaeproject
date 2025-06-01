@@ -509,7 +509,7 @@
             
             // 로그인 페이지로 이동 버튼
             $('#go-to-login-btn').on('click', function() {
-                window.location.href = 'userLoginView';
+                window.location.href = '<%=request.getContextPath()%>/user/loginview.do';
             });
             
             // 생년월일 입력값 제한 (숫자만)
