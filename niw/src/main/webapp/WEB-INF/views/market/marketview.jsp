@@ -18,7 +18,7 @@
 
 <style>
 .material-container {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #ffffff;
     min-height: calc(100vh - 200px);
     padding: 2rem 0;
 }
@@ -49,7 +49,7 @@
 }
 
 .filter-btn {
-    background: linear-gradient(45deg, #667eea, #764ba2);
+    background: linear-gradient(45deg, var(--bs-blind-gray), var(--bs-blind-dark));
     border: none;
     color: white;
     padding: 0.5rem 1rem;
@@ -66,9 +66,9 @@
 }
 
 .filter-btn.active {
-    background: linear-gradient(45deg, #ff6b6b, #ffa726);
+    background: linear-gradient(45deg, var(--bs-blind-accent), #ff6a36);
     transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+    box-shadow: 0 4px 15px rgba(255, 125, 77, 0.3);
 }
 
 .material-grid {
@@ -86,6 +86,9 @@
     transition: all 0.3s ease;
     position: relative;
     cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
 .material-card:hover {
@@ -96,12 +99,12 @@
 .card-image {
     width: 100%;
     height: 200px;
-    background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+    background: linear-gradient(135deg, var(--bs-dropdown-pastel) 0%, #a8f4f7 100%);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 3rem;
-    color: #667eea;
+    color: var(--bs-blind-dark);
     position: relative;
     overflow: hidden;
 }
@@ -129,7 +132,7 @@
 
 .card-category {
     display: inline-block;
-    background: linear-gradient(45deg, #667eea, #764ba2);
+    background: linear-gradient(45deg, var(--bs-blind-gray), var(--bs-blind-dark));
     color: white;
     padding: 0.25rem 0.75rem;
     border-radius: 15px;
@@ -168,7 +171,7 @@
 .card-price {
     font-size: 1.25rem;
     font-weight: 700;
-    color: #667eea;
+    color: var(--bs-blind-dark);
     text-align: right;
 }
 
@@ -190,31 +193,77 @@
     gap: 0.25rem;
 }
 
+.card-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 1rem;
+}
+
+.btn-card-download,
+.btn-card-purchase {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    min-width: 100px;
+    justify-content: center;
+}
+
+.btn-card-download {
+    background: linear-gradient(45deg, #48bb78, #38a169);
+    color: white;
+}
+
+.btn-card-download:hover {
+    background: linear-gradient(45deg, #38a169, #2f855a);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(72, 187, 120, 0.3);
+}
+
+.btn-card-purchase {
+    background: linear-gradient(45deg, var(--bs-blind-gray), var(--bs-blind-dark));
+    color: white;
+}
+
+.btn-card-purchase:hover {
+    background: linear-gradient(45deg, var(--bs-blind-dark), var(--bs-blind-light-gray));
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(26, 138, 142, 0.3);
+}
+
 .result-summary {
     text-align: center;
     margin-bottom: 2rem;
 }
 
 .result-text {
-    color: white;
+    color: var(--bs-blind-dark);
     font-size: 1.1rem;
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(26, 138, 142, 0.1);
     backdrop-filter: blur(10px);
     padding: 1rem 2rem;
     border-radius: 50px;
     display: inline-block;
+    border: 1px solid rgba(26, 138, 142, 0.2);
 }
 
 .no-results {
     text-align: center;
     padding: 4rem 2rem;
-    color: white;
+    color: #6c757d;
 }
 
 .no-results i {
     font-size: 4rem;
     margin-bottom: 1rem;
     opacity: 0.5;
+    color: var(--bs-blind-gray);
 }
 
 .pagination-container {
@@ -226,7 +275,7 @@
 .pagination .page-link {
     background: rgba(255, 255, 255, 0.9);
     border: none;
-    color: #667eea;
+    color: var(--bs-blind-dark);
     font-weight: 500;
     margin: 0 0.25rem;
     border-radius: 10px;
@@ -234,13 +283,13 @@
 }
 
 .pagination .page-item.active .page-link {
-    background: linear-gradient(45deg, #667eea, #764ba2);
+    background: linear-gradient(45deg, var(--bs-blind-gray), var(--bs-blind-dark));
     color: white;
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 4px 15px rgba(26, 138, 142, 0.3);
 }
 
 .pagination .page-link:hover {
-    background: linear-gradient(45deg, #667eea, #764ba2);
+    background: linear-gradient(45deg, var(--bs-blind-gray), var(--bs-blind-dark));
     color: white;
     transform: translateY(-2px);
 }
@@ -343,48 +392,66 @@
                             <% if (material.thumbnailFilePaths() != null && !material.thumbnailFilePaths().isEmpty() 
                                    && !material.thumbnailFilePaths().get(0).trim().isEmpty()) { %>
                                 <img src="<%= request.getContextPath() %>/<%= material.thumbnailFilePaths().get(0) %>" 
-                                     alt="<%= material.materialTitle() %>" class="card-thumbnail">
+                                     alt="<%= material.materialTitle() %>" class="card-thumbnail"
+                                     onerror="this.style.display='none'; this.parentNode.innerHTML='<i class=\'bi bi-file-earmark-text\'></i>';">
                             <% } else { %>
                                 <i class="bi bi-file-earmark-text"></i>
                             <% } %>
                         </div>
                         
                         <div class="card-content">
-                            <div class="card-category">
-                                <%= material.materialCategory() %> • <%= material.materialGrade() %> • <%= material.materialSubject() %>
-                            </div>
-                            
-                            <h5 class="card-title"><%= material.materialTitle() %></h5>
-                            
-                            <p class="card-instructor">
-                                <i class="bi bi-person-circle me-1"></i><%= material.instructorName() %>
-                            </p>
-                            
-                            <div class="card-info">
-                                <span><i class="bi bi-file-text me-1"></i><%= material.materialPage() %>페이지</span>
-                                <span><i class="bi bi-star-fill me-1"></i><%= String.format("%.1f", material.materialRating()) %></span>
-                            </div>
-                            
-                            <div class="card-price <%= material.materialPrice() == 0 ? "price-free" : "" %>">
-                                <% if (material.materialPrice() == 0) { %>
-                                    <i class="bi bi-gift me-1"></i>무료
-                                <% } else { %>
-                                    <i class="bi bi-currency-dollar me-1"></i><%= String.format("%,d", material.materialPrice()) %>원
-                                <% } %>
-                            </div>
-                            
-                            <div class="card-stats">
-                                <div class="stat-item">
-                                    <i class="bi bi-eye"></i>
-                                    <span><%= material.materialViewCount() %></span>
+                            <div class="card-main-info">
+                                <div class="card-category">
+                                    <%= material.materialCategory() %> • <%= material.materialGrade() %> • <%= material.materialSubject() %>
                                 </div>
-                                <div class="stat-item">
-                                    <i class="bi bi-download"></i>
-                                    <span><%= material.materialDownloadCount() %></span>
+                                
+                                <h5 class="card-title"><%= material.materialTitle() %></h5>
+                                
+                                <p class="card-instructor">
+                                    <i class="bi bi-person-circle me-1"></i><%= material.instructorName() %>
+                                </p>
+                                
+                                <div class="card-info">
+                                    <span><i class="bi bi-file-text me-1"></i><%= material.materialPage() %>페이지</span>
+                                    <span><i class="bi bi-star-fill me-1"></i><%= String.format("%.1f", material.materialRating()) %></span>
                                 </div>
-                                <div class="stat-item">
-                                    <i class="bi bi-chat-dots"></i>
-                                    <span><%= material.materialCommentCount() %></span>
+                                
+                                <div class="card-price <%= material.materialPrice() == 0 ? "price-free" : "" %>">
+                                    <% if (material.materialPrice() == 0) { %>
+                                        <i class="bi bi-gift me-1"></i>무료
+                                    <% } else { %>
+                                        <i class="bi bi-currency-dollar me-1"></i><%= String.format("%,d", material.materialPrice()) %>원
+                                    <% } %>
+                                </div>
+                            </div>
+                            
+                            <div class="card-bottom">
+                                <div class="card-stats">
+                                    <div class="stat-item">
+                                        <i class="bi bi-eye"></i>
+                                        <span><%= material.materialViewCount() %></span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <i class="bi bi-download"></i>
+                                        <span><%= material.materialDownloadCount() %></span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <i class="bi bi-chat-dots"></i>
+                                        <span><%= material.materialCommentCount() %></span>
+                                    </div>
+                                </div>
+                                
+                                <!-- 구매하기 버튼 -->
+                                <div class="card-actions mt-3">
+                                    <% if (material.materialPrice() == 0) { %>
+                                        <button class="btn-card-download" onclick="event.stopPropagation(); downloadMaterial(<%= material.materialId() %>)">
+                                            <i class="bi bi-download me-1"></i>무료 다운로드
+                                        </button>
+                                    <% } else { %>
+                                        <button class="btn-card-purchase" onclick="event.stopPropagation(); purchaseMaterial(<%= material.materialId() %>)">
+                                            <i class="bi bi-cart-plus me-1"></i>구매하기
+                                        </button>
+                                    <% } %>
                                 </div>
                             </div>
                         </div>
@@ -496,16 +563,28 @@ $(document).ready(function() {
     function showLoading() {
         $('.material-grid').html(`
             <div style="grid-column: 1 / -1; text-align: center; padding: 3rem;">
-                <div class="spinner-border text-light" role="status">
+                <div class="spinner-border text-primary" role="status">
                     <span class="visually-hidden">Loading...</span>
                 </div>
-                <p class="text-light mt-2">자료를 불러오는 중...</p>
+                <p class="text-muted mt-2">자료를 불러오는 중...</p>
             </div>
         `);
     }
     
     // 초기 로드시 학년 버튼 조정
     adjustGradeButtons(currentCategory);
+    
+    // 이미지 로딩 에러 처리
+    $('.card-thumbnail').on('error', function() {
+        console.log('이미지 로딩 실패:', $(this).attr('src'));
+        $(this).hide();
+        $(this).parent().html('<i class="bi bi-file-earmark-text"></i>');
+    });
+    
+    // 이미지 로딩 성공 확인
+    $('.card-thumbnail').on('load', function() {
+        console.log('이미지 로딩 성공:', $(this).attr('src'));
+    });
     
     // 카드 호버 애니메이션
     $('.material-card').hover(
@@ -545,6 +624,32 @@ $(document).ready(function() {
         }, index * 100);
     });
 });
+
+// 자료 구매하기
+function purchaseMaterial(materialId) {
+    <% if (loginUser == null) { %>
+        alert('로그인이 필요한 서비스입니다.');
+        location.href = '<%= request.getContextPath() %>/user/loginview.do';
+        return;
+    <% } %>
+    
+    // 상세페이지로 이동해서 구매 진행
+    location.href = '<%= request.getContextPath() %>/market/detail.do?id=' + materialId;
+}
+
+// 무료 자료 다운로드
+function downloadMaterial(materialId) {
+    <% if (loginUser == null) { %>
+        alert('로그인이 필요한 서비스입니다.');
+        location.href = '<%= request.getContextPath() %>/user/loginview.do';
+        return;
+    <% } %>
+    
+    if (confirm('이 자료를 다운로드하시겠습니까?')) {
+        // 바로 다운로드 처리
+        location.href = '<%= request.getContextPath() %>/market/download.do?id=' + materialId;
+    }
+}
 </script>
 
 <%@ include file="/WEB-INF/views/common/footer.jsp" %>

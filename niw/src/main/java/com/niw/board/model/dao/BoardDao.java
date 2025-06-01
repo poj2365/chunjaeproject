@@ -84,6 +84,27 @@ public enum BoardDao {
 		}
 		return articles;
 	}
+	public List<Article> searchArticleByUser(Connection conn, String userId, String order, int cPage, int numPerPage, int totalData){
+		List<Article> articles = new ArrayList<>();
+		try {
+			String sql =  sqlPro.getProperty("searchArticle");
+			String finalSql = sql.formatted(order);
+			pstmt = conn.prepareStatement(finalSql);
+			pstmt.setString(1, userId);
+			pstmt.setInt(2, (cPage - 1) * numPerPage + 1);
+			pstmt.setInt(3, totalData > cPage * numPerPage? cPage * numPerPage : totalData);
+			rs = pstmt.executeQuery();
+			while(rs.next()) {
+				articles.add(getArticle(rs));
+			}
+		} catch(SQLException e) {
+			e.printStackTrace();
+		} finally {
+			close(rs);
+			close(pstmt);
+		}
+		return articles;
+	}
 	
 	public int countArticle(Connection conn, int category, String searchData, int likes) {
 		int result = 0;

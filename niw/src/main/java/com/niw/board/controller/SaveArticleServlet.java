@@ -56,7 +56,7 @@ public class SaveArticleServlet extends HttpServlet {
 			        "figure", "figcaption", "picture", "source",
 			        "iframe", "table", "tbody", "thead", "tfoot", "tr", "td", "th", "colgroup", "col",
 			        "blockquote", "p", "ul", "ol", "li", "a", "br", "hr", "span", "div",
-			        "strong", "em", "u", "del", "code", "pre"
+			        "strong", "em", "u", "del", "code", "pre", "oembed"
 			    )
 			    .addAttributes("img", "src", "width", "height", "alt", "data-ckbox-resource-id", "srcset", "sizes")
 			    .addAttributes("a", "href", "target", "rel", "download", "data-ckbox-resource-id")
@@ -70,6 +70,7 @@ public class SaveArticleServlet extends HttpServlet {
 			    .addAttributes("div", "style")
 			    .addAttributes("blockquote", "class", "style")
 			    .addAttributes("p", "class", "style")
+			    .addAttributes("oembed", "url")
 			); 
 		String userId = ((User) request.getSession().getAttribute("loginUser")).userId();
 		int result = BoardService.SERVICE.saveArticle(Article.builder()

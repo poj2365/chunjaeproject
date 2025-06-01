@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
-		<%@ include file="/WEB-INF/views/common/header.jsp"%>
+
+<%@ include file="/WEB-INF/views/common/header.jsp"%>
 <%
 // 메시지 처리
 String errorMessage = (String) request.getAttribute("errorMessage");
@@ -17,7 +18,7 @@ if (loginUser != null) {
 	if (redirect != null && !redirect.isEmpty()) {
 		response.sendRedirect(redirect);
 	} else {
-		response.sendRedirect(request.getContextPath() + "/dashboard");
+		response.sendRedirect(request.getContextPath() + "/");
 	}
 	return;
 }
@@ -28,8 +29,7 @@ if (loginUser != null) {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>로그인 - 학습메이트</title>
-<link rel="stylesheet"
-	href="<%=request.getContextPath()%>/resources/css/login.css">
+<link rel="stylesheet" href="<%=request.getContextPath()%>/resources/css/login.css">
 <!-- Bootstrap CSS -->
 <link
 	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
@@ -136,7 +136,7 @@ if (loginUser != null) {
 										for="rememberMe"> 아이디 저장 </label>
 								</div>
 								<div class="login-options">
-									<a href="<%=request.getContextPath()%>/auth/find-account">아이디/비밀번호
+									<a href="<%=request.getContextPath()%>/useridpwfindview.do">아이디/비밀번호
 										찾기</a>
 								</div>
 							</div>
