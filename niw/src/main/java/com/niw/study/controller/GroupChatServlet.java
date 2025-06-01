@@ -7,20 +7,19 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.niw.study.model.service.GroupMemberService;
-import com.niw.study.model.service.GroupRequestService;
+import com.niw.common.CommonTemplate;
 
 /**
- * Servlet implementation class GroupMemberUpdateServlet
+ * Servlet implementation class GroupChatServlet
  */
-@WebServlet("/study/updategroupmember.do")
-public class GroupMemberUpdateServlet extends HttpServlet {
+@WebServlet("/study/groupchat.do")
+public class GroupChatServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public GroupMemberUpdateServlet() {
+    public GroupChatServlet() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -29,11 +28,9 @@ public class GroupMemberUpdateServlet extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String userId = request.getParameter("userId");
 		String groupNumber = request.getParameter("groupNumber");
-		String status = "APPROVED";
-		int result = GroupRequestService.SERVICE.updateGroupRequest(userId,groupNumber,status);
-		int updateMember = GroupMemberService.SERVICE.updateGroupMember(userId,groupNumber,status);
+		request.setAttribute("groupNumber", Integer.parseInt(groupNumber));
+		request.getRequestDispatcher(CommonTemplate.WEB_VIEWS+"/study/groupChat.jsp").forward(request, response);
 	}
 
 	/**

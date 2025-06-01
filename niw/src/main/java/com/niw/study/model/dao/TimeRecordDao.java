@@ -110,5 +110,26 @@ public enum TimeRecordDao {
 		}
 		return trList;
 	}
+
+	public List<TimeRecord> searchTimeTodayGroup(Connection conn, String groupNumber, LocalDateTime startDate,
+			 LocalDateTime endDate) {
+			List<TimeRecord> trListGroup = new ArrayList<TimeRecord>();
+			try {
+				pstmt = conn.prepareStatement(sql.getProperty("searchTimeTodayGroup"));
+				pstmt.setInt(1, Integer.parseInt(groupNumber));
+				pstmt.setTimestamp(2,  Timestamp.valueOf(startDate));
+				pstmt.setTimestamp(3,  Timestamp.valueOf(endDate));
+				rs = pstmt.executeQuery();
+				while (rs.next()) {
+					trListGroup.add(getTime(rs));
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			} finally {
+				JDBCTemplate.close(rs);
+				JDBCTemplate.close(pstmt);
+			}
+			return trListGroup;
+		}
 }
 

@@ -95,7 +95,8 @@ public enum GroupRequestDao {
 	public int updateGroupRequest(Connection conn, String userId, String groupNumber, String status) {
 			int result = 0;
 			try {
-				pstmt=conn.prepareStatement(sql.getProperty("rejectGroupRequest"));
+				pstmt=conn.prepareStatement(sql.getProperty("updateGroupRequest"));
+				System.out.println(status+ " : "+userId+":"+groupNumber);
 				pstmt.setString(1, status);
 				pstmt.setString(2, userId);
 				pstmt.setInt(3, Integer.parseInt(groupNumber));
