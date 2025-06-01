@@ -74,7 +74,7 @@ public class MaterialListServlet extends HttpServlet {
             request.setAttribute("selectedSubject", subject);
             
             // JSP로 포워딩
-            request.getRequestDispatcher("/WEB-INF/views/market/materialList.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/views/market/marketview.jsp").forward(request, response);
             
         } finally {
             JDBCTemplate.close(conn);
