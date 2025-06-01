@@ -84,4 +84,36 @@
 <script src="https://cdn.ckbox.io/ckbox/2.6.1/ckbox.js" crossorigin></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="<%=request.getContextPath()%>/resources/js/board/board.js"></script>
+<script>
+	/* Flatpickr */
+	const select = document.getElementById('scheduleSelect');
+	const customInput = document.getElementById('customDatetime');
+	const now = new Date();
+	const fp = flatpickr(customInput, {
+	  enableTime: true,
+	  dateFormat: "Y-m-d H:i",
+	  time_24hr: true,
+	  defaultDate: now,
+	  minDate: now,
+	  onChange: function() {
+	    const selected = selectedDates[0];
+	    const current = new Date();
+	    if (selected < current) {
+	        alert("현재 시각 이후 시간만 선택 가능합니다.");
+	        scheduleSelect.value = "0";
+	        customInput.classList.add('d-none');
+	    	}
+	    }
+	});
+	
+	select.addEventListener('change', () => {
+	  if (select.value === '-1') {
+	    customInput.classList.remove('d-none');
+	    fp.open();
+	  } else {
+	    customInput.classList.add('d-none');
+	  }
+	});
+</script>
+
 <%@include file="/WEB-INF/views/common/footer.jsp" %>
