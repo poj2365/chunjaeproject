@@ -42,6 +42,26 @@ public enum UserDao {
 		return user;
 	}
 	
+	
+	public String findId(Connection conn, String userName, String userEmail) {
+		String result= null;
+		try {
+			pstmt = conn.prepareStatement(sql.getProperty("findId"));
+			pstmt.setString(1, userEmail);
+			pstmt.setString(2, userName);
+			rs = pstmt.executeQuery();
+			if(rs.next()) {
+				result = rs.getString("USER_ID");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			close(rs);
+			close(pstmt);
+		}
+		return result;
+	}
+	
 	public User getUser(ResultSet rs) throws SQLException {
 		return User.builder()
 				.userId(rs.getString("USER_ID"))
@@ -97,6 +117,58 @@ public enum UserDao {
 	        close(pstmt);
 	    }
 	    
+	    return result;
+	}
+	
+	// UserDao 클래스에 추가할 메서드들
+
+	/**
+	 * 비밀번호 찾기를 위한 사용자 이메일 조회
+	 * @param conn 데이터베이스 연결
+	 * @param userId 사용자 아이디
+	 * @param userName 사용자 이름
+	 * @param birthDate 생년월일 (YYYY-MM-DD 형식)
+	 * @return 사용자 이메일 (해당하는 사용자가 없으면 null)
+	 */
+	public String getUserEmailForPasswordReset(Connection conn, String userId, String userName, String birthDate) {
+	    String userEmail = null;
+	    try {
+	        pstmt = conn.prepareStatement(sql.getProperty("getUserEmailForPasswordReset"));
+	        pstmt.setString(1, userId);
+	        pstmt.setString(2, userName);
+	        pstmt.setString(3, birthDate);
+	        rs = pstmt.executeQuery();
+	        if(rs.next()) {
+	            userEmail = rs.getString("USER_EMAIL");
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    } finally {
+	        close(rs);
+	        close(pstmt);
+	    }
+	    return userEmail;
+	}
+
+	/**
+	 * 사용자 비밀번호 업데이트
+	 * @param conn 데이터베이스 연결
+	 * @param userId 사용자 아이디
+	 * @param newPassword 새로운 비밀번호
+	 * @return 업데이트 성공 시 1, 실패 시 0
+	 */
+	public int updateUserPassword(Connection conn, String userId, String newPassword) {
+	    int result = 0;
+	    try {
+	        pstmt = conn.prepareStatement(sql.getProperty("updateUserPassword"));
+	        pstmt.setString(1, newPassword);
+	        pstmt.setString(2, userId);
+	        result = pstmt.executeUpdate();
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    } finally {
+	        close(pstmt);
+	    }
 	    return result;
 	}
 }

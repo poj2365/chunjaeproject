@@ -136,7 +136,7 @@ if (loginUser != null) {
 										for="rememberMe"> 아이디 저장 </label>
 								</div>
 								<div class="login-options">
-									<a href="<%=request.getContextPath()%>/auth/find-account">아이디/비밀번호
+									<a href="<%=request.getContextPath()%>/useridpwfindview.do">아이디/비밀번호
 										찾기</a>
 								</div>
 							</div>
