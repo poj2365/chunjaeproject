@@ -141,14 +141,14 @@ public class IdPwFindController extends HttpServlet {
         System.out.println("세션의 이메일: " + userEmail);
         System.out.println("세션의 사용자ID: " + resetUserId);
         
-        // ⭐ 주석 해제: 인증번호 입력 검증
+     
         if (emailCode == null || emailCode.trim().isEmpty()) {
             result.put("success", false);
             result.put("message", "인증번호를 입력해주세요.");
             return;
         }
         
-        // ⭐ 주석 해제: 세션에서 이메일 정보 확인
+        
         if (userEmail == null || userEmail.trim().isEmpty()) {
             result.put("success", false);
             result.put("message", "인증번호 발송 후 다시 시도해주세요.");
