@@ -1,14 +1,15 @@
+<%@page import="com.niw.user.model.dto.User"%>
 <%@page import="com.niw.study.model.dto.TimeRecord"%>
 <%@page import="com.niw.study.model.dto.Calendar"%>
 <%@page import="java.util.List"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
-<%@include file="/WEB-INF/views/common/header.jsp"%>
-<script
-	src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.17/index.global.min.js'></script>
+<script src="<%=request.getContextPath()%>/resources/js/jquery-3.7.1.min.js"></script>
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.17/index.global.min.js'></script>
 <%
 List<Calendar> calendarList = (List<Calendar>) request.getAttribute("calendar");
 List<TimeRecord> trList = (List<TimeRecord>) request.getAttribute("trList");
+User loginUser= (User)session.getAttribute("loginUser");
 %>
 <style>
 .cal-container {
@@ -188,6 +189,7 @@ form button:hover {
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         padding: 30px;
         min-height: 450px;
+        width:1000px;
     }
     
     .loading-content {
@@ -225,49 +227,6 @@ form button:hover {
         }
     }
 </style>
-<section>
-<!-- 메인 컨테이너 -->
-<div class="mypage-container">
-    <!-- 사이드바 영역 -->
-    <div class="sidebar">
-        <div class="profile-section">
-            <div class="profile-pic">
-                <i class="bi bi-person-circle" style="font-size: 60px; color: #ccc;"></i>
-            </div>
- 			<% if(loginUser!=null){%>
-            <div class="user-id"><%=loginUser.userId() %></div>
-            <div class="user-name"><%=loginUser.userName() %></div>
-            <div class="point-info">포인트:<%=loginUser.userPoint() %> P</div>
-            <% }else{%>
-            <div class="user-id">Guest</div>
-           <%  }%>
-        </div>
-        <div class="menu-section">
-            <div class="menu-title">스터디 그룹</div>
-            <ul>
-                <li class="menu-item" data-tab="grouplist">
-                    <i class="bi bi-person-plus"></i>스터디 모집
-                </li>
-                <li class="menu-item" data-tab="studygroup">
-                    <i class="bi bi-people"></i>내 스터디 그룹
-                </li>
-            </ul>
-        </div>
-			<div class="menu-section">
-				<div class="menu-title">공부</div>
-				<ul>
-					<li class="menu-item" data-tab="record"><i class="bi bi-clock"></i>공부
-						시간 기록</li>
-					<li class="menu-item" data-tab="rank"><i
-						class="bi bi-trophy"></i>랭킹</li>
-					<li class="menu-item active" data-tab="calendar"><i
-						class="bi bi-calendar-check"></i>스터디 플래너</li>
-				</ul>
-			</div>
-		</div>
-    
-    <!-- 메인 컨텐츠 영역 -->
-    <div class="main-content">
 <div class="cal-container">
 		<div id='calendar'></div>
 	</div>
@@ -308,7 +267,6 @@ const timeRecordTitle = [
        } %>
   ];
 
-      document.addEventListener('DOMContentLoaded', function() {
   	    // 사이드바 메뉴 클릭 이벤트
   	    $('.menu-item').on('click', function() {
   	        var $this = $(this);
@@ -326,6 +284,7 @@ const timeRecordTitle = [
   	        }
   	    });
   	  	
+  	  function initCalendar() {
         var calendarEl = document.getElementById('calendar');
         <% if(loginUser==null){ %>
         var calendar = new FullCalendar.Calendar(calendarEl, {
@@ -386,10 +345,8 @@ const timeRecordTitle = [
     		    	document.getElementById("insertForm").style.display = "none";
     		    	document.getElementById("updateForm").style.display = "block";
 	    		    document.getElementById("content").textContent = data.calendarContent;
+	    		    document.getElementById("start").value = formatDateToInput(data.startTime);
     		        if(arg.event.endStr == undefined || arg.event.endStr==""){
-    		            console.log(formatDateToInput(arg.event.start));
-    		            console.log(arg);
-    		            console.log(formatDateToInput(data.endTime));
     		            document.getElementById("end").value = formatDateToInput(data.endTime);
     		            }
     		    }).catch(error=>{
@@ -420,7 +377,7 @@ const timeRecordTitle = [
         });
         <% } %>
         calendar.render();
-      });
+      };
       
       function formatDateToInput(date) {
     	  const d = new Date(date);
@@ -456,7 +413,7 @@ const timeRecordTitle = [
     		    const content = document.getElementById('content').value;
     		    const startDate = document.getElementById('start').value;
     		    const endDate = document.getElementById('end').value;
-    		    const userId = "user_0001";
+    		    const userId = '<%=loginUser.userId()%>';
 				
     		    let jsonData = {}
     		    if(path=="calendarsave"){
@@ -506,4 +463,3 @@ const timeRecordTitle = [
     		    closeModal();
     		};
     </script>
-<%@include file="/WEB-INF/views/common/footer.jsp"%>
