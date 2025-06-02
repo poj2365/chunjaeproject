@@ -44,7 +44,7 @@ User loginUser= (User)session.getAttribute("loginUser");
             <!-- 비로그인 상태 메뉴 -->
             <a href="<%=request.getContextPath()%>/user/loginview.do" class="active"><i class="bi bi-person-circle me-1"></i>로그인</a>
             <a href="<%=request.getContextPath()%>/user/enrollview.do"><i class="bi bi-person-plus me-1"></i>회원가입</a>
-            <a href="<%=request.getContextPath()%>/cs/main.do"><i class="bi bi-headset me-1"></i>고객센터</a>
+            <a href="https://open.kakao.com/o/scWgCCzh"><i class="bi bi-headset me-1"></i>고객센터</a>
           <% } else { %>
             <!-- 로그인 상태 메뉴 -->
             <a href="<%=request.getContextPath()%>/user/logout.do"><i class="bi bi-box-arrow-right me-1"></i>로그아웃</a>
@@ -54,7 +54,7 @@ User loginUser= (User)session.getAttribute("loginUser");
             <a href="<%=request.getContextPath()%>/user/mypage.do"><i class="bi bi-person-gear me-1"></i>마이페이지</a>
             <%} %>
             <%-- <a href="<%=request.getContextPath()%>/message/list.do"><i class="bi bi-envelope me-1"></i>쪽지</a> --%>
-            <a href="<%=request.getContextPath()%>/cs/main.do"><i class="bi bi-headset me-1"></i>고객센터</a>
+            <a href="https://open.kakao.com/o/scWgCCzh"><i class="bi bi-headset me-1"></i>고객센터</a>
           <% } %>
         </div>
       </div>
