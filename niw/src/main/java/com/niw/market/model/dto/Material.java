@@ -33,7 +33,72 @@ public record Material(
 		int materialCommentCount
 		) {
 
-	
+    public static class MaterialListResult {
+        private List<Material> materials;
+        private int totalCount;
+        private int totalPage;
+        private int currentPage;
+        private int pageSize;
+        
+        // Getters and Setters
+        public List<Material> getMaterials() {
+            return materials;
+        }
+        
+        public void setMaterials(List<Material> materials) {
+            this.materials = materials;
+        }
+        
+        public int getTotalCount() {
+            return totalCount;
+        }
+        
+        public void setTotalCount(int totalCount) {
+            this.totalCount = totalCount;
+        }
+        
+        public int getTotalPage() {
+            return totalPage;
+        }
+        
+        public void setTotalPage(int totalPage) {
+            this.totalPage = totalPage;
+        }
+        
+        public int getCurrentPage() {
+            return currentPage;
+        }
+        
+        public void setCurrentPage(int currentPage) {
+            this.currentPage = currentPage;
+        }
+        
+        public int getPageSize() {
+            return pageSize;
+        }
+        
+        public void setPageSize(int pageSize) {
+            this.pageSize = pageSize;
+        }
+        
+        // 페이징 관련 편의 메서드들
+        public boolean hasNextPage() {
+            return currentPage < totalPage;
+        }
+        
+        public boolean hasPreviousPage() {
+            return currentPage > 1;
+        }
+        
+        public int getStartPage(int pageBarSize) {
+            return ((currentPage - 1) / pageBarSize) * pageBarSize + 1;
+        }
+        
+        public int getEndPage(int pageBarSize) {
+            int endPage = getStartPage(pageBarSize) + pageBarSize - 1;
+            return Math.min(endPage, totalPage);
+        }
+    }
 
 	
 }

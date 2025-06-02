@@ -2,6 +2,7 @@ package com.niw.market.controller;
 
 import java.io.IOException;
 import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -9,10 +10,15 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import com.niw.common.JDBCTemplate;
 import com.niw.market.model.dao.MaterialDao;
 import com.niw.market.model.dto.Material;
+import com.niw.market.model.dto.Purchase;
+import com.niw.market.model.service.MaterialService;
+import com.niw.market.model.service.PurchaseService;
+import com.niw.user.model.dto.User;
 
 @WebServlet("/market/list.do")
 public class MaterialListServlet extends HttpServlet {
@@ -45,7 +51,8 @@ public class MaterialListServlet extends HttpServlet {
         
         Connection conn = JDBCTemplate.getConnection();
         MaterialDao dao = MaterialDao.DAO;
-        
+        HttpSession session = request.getSession();
+        User loginUser=(User)session.getAttribute("loginUser");
         try {
             // 전체 개수 조회
             int totalCount = dao.getTotalCountByFilter(conn, category, grade, subject);
@@ -62,8 +69,21 @@ public class MaterialListServlet extends HttpServlet {
             
             // 페이지바 생성
             String pageBar = generatePageBar(request, cPage, totalPage, category, grade, subject);
+            List<Integer> purchases= new ArrayList<>();
+            if(loginUser!=null) {
+            	for(Material m : materials) {
+        
+            		Purchase purchase = PurchaseService.SERVICE.getPurchaseInfo(loginUser.userId(), m.materialId());
+            		if(purchase!=null) {
+            		purchases.add(purchase.materialId());
+            		}
+            	
+            	}
+            }
+            
             
             // request에 데이터 설정
+            request.setAttribute("purchases",purchases);
             request.setAttribute("materials", materials);
             request.setAttribute("pageBar", pageBar);
             request.setAttribute("totalCount", totalCount);
