@@ -479,7 +479,7 @@ function loadStats() {
 // 자료 카드 생성
 function createMaterialCard(material) {
     var imageContent = material.thumbnail ? 
-        `<img src="${material.thumbnail}" alt="${material.title}">` : 
+        `<img src="\${material.thumbnail}" alt="\${material.title}">` : 
         `<i class="bi bi-file-earmark-text placeholder-icon"></i>`;
     
     var downloadBtnClass = material.downloadCount >= material.maxDownload ? 'disabled' : '';
@@ -488,23 +488,23 @@ function createMaterialCard(material) {
     return `
         <div class="material-card">
             <div class="material-img">
-                ${imageContent}
-                <div class="download-badge">다운로드 ${material.downloadCount}회</div>
+                \${imageContent}
+                <div class="download-badge">다운로드 \${material.downloadCount}회</div>
             </div>
             <div class="material-info">
-                <div class="material-title">${material.title}</div>
-                <div class="material-meta">${material.category} > ${material.level} | ${material.author}</div>
-                <div class="material-price">${material.price.toLocaleString()}원</div>
-                <div class="material-date">구매일: ${material.purchaseDate}</div>
+                <div class="material-title">\${material.title}</div>
+                <div class="material-meta">\${material.category} > \${material.level} | \${material.author}</div>
+                <div class="material-price">\${material.price.toLocaleString()}원</div>
+                <div class="material-date">구매일: \${material.purchaseDate}</div>
                 <div class="material-actions">
-                    <button class="btn btn-download ${downloadBtnClass}" 
-                            data-material-id="${material.id}" 
+                    <button class="btn btn-download \${downloadBtnClass}" 
+                            data-material-id="\${material.id}" 
                             ${material.downloadCount >= material.maxDownload ? 'disabled' : ''}>
                         <i class="bi bi-download me-1"></i>${downloadBtnText}
                     </button>
                     <button class="btn btn-review" 
-                            data-material-id="${material.id}" 
-                            data-material-title="${material.title}">
+                            data-material-id="\${material.id}" 
+                            data-material-title="\${material.title}">
                         <i class="bi bi-star me-1"></i>리뷰작성
                     </button>
                 </div>
@@ -542,16 +542,16 @@ function createPagination(totalPages, currentPage) {
     var endPage = Math.min(totalPages, currentPage + 2);
     
     if(currentPage > 1) {
-        pagination += `<div class="page-item"><a href="#" class="page-link" data-page="${currentPage - 1}">‹</a></div>`;
+        pagination += `<div class="page-item"><a href="#" class="page-link" data-page="\${currentPage - 1}">‹</a></div>`;
     }
     
     for(var i = startPage; i <= endPage; i++) {
         var activeClass = i === currentPage ? 'active' : '';
-        pagination += `<div class="page-item ${activeClass}"><a href="#" class="page-link" data-page="${i}">${i}</a></div>`;
+        pagination += `<div class="page-item \${activeClass}"><a href="#" class="page-link" data-page="\${i}">${i}</a></div>`;
     }
     
     if(currentPage < totalPages) {
-        pagination += `<div class="page-item"><a href="#" class="page-link" data-page="${currentPage + 1}">›</a></div>`;
+        pagination += `<div class="page-item"><a href="#" class="page-link" data-page="\${currentPage + 1}">›</a></div>`;
     }
     
     $('#material-pagination').html(pagination);
