@@ -188,3 +188,39 @@
   </div>
 <%@ include file="/WEB-INF/views/common/footer.jsp"%>
 
+<!--  common -->
+<script>
+	$(document).ready(()=>{
+		// 페이지 로딩시 게시글 로드
+		loadArticle("");
+	});
+	
+	// contextPath 획득 함수
+	const getContextPath = () => {
+		return "/" + window.location.pathname.split("/")[1];
+	}
+</script>
+
+<!-- board -->
+<script>
+	const loadArticle = (searchData) => {
+		fetch(getContextPath() + "/main/article.do", {
+			method: "post",
+			headers: {
+				"Content-type":"application/json;charset=utf-8"
+			},
+			body: JSON.stringify(searchData)
+		})
+		.then(response => {
+			if(response.ok){
+				return response.json();
+			} else {
+				throw new Error('index loadArticle fail');
+			}
+		})
+		.then(data => {
+			const articles = data;
+			console.log(articles);
+		})
+	}
+</script>

@@ -31,6 +31,13 @@ public enum BoardService {
 		return articles;
 	}
 	
+	public List<Article> searchArticleByRecommend(int recommend, String searchData, int numPerPage){
+		Connection conn = getConnection();
+		List<Article> articles = BoardDao.DAO.searchArticleByRecommend(conn, recommend, searchData, numPerPage);
+		close(conn);
+		return articles;
+	}
+	
 	public int countArticle(int category, String searchData, int likes) {
 		Connection conn = getConnection();
 		int result = BoardDao.DAO.countArticle(conn, category, searchData, likes);

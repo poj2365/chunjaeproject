@@ -85,9 +85,7 @@
 		})
 		.then(data => {
 			const list = data['list'];
-			if(list.length > 0){
-				$container.html("");
-        	}
+			$container.html("");
 			const pageBar = data['pageBar'];
 			$pageBar.html("");
 			$pageBar.append(pageBar);

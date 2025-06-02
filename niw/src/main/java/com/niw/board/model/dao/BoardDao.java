@@ -106,6 +106,25 @@ public enum BoardDao {
 		return articles;
 	}
 	
+	public List<Article> searchArticleByRecommend(Connection conn, int recommend, String searchData, int numPerPage){
+		List<Article> articles = new ArrayList<>();
+		try {
+			pstmt = conn.prepareStatement(sqlPro.getProperty("searchArticleByRecommend"));
+			pstmt.setInt(1, recommend);
+			pstmt.setString(2, searchData);
+			pstmt.setInt(3, numPerPage);
+			rs = pstmt.executeQuery();
+			while(rs.next()) {
+				articles.add(getArticle(rs));
+			}
+		} catch(SQLException e) {
+			e.printStackTrace();
+		} finally {
+			close(rs);
+			close(pstmt);
+		}
+		return articles;
+	}
 	public int countArticle(Connection conn, int category, String searchData, int likes) {
 		int result = 0;
 		try {
