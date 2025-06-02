@@ -547,36 +547,6 @@ const updateCommentWriter = (content, commentId, articleId, $original) => {
 }
 
 
-/* Flatpickr */
-const select = document.getElementById('scheduleSelect');
-const customInput = document.getElementById('customDatetime');
-const now = new Date();
-const fp = flatpickr(customInput, {
-  enableTime: true,
-  dateFormat: "Y-m-d H:i",
-  time_24hr: true,
-  defaultDate: now,
-  minDate: now,
-  onChange: function() {
-    const selected = selectedDates[0];
-    const current = new Date();
-    if (selected < current) {
-        alert("현재 시각 이후 시간만 선택 가능합니다.");
-        scheduleSelect.value = "0";
-        customInput.classList.add('d-none');
-    	}
-    }
-});
-
-select.addEventListener('change', () => {
-  if (select.value === '-1') {
-    customInput.classList.remove('d-none');
-    fp.open();
-  } else {
-    customInput.classList.add('d-none');
-  }
-});
-
 
 /*CKEditor */
 /**
@@ -638,6 +608,7 @@ const CLOUD_SERVICES_TOKEN_URL =
 	'https://ppqgdiyioua9.cke-cs.com/token/dev/cdb660b731234956a479c7c2b7fd019d528805c23c7b225ee7c5cfffe86d?limit=10';
 
 const editorConfig = {
+	
 	toolbar: {
 		items: [
 			'undo',

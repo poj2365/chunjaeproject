@@ -63,18 +63,18 @@ public enum GroupMemberService {
 	public int deleteGroupMemberById(String userId, String groupNumber) {
 		conn = JDBCTemplate.getConnection();
 		int result = dao.deleteGroupMemberById(conn, userId, groupNumber);
-		JDBCTemplate.close(conn);
 		if(result>0) JDBCTemplate.commit(conn);
 		else JDBCTemplate.rollback(conn);
+		JDBCTemplate.close(conn);
 		return result;
 	}
 
 	public int updateGroupMember(String userId, String groupNumber, String status) {
 		conn = JDBCTemplate.getConnection();
 		int result = dao.updateGroupMember(conn, userId, groupNumber, status);
-		JDBCTemplate.close(conn);
 		if(result>0) JDBCTemplate.commit(conn);
 		else JDBCTemplate.rollback(conn);
+		JDBCTemplate.close(conn);
 		return result;
 	}
 }

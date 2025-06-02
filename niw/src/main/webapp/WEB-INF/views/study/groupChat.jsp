@@ -7,19 +7,75 @@
 int groupNumber = (int) request.getAttribute("groupNumber");
 %>
 <style>
-
-.timer-container {
-	max-width: 700px;
-	min-width: 300px;
-	margin: 0 auto 30px;
-	margin-top: 20px;
-	background: white;
-	padding: 20px;
-	text-align: center;
-	background-color: white;
-	width: 100%;
+#chat-container {
+  display: flex;
+  flex-direction: column;
+  height: 500px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
 }
 
+#msg-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 15px;
+  background: #f9f9f9;
+}
+
+.chat-message {
+  max-width: 70%;
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-message.self {
+  align-items: flex-end;
+  margin-left: auto;
+}
+
+.chat-message.other {
+  align-items: flex-start;
+  margin-right: auto;
+}
+
+.chat-sender {
+  font-size: 12px;
+  color: #888;
+  margin-bottom: 4px;
+}
+
+.chat-bubble {
+  padding: 10px 14px;
+  border-radius: 18px;
+  background-color: #e0e0e0;
+  word-break: break-word;
+}
+
+.chat-message.self .chat-bubble {
+  background-color: #d0e6ff;
+}
+
+#msg-input-area {
+  display: flex;
+  padding: 10px;
+  background: #fff;
+  border-top: 1px solid #ccc;
+}
+
+#msg {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-right: 10px;
+}
+
+#send-btn {
+  white-space: nowrap;
+}
     /* 마이페이지 전용 스타일 */
     .mypage-container {
         max-width: 1400px; /* 1200px → 1400px로 증가 */
@@ -190,14 +246,19 @@ int groupNumber = (int) request.getAttribute("groupNumber");
             <div class="profile-pic">
                 <i class="bi bi-person-circle" style="font-size: 60px; color: #ccc;"></i>
             </div>
-            <div class="user-id"></div>
-            <div class="user-name"></div>
-            <div class="point-info">포인트:P</div>
+            <% if(loginUser!=null){%>
+            <div class="user-id"><%=loginUser.userId() %></div>
+            <div class="user-name"><%=loginUser.userName() %></div>
+            <div class="point-info">포인트:<%=loginUser.userPoint() %> P</div>
+            <% }else{%>
+            <div class="user-id">Guest</div>
+           <%  }%>
+
         </div>
         <div class="menu-section">
             <div class="menu-title">스터디 그룹</div>
             <ul>
-                <li class="menu-item" data-tab="grouplist">
+                <li class="menu-item active" data-tab="grouplist">
                     <i class="bi bi-person-plus"></i>스터디 모집
                 </li>
                 <li class="menu-item" data-tab="studygroup">
@@ -208,7 +269,7 @@ int groupNumber = (int) request.getAttribute("groupNumber");
         <div class="menu-section">
             <div class="menu-title">공부</div>
             <ul>
-            	<li class="menu-item active" data-tab="record">
+            	<li class="menu-item" data-tab="record">
                     <i class="bi bi-clock"></i>공부 시간 기록
                 </li>
                 <li class="menu-item" data-tab="rank">
@@ -228,23 +289,40 @@ int groupNumber = (int) request.getAttribute("groupNumber");
 </div>
     <div id="chat-container">
         <div id="msg-container"></div>
-        <div>
-            <input type="text" id="msg">
-            <button class="btn btn-outline-primary" id="send-btn">전송</button>
+  <div id="msg-input-area">
+        <input type="text" id="msg" placeholder="메시지를 입력하세요">
+        <button class="btn btn-outline-primary" id="send-btn">전송</button>
         </div>
     </div>
-    <div id="info-container">현재 접속자 정보</div>
     </div>
     </div>
     </section>
     <script>
-        const sender="<%=loginUser.userId()%>";
+    const sender="<%=loginUser.userId()%>";
+    const groupNumber = "<%=groupNumber%>";
+    
+    $(document).ready(() => {
+        fetch("<%=request.getContextPath()%>/study/groupchathistory.do?groupNumber="+groupNumber)
+        .then(response=>{
+        	if(response.ok){
+        		return response.json();
+        	}
+        }).then(data=>{
+        	data.forEach(msg=>{
+        		msgPrint(msg);
+        	})
+        }).catch(error => {
+            console.error("데이터 불러오기 실패:", error);
+        });
+    });
+    
         //접속요청을 서버에 보냄
-        let socket=new WebSocket("ws://localhost:9090<%=request.getContextPath()%>/study/groupchat");
+        let socket=new WebSocket("ws://localhost:9090<%=request.getContextPath()%>/study/groupchat?groupNumber=" + groupNumber);
         //핸들러 등록하기
         socket.onopen=(response)=>{
             console.log(response);
-            const msg=new Message("A",sender,"","","");
+            const sendTime = new Date().toISOString();
+            const msg=new Message("A",groupNumber,sender,"",sendTime);
             socket.send(msg.msgToJson());
         }
         socket.onmessage=(e)=>{
@@ -253,50 +331,58 @@ int groupNumber = (int) request.getAttribute("groupNumber");
                 case "A" : alramMessage(message);break;
                 case "M" : msgPrint(message);break;
             }
-            /* ("#msg-container").append(("<p>"+message+"</p>")); */
         }
         $("#send-btn").click(e=>{
             const message=$("#msg").val();
             sendMessage(message);
+            document.getElementById("msg").value = "";
         });
         const alramMessage=(message)=>{
-            const $h3=("<h3>").text(message.data).css("textAlign","center");
+            const $h3=$("<h3>").text(message.data).css("textAlign","center");
             $("#msg-container").append($h3);
         }
         const msgPrint=(message)=>{
-            const $container=$("<div>").css({"display":"flex","width":"100%"});
-            const $div=$("<div>").css("width","30%");
-            const $h4=$("<h4>").text(message.data).css("marginLeft","3%");
-            const $span=$("<span>").text(message.sender);
-            $div.append($span).append($h4);
-            $container.append($div);
-            if(sender==message.sender){
-                //내 메세지면
-                $container.css("justifyContent","end");
-            }
-            $("#msg-container").append($container);
+        	const isSelf = sender === message.sender;
+        	  const $wrapper = $("<div>").addClass("chat-message").addClass(isSelf ? "self" : "other");
+        	  const $sender = $("<div>").addClass("chat-sender").text(message.sender);
+        	  const $bubble = $("<div>").addClass("chat-bubble").text(message.message);
+        	  const formatSendTime = formatDateTime(message.sendTime);
+        	  const $sendTime = $("<div>").addClass("chat-sender").text(formatSendTime);
+        	  $wrapper.append($sender).append($bubble).append($sendTime);
+        	  $("#msg-container").append($wrapper);
+        	  $("#msg-container").scrollTop($("#msg-container")[0].scrollHeight);
         }
 
 
         const sendMessage=(message)=>{
-            const msg=new Message('M',sender,'',message,'');
+        	const sendTime = new Date().toISOString();
+            const msg=new Message('M',groupNumber,sender,message,sendTime);
             //메세지 전송용 함수
             socket.send(msg.msgToJson());
         }
 
         class Message{
-            constructor(type,sender,receiver,data,room){
-                this.type=type;
+            constructor(type,groupNumber,sender,message,sendTime){
+            	this.type=type;
+                this.groupNumber=groupNumber;
                 this.sender=sender;
-                this.receiver=receiver;
-                this.data=data;
-                this.room=room;
+                this.message=message;
+                this.sendTime=sendTime;
             }
             msgToJson(){
                 return JSON.stringify(this);
             }
         }
 
+        const formatDateTime = (isoString) => {
+            const date = new Date(isoString);
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+          return `\${year}-\${month}-\${day} \${hours}:\${minutes}`;
+      	}
             
     	    // 사이드바 메뉴 클릭 이벤트
     	    $('.menu-item').on('click', function() {

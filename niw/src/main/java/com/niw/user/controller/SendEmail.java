@@ -1,5 +1,6 @@
 package com.niw.user.controller;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
@@ -193,5 +194,64 @@ public class SendEmail {
         props.put("mail.smtp.ssl.protocols", "TLSv1.2");
         
         return props;
+    }
+    
+    /**
+     * 비밀번호 찾기 인증번호 발송
+     * 
+     * @param toEmail 수신자 이메일
+     * @param verificationCode 인증번호
+     * @param userId 사용자 아이디
+     * @param userName 사용자 이름
+     * @param request HttpServletRequest (JSP 렌더링용)
+     * @param response HttpServletResponse (JSP 렌더링용)
+     * @return 발송 성공 여부
+     */
+    public boolean sendPasswordResetEmail(String toEmail, String verificationCode, 
+            String userId, String userName, HttpServletRequest request, HttpServletResponse response) {
+        try {
+            // SMTP 설정
+            Properties props = getSmtpProperties();
+            
+            // 인증정보로 세션 생성
+            Session session = Session.getInstance(props, new Authenticator() {
+                @Override
+                protected PasswordAuthentication getPasswordAuthentication() {
+                    return new PasswordAuthentication(EMAIL_ID, EMAIL_PASSWORD);
+                }
+            });
+            
+            // 메시지 작성
+            Message message = new MimeMessage(session);
+            message.setFrom(new InternetAddress(EMAIL_ID, FROM_NAME));
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail));
+            message.setSubject("학습메이트 비밀번호 찾기 인증번호");
+            
+            // JSP 템플릿을 렌더링해서 HTML 이메일 내용 생성
+            Map<String, Object> templateData = new HashMap<>();
+            templateData.put("verificationCode", verificationCode);
+            templateData.put("userId", userId);
+            templateData.put("userName", userName);
+            
+            String htmlContent = JspRendererUtil.renderJspToString(
+                "/WEB-INF/views/email/password-reset-email.jsp", 
+                templateData, 
+                request, 
+                response
+            );
+            
+            message.setContent(htmlContent, "text/html; charset=utf-8");
+            
+            // 이메일 발송
+            Transport.send(message);
+            
+            System.out.println("비밀번호 찾기 이메일 발송 성공: " + toEmail);
+            return true;
+            
+        } catch (Exception e) {
+            System.err.println("비밀번호 찾기 이메일 발송 실패: " + toEmail);
+            e.printStackTrace();
+            return false;
+        }
     }
 }

@@ -240,20 +240,25 @@ List<TimeRecord> trList = (List<TimeRecord>) request.getAttribute("trList");
 <section>
 <!-- 메인 컨테이너 -->
 <div class="mypage-container">
-    <!-- 사이드바 영역 -->
+   		 <!-- 사이드바 영역 -->
     <div class="sidebar">
         <div class="profile-section">
             <div class="profile-pic">
                 <i class="bi bi-person-circle" style="font-size: 60px; color: #ccc;"></i>
             </div>
-            <div class="user-id"></div>
-            <div class="user-name"></div>
-            <div class="point-info">포인트:P</div>
+            <% if(loginUser!=null){%>
+            <div class="user-id"><%=loginUser.userId() %></div>
+            <div class="user-name"><%=loginUser.userName() %></div>
+            <div class="point-info">포인트:<%=loginUser.userPoint() %> P</div>
+            <% }else{%>
+            <div class="user-id">Guest</div>
+           <%  }%>
+
         </div>
         <div class="menu-section">
             <div class="menu-title">스터디 그룹</div>
             <ul>
-                <li class="menu-item" data-tab="grouplist">
+                <li class="menu-item " data-tab="grouplist">
                     <i class="bi bi-person-plus"></i>스터디 모집
                 </li>
                 <li class="menu-item" data-tab="studygroup">

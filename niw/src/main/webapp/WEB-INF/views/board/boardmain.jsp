@@ -10,7 +10,6 @@
 				java.time.LocalDate,
 				java.time.Duration"%>
 <link rel="stylesheet" href="<%=request.getContextPath()%>/resources/css/board.css">
-<script src="<%=request.getContextPath()%>/resources/js/board/board.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
 <% 
@@ -26,7 +25,13 @@
             <div class="profile-pic">
                 <i class="bi bi-person-circle" style="font-size: 60px; color: #ccc;"></i>
             </div>
-            <div class="user-id">Guest</div>
+            <% if(loginUser!=null){%>
+	            <div class="user-id"><%=loginUser.userId() %></div>
+	            <div class="user-name"><%=loginUser.userName() %></div>
+	            <div class="point-info">포인트:<%=loginUser.userPoint() %> P</div>
+            <% }else{%>
+            	<div class="user-id">Guest</div>
+            <% }%>
         </div>
         <div class="menu-section">
             <div class="menu-title" >카테고리</div>
@@ -200,7 +205,15 @@
 	</article>
 	
 </section>
+<script>
+	const CKEDITOR_INITIAL_DATA = "";
+</script>
+<script src="https://cdn.ckeditor.com/ckeditor5/45.1.0/ckeditor5.umd.js" crossorigin></script>
+<script src="https://cdn.ckeditor.com/ckeditor5/45.1.0/translations/ko.umd.js" crossorigin></script>
+<script src="https://cdn.ckbox.io/ckbox/2.6.1/ckbox.js" crossorigin></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="<%=request.getContextPath()%>/resources/js/board/board.js"></script>
+
 
 <%@include file="/WEB-INF/views/common/footer.jsp" %>
 			

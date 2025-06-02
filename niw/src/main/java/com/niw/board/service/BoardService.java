@@ -24,6 +24,13 @@ public enum BoardService {
 		return articles;
 	}
 	
+	public List<Article> searchArticleByUser(String userId, String order, int cPage, int numPerPage, int totalData){
+		Connection conn = getConnection();
+		List<Article> articles = BoardDao.DAO.searchArticleByUser(conn, userId, order, cPage, numPerPage, totalData);
+		close(conn);
+		return articles;
+	}
+	
 	public int countArticle(int category, String searchData, int likes) {
 		Connection conn = getConnection();
 		int result = BoardDao.DAO.countArticle(conn, category, searchData, likes);
