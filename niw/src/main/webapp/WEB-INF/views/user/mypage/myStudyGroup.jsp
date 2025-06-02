@@ -1,14 +1,15 @@
+<%@page import="com.niw.user.model.dto.User"%>
 <%@page import="com.niw.study.model.dto.GroupMember"%>
 <%@page import="java.util.List"%>
 <%@page import="com.niw.study.model.dto.StudyGroup"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
-<%@include file="/WEB-INF/views/common/header.jsp"%>
 <!-- Chart.js CDN -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <%
 List<StudyGroup> groups = (List<StudyGroup>) request.getAttribute("groups");
 List<GroupMember> members = (List<GroupMember>) request.getAttribute("members");
+User loginUser= (User)session.getAttribute("loginUser");
 %>
 <style>
 .detail-header {
@@ -323,53 +324,7 @@ List<GroupMember> members = (List<GroupMember>) request.getAttribute("members");
         color: #333;
     }
 </style>
-<section>
-	<!-- 메인 컨테이너 -->
-	<div class="mypage-container">
-		 <!-- 사이드바 영역 -->
-    <div class="sidebar">
-        <div class="profile-section">
-            <div class="profile-pic">
-                <i class="bi bi-person-circle" style="font-size: 60px; color: #ccc;"></i>
-            </div>
-            <% if(loginUser!=null){%>
-            <div class="user-id"><%=loginUser.userId() %></div>
-            <div class="user-name"><%=loginUser.userName() %></div>
-            <div class="point-info">포인트:<%=loginUser.userPoint() %> P</div>
-            <% }else{%>
-            <div class="user-id">Guest</div>
-           <%  }%>
-
-        </div>
-        <div class="menu-section">
-            <div class="menu-title">스터디 그룹</div>
-            <ul>
-                <li class="menu-item " data-tab="grouplist">
-                    <i class="bi bi-person-plus"></i>스터디 모집
-                </li>
-                <li class="menu-item active" data-tab="studygroup">
-                    <i class="bi bi-people"></i>내 스터디 그룹
-                </li>
-            </ul>
-        </div>
-        <div class="menu-section">
-            <div class="menu-title">공부</div>
-            <ul>
-            	<li class="menu-item" data-tab="record">
-                    <i class="bi bi-clock"></i>공부 시간 기록
-                </li>
-                <li class="menu-item" data-tab="rank">
-                    <i class="bi bi-trophy"></i>랭킹
-                </li>
-                <li class="menu-item" data-tab="calendar">
-                    <i class="bi bi-calendar-check"></i>스터디 플래너
-                </li>
-            </ul>
-        </div>
-    </div>
-		<!-- 메인 컨텐츠 영역 -->
-		<div class="main-content">
-				<div class="content-header">
+<div class="content-header">
     <h2 class="content-title">내 스터디 그룹</h2>
 </div>
 			<%
@@ -502,12 +457,7 @@ List<GroupMember> members = (List<GroupMember>) request.getAttribute("members");
 					<canvas id="studyChart"></canvas>
 				</div>
 			</div>
-		</div>
-	</div>
-	<%
-	}
-	%>
-	
+	<%} %>
 	<!-- 모달 창 -->
 <div id="groupModal" class="modal">
   <div class="modal-content">
@@ -537,8 +487,6 @@ List<GroupMember> members = (List<GroupMember>) request.getAttribute("members");
 </div>
 
 	<script>
-	document.addEventListener('DOMContentLoaded', function() {
-
 	$('.tab-item').on('click', function() {
 	    var index = $(this).data('index');
 
@@ -553,24 +501,7 @@ List<GroupMember> members = (List<GroupMember>) request.getAttribute("members");
 	    document.getElementById("detailSection").style.display = "block";
 	    document.getElementById("chartSection").style.display = "none";
 	});
-
-	 // 사이드바 메뉴 클릭 이벤트
-    $('.menu-item').on('click', function() {
-        var $this = $(this);
-        var tabId = $this.data('tab');
-        if(tabId=="calendar"){
-        	location.assign("<%=request.getContextPath() %>/study/calender.do");
-        }else if(tabId=="record"){
-        	location.assign("<%=request.getContextPath() %>/study/timerecord.do");
-        }else if(tabId=="rank"){
-        	location.assign("<%=request.getContextPath() %>/study/timeranking.do");
-        }else if(tabId=="studygroup"){
-        	location.assign("<%=request.getContextPath() %>/study/groupdetail.do");
-        }else if(tabId=="grouplist"){
-        	location.assign("<%=request.getContextPath() %>/study/grouplist.do");
-        }
-    });
-	});
+	
 let showingDetail = true;
 
 document.querySelectorAll('.arrow-button').forEach(button => {
@@ -728,5 +659,3 @@ function drawChart(groupIndex,groupNumber) {
 };
 
 </script>
-</section>
-<%@include file="/WEB-INF/views/common/footer.jsp"%>
