@@ -658,6 +658,4 @@ function drawChart(groupIndex,groupNumber) {
  });
 };
 
-}      
-    
 </script>

@@ -255,9 +255,6 @@ form button:hover {
 			</form>
 		</div>
 	</div>
-    </div>
-</div>
-</section>
 <script>
 const timeRecordTitle = [
     <% if (trList != null) {
@@ -461,5 +458,5 @@ const timeRecordTitle = [
     		        location.replace("<%=request.getContextPath()%>");
     		    });
     		    closeModal();
-    		};
+    		}
     </script>

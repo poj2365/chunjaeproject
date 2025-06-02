@@ -727,8 +727,6 @@ function drawChart(groupIndex,groupNumber) {
  });
 };
 
-        
-    
 </script>
 </section>
 <%@include file="/WEB-INF/views/common/footer.jsp"%>
