@@ -88,5 +88,16 @@ public class PointService {
 		JDBCTemplate.close(conn);
 		return files;
 	}
+	
+	public List<PointRefund> showAllRefundList(){
+		List<PointRefund> lists = new ArrayList<PointRefund>();
+		Connection conn = JDBCTemplate.getConnection();
+		//lists = dao.showAllRefundList(conn);
+		JDBCTemplate.close(conn);
+		return lists;
+		
+	}
+	
+	
 
 }

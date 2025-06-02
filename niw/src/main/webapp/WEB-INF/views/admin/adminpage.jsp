@@ -190,10 +190,10 @@ if(loginUser == null || !loginUser.userRole().equals("ADMIN")) {
         
         <!-- 필요시 추가 -->
         <div class="menu-section">
-            <div class="menu-title">더미</div>
+            <div class="menu-title">환불 요청 목록</div>
             <ul>
-                <li class="menu-item" data-tab="더미">
-                    <i class="bi bi-person"></i>더미
+                <li class="menu-item" data-tab="refund">
+                    <i class="bi bi-person"></i>환불 요청 목록
                 </li>
             </ul>
          </div>
