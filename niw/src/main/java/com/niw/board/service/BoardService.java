@@ -258,5 +258,28 @@ public enum BoardService {
 		return notice;
 	}
 	
+	public int countNotice() {
+		Connection conn = getConnection();
+		int result = BoardDao.DAO.countNotice(conn);
+		close(conn);
+		return result;
+	}
 	
+	public int saveNotice(Notice notice) {
+		Connection conn = getConnection();
+		int result = BoardDao.DAO.saveNotice(conn, notice);
+		if(result > 0) commit(conn);
+		else rollback(conn);
+		close(conn);
+		return result;
+	}
+	
+	public int deleteNotice(int noticeId) {
+		Connection conn = getConnection();
+		int result = BoardDao.DAO.deleteNotice(conn, noticeId);
+		if(result > 0) commit(conn);
+		else rollback(conn);
+		close(conn);
+		return result;
+	}
 }
