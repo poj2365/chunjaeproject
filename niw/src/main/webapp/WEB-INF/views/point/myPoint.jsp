@@ -489,56 +489,171 @@ if (loginUser == null) {
 </div>
 
 <script>
+
+document.addEventListener('DOMContentLoaded', function() {
+    let allPointHistory = [];
+    loadPointHistory();
+    
+    const tabItems = document.querySelectorAll('.tab-item');
+    tabItems.forEach(tab => {
+        tab.addEventListener('click', function() {
+            // 활성화된 탭 스타일 변경
+            tabItems.forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+            
+            // 선택된 타입으로 필터링
+            const selectedType = this.getAttribute('data-type');
+            filterPointHistory(selectedType);
+        });
+    });
+    
+    function loadPointHistory() {
+        $.post('<%=request.getContextPath()%>/point/pointhistory.do', { 
+            userId: '<%=loginUser.userId()%>' 
+        })
+        .done(response => {
+            console.log(response);
+            allPointHistory = response; 
+            displayPointHistory(response); 
+        })
+        .fail(error => {
+            const history = document.getElementById('point-history-tbody');
+            history.innerHTML = '';
+            history.innerHTML = `<tr>
+                <td colspan="4" style="text-align: center; padding: 50px;">데이터를 불러올 수 없습니다.</td>
+            </tr>`;
+            console.log(error);
+        });
+    }
+    
+    function filterPointHistory(type) {
+        let filteredData = [];
+        
+        if (type === 'all') {
+            filteredData = allPointHistory;
+        } else if (type === 'plus') {
+            
+        	
+            filteredData = allPointHistory.filter(row => {
+                const changePoint = parseInt(row.changePoint) || 0;
+                return changePoint > 0;
+            });
+        } else if (type === 'minus') {
+            
+            filteredData = allPointHistory.filter(row => {
+                const changePoint = parseInt(row.changePoint) || 0;
+                return changePoint < 0;
+            });
+        }
+        
+        displayPointHistory(filteredData);
+    }
+  
+    function displayPointHistory(data) {
+        const history = document.getElementById('point-history-tbody');
+        history.innerHTML = '';
+        
+        if (data.length === 0) {
+            history.innerHTML = `<tr>
+                <td colspan="4" style="text-align: center; padding: 50px;">데이터가 없습니다.</td>
+            </tr>`;
+        } else {
+            data.forEach(row => {
+                const tr = document.createElement('tr');
+                
+                const tdDate = document.createElement('td');
+                tdDate.textContent = row["date"];
+
+                
+                const tdContent = document.createElement('td');
+                tdContent.textContent = row["content"];
+                
+                const tdChangePoint = document.createElement('td');
+                tdChangePoint.style.textAlign = 'right';
+                
+                
+                const changePoint = parseInt(row["changePoint"]) || 0;
+                if (changePoint > 0) {
+                    tdChangePoint.style.color = '#28a745'; 
+                    tdChangePoint.textContent = '+' + changePoint + 'P';
+                } else if (changePoint < 0) {
+                    tdChangePoint.style.color = '#dc3545'; 
+                    tdChangePoint.textContent = changePoint + 'P';
+                } else {
+                    tdChangePoint.textContent = changePoint + 'P';
+                }
+                
+                const tdMyPoint = document.createElement('td');
+                tdMyPoint.style.textAlign = 'right';
+                tdMyPoint.textContent = row["myPoint"] + 'P';
+                
+                tr.appendChild(tdDate);
+                tr.appendChild(tdContent);
+                tr.appendChild(tdChangePoint);
+                tr.appendChild(tdMyPoint);
+                
+                history.appendChild(tr);
+            });
+        }
+    }
+    
+   
+    const filterForm = document.getElementById('point-filter-form');
+    if (filterForm) {
+        filterForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const startDate = document.getElementById('start-date').value;
+            const endDate = document.getElementById('end-date').value;
+            const pointType = document.getElementById('point-type').value;
+            
+            let filteredData = allPointHistory;
+            
+            
+            if (startDate) {
+                filteredData = filteredData.filter(row => {
+                    return new Date(row.date) >= new Date(startDate);
+                });
+            }
+            
+            if (endDate) {
+                filteredData = filteredData.filter(row => {
+                    return new Date(row.date) <= new Date(endDate);
+                });
+            }
+            
+            
+            if (pointType !== 'all') {
+                if (pointType === 'plus') {
+                    filteredData = filteredData.filter(row => {
+                        const changePoint = parseInt(row.changePoint) || 0;
+                        return changePoint > 0;
+                    });
+                } else if (pointType === 'minus') {
+                    filteredData = filteredData.filter(row => {
+                        const changePoint = parseInt(row.changePoint) || 0;
+                        return changePoint < 0;
+                    });
+                }
+            }
+            
+            displayPointHistory(filteredData);
+            
+            // 탭 활성화 상태도 업데이트
+            const tabItems = document.querySelectorAll('.tab-item');
+            tabItems.forEach(t => t.classList.remove('active'));
+            
+            if (pointType === 'plus') {
+                document.querySelector('.tab-item[data-type="plus"]').classList.add('active');
+            } else if (pointType === 'minus') {
+                document.querySelector('.tab-item[data-type="minus"]').classList.add('active');
+            } else {
+                document.querySelector('.tab-item[data-type="all"]').classList.add('active');
+            }
+        });
+    }
+}); 
 	
-	document.addEventListener('DOMContentLoaded', function() {
-	$.post('<%=request.getContextPath()%>/point/pointhistory.do',{ userId: '<%=loginUser.userId()%>' }) 
-	// jquery $.post ajax요청임
-	.done(response=>{
-		console.log(response);
-		const history = document.getElementById('point-history-tbody');
-		history.innerHTML='';
-		
-		if (response.length==0) {
-			history.innerHTML = `<tr>
-	            					<td colspan="4" style="text-align: center; padding: 50px;">데이터가 없습니다.</td>
-		        				</tr>`
-		} else {
-			response.forEach(row => {
-			    const tr = document.createElement('tr');
-			    
-			    const tdDate = document.createElement('td');
-			    tdDate.textContent = row["date"];
-			    
-			    const tdContent = document.createElement('td');
-			    tdContent.textContent = row["content"];
-			    
-			    const tdChangePoint = document.createElement('td');
-			    tdChangePoint.style.textAlign = 'right';
-			    tdChangePoint.textContent = row["changePoint"] + 'P';
-			    
-			    const tdMyPoint = document.createElement('td');
-			    tdMyPoint.textContent = row["myPoint"];
-			    
-			    tr.appendChild(tdDate);
-			    tr.appendChild(tdContent);
-			    tr.appendChild(tdChangePoint);
-			    tr.appendChild(tdMyPoint);
-			    
-			    history.appendChild(tr);
-			});
-		}
-	}) .fail(error=>{
-		const history = document.getElementById('point-history-tbody');
-		history.innerHTML='';
-		history.innerHTML = `<tr>
-			<td colspan="4" style="text-align: center; padding: 50px;">데이터를 불러올 수 없습니다.</td>
-		</tr>`;
-		console.log(error);
-	});
-	
-	});
-		
-	
-	
+
 	
 </script>

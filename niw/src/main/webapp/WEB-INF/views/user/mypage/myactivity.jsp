@@ -459,9 +459,9 @@ function loadTimerData(response) {
                         <td>${record.subject}</td>
                         <td>${record.studyTime}</td>
                         <td>
-                            <span class="text-${achievementClass}">${record.achievement}%</span>
+                            <span class="text-\${achievementClass}">\${record.achievement}%</span>
                             <div class="progress-bar">
-                                <div class="progress-fill bg-${achievementClass}" style="width: ${record.achievement}%"></div>
+                                <div class="progress-fill bg-\${achievementClass}" style="width: \${record.achievement}%"></div>
                             </div>
                         </td>
                         <td style="text-align: left; max-width: 200px;">${record.memo || '-'}</td>
@@ -490,21 +490,21 @@ function createActivityItem(item, tabId) {
     switch(tabId) {
         case 'comments':
             if (item.comment) {
-                extraContent = `<div class="activity-comment">"${item.comment}"</div>`;
+                extraContent = `<div class="activity-comment">"\${item.comment}"</div>`;
             }
             break;
         case 'current-studies':
         case 'past-studies':
             if (item.description) {
-                extraContent = `<div class="activity-description">${item.description}</div>`;
+                extraContent = `<div class="activity-description">\${item.description}</div>`;
             }
             if (item.result && tabId === 'past-studies') {
-                extraContent += `<div class="activity-result">활동 성과: ${item.result}</div>`;
+                extraContent += `<div class="activity-result">활동 성과: \${item.result}</div>`;
             }
             break;
         case 'favorites':
             if (item.summary) {
-                extraContent = `<div class="activity-summary">${item.summary}</div>`;
+                extraContent = `<div class="activity-summary">\${item.summary}</div>`;
             }
             break;
     }
@@ -512,11 +512,11 @@ function createActivityItem(item, tabId) {
     return `
         <div class="activity-item">
             <div class="activity-info">
-                <div class="activity-title">${item.title}</div>
-                <div class="activity-meta">${item.meta}</div>
-                ${extraContent}
+                <div class="activity-title">\${item.title}</div>
+                <div class="activity-meta">\${item.meta}</div>
+                \${extraContent}
             </div>
-            <div class="activity-date">${item.date}</div>
+            <div class="activity-date">\${item.date}</div>
         </div>
     `;
 }
