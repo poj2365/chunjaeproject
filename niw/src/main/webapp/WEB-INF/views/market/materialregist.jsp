@@ -631,9 +631,9 @@
 									<label class="form-label">자료 카테고리</label> <select
 										class="form-select" name="category" required>
 										<option value="">선택해주세요</option>
-										<option value="초등">초등학교</option>
-										<option value="중등">중학교</option>
-										<option value="고등">고등학교</option>
+										<option value="초등학교">초등학교</option>
+										<option value="중학교">중학교</option>
+										<option value="고등학교">고등학교</option>
 										<option value="기타">기타</option>
 									</select>
 								</div>
@@ -1855,7 +1855,7 @@ $(document).ready(function() {
 	  }
 	}
 
-  window.addEventListener("beforeunload",e=>{
+  <%-- window.addEventListener("beforeunload",e=>{
     $.ajax({
         url : '<%=request.getContextPath()%>/market/cancleRegist.do',
         type : 'POST',
@@ -1867,7 +1867,7 @@ $(document).ready(function() {
       });
 
       return "1";
-  });
+  }); --%>
 
 </script>
 

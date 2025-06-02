@@ -36,12 +36,12 @@ public class MaterialDetailServlet extends HttpServlet {
             return;
         }
         
-        // ✅ 로그인 사용자 정보 가져오기
+  
         HttpSession session = request.getSession();
         User loginUser = (User) session.getAttribute("loginUser");
         String userId = loginUser != null ? loginUser.userId() : null;
         
-        // Service를 통해 자료 상세 조회 (조회수 증가 포함)
+     
         MaterialService service = MaterialService.SERVICE;
         Material material = service.getMaterialDetail(materialId);
         
@@ -50,17 +50,17 @@ public class MaterialDetailServlet extends HttpServlet {
             return;
         }
         
-        // ✅ 구매 여부 별도 확인
+       
         boolean isPurchased = false;
         if (userId != null) {
             isPurchased = PurchaseService.SERVICE.isPurchased(userId, materialId);
         }
         
-        // request에 자료 정보 설정
+      
         request.setAttribute("material", material);
-        request.setAttribute("isPurchased", isPurchased); // ✅ 구매 여부 별도 전달
+        request.setAttribute("isPurchased", isPurchased);
         
-        // JSP로 포워딩
+    
         request.getRequestDispatcher("/WEB-INF/views/market/materialdetail.jsp").forward(request, response);
     }
 }

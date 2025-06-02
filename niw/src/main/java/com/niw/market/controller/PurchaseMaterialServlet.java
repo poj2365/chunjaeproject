@@ -55,14 +55,14 @@ public class PurchaseMaterialServlet extends HttpServlet {
             
             String userId = loginUser.userId();
             
-            // 3. 이미 구매했는지 확인
+  
             PurchaseService purchaseService = PurchaseService.SERVICE;
             if (purchaseService.isPurchased(userId, materialId)) {
                 out.print("{\"success\": false, \"message\": \"이미 구매한 자료입니다.\"}");
                 return;
             }
             
-            // 4. 자료 정보 조회 (가격 확인)
+
             MaterialService materialService = MaterialService.SERVICE;
             Material material = materialService.getMaterialById(materialId);
             
@@ -76,7 +76,7 @@ public class PurchaseMaterialServlet extends HttpServlet {
                 return;
             }
             
-            // 5. Purchase 객체 생성
+
             Purchase purchase = Purchase.builder()
                     .userId(userId)
                     .materialId(materialId)
@@ -84,7 +84,6 @@ public class PurchaseMaterialServlet extends HttpServlet {
                     .purchaseStatus("COMPLETED")
                     .build();
             
-            // 6. 구매 등록
             int result = purchaseService.registerPurchase(purchase);
             
             if (result > 0) {

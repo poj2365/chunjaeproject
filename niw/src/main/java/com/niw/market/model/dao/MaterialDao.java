@@ -98,9 +98,7 @@ public enum MaterialDao {
         return materials;
     }
 
-    /**
-     * 필터별 자료 개수 조회
-     */
+
     public int getTotalCountByFilter(Connection conn, String category, String grade, String subject) {
         int count = 0;
         String sql = getCountSqlByFilter(category, grade, subject);
@@ -119,9 +117,7 @@ public enum MaterialDao {
         return count;
     }
 
-    /**
-     * 조회수 증가
-     */
+
     public int increaseViewCount(Connection conn, int materialId) {
         int result = 0;
         try (PreparedStatement pstmt = conn.prepareStatement(sqlProp.getProperty("increaseViewCount"))) {
@@ -133,9 +129,7 @@ public enum MaterialDao {
         return result;
     }
 
-    /**
-     * 다운로드수 증가
-     */
+  
     public int increaseDownloadCount(Connection conn, int materialId) {
         int result = 0;
         try (PreparedStatement pstmt = conn.prepareStatement(sqlProp.getProperty("increaseDownloadCount"))) {
@@ -147,9 +141,7 @@ public enum MaterialDao {
         return result;
     }
 
-    /**
-     * 필터 조건에 따른 SQL 선택
-     */
+
     private String getSqlByFilter(String category, String grade, String subject) {
         if (isNotEmpty(category) && isNotEmpty(grade) && isNotEmpty(subject)) {
             return sqlProp.getProperty("getMaterialListByAll");
@@ -169,9 +161,7 @@ public enum MaterialDao {
         }
     }
 
-    /**
-     * 필터 조건에 따른 COUNT SQL 선택
-     */
+    
     private String getCountSqlByFilter(String category, String grade, String subject) {
         if (isNotEmpty(category) && isNotEmpty(grade) && isNotEmpty(subject)) {
             return sqlProp.getProperty("getTotalCountByAll");
@@ -191,9 +181,7 @@ public enum MaterialDao {
         }
     }
 
-    /**
-     * 필터 파라미터 설정
-     */
+  
     private int setFilterParameters(PreparedStatement pstmt, String category, String grade, String subject) throws SQLException {
         int paramIndex = 1;
         
@@ -208,14 +196,12 @@ public enum MaterialDao {
             pstmt.setString(paramIndex++, category);
             pstmt.setString(paramIndex++, subject);
         }
-        // 단일 카테고리나 전체 조회의 경우 파라미터 없음
+     
         
         return paramIndex;
     }
 
-    /**
-     * 문자열이 비어있지 않고 "전체"가 아닌지 확인
-     */
+   
     private boolean isNotEmpty(String value) {
         return value != null && !value.trim().isEmpty() && !"전체".equals(value);
     }
