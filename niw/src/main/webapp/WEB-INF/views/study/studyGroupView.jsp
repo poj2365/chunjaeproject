@@ -8,6 +8,7 @@
    	StudyGroup group = (StudyGroup)request.getAttribute("group");
    List<GroupMember> members = (List<GroupMember>)request.getAttribute("members");
    int groupCnt = (int)request.getAttribute("groupCnt");
+   int groupLimit = (int)request.getAttribute("groupLimit");
 	%>
    <style>
     .detail-header {
@@ -44,6 +45,7 @@
     .members {
       display: flex;
       align-items: center;
+      margin-top:10px;
       margin-bottom: 10px;
     }
 
@@ -329,15 +331,20 @@
 <section>
 <!-- 메인 컨테이너 -->
 <div class="mypage-container">
-    <!-- 사이드바 영역 -->
+    		 <!-- 사이드바 영역 -->
     <div class="sidebar">
         <div class="profile-section">
             <div class="profile-pic">
                 <i class="bi bi-person-circle" style="font-size: 60px; color: #ccc;"></i>
             </div>
-            <div class="user-id"></div>
-            <div class="user-name"></div>
-            <div class="point-info">포인트:P</div>
+            <% if(loginUser!=null){%>
+            <div class="user-id"><%=loginUser.userId() %></div>
+            <div class="user-name"><%=loginUser.userName() %></div>
+            <div class="point-info">포인트:<%=loginUser.userPoint() %> P</div>
+            <% }else{%>
+            <div class="user-id">Guest</div>
+           <%  }%>
+
         </div>
         <div class="menu-section">
             <div class="menu-title">스터디 그룹</div>
@@ -370,49 +377,74 @@
     <div class="main-content">
     <div class="detail-container">
     <div class="detail-header">
+    <%if(group.status().equals("RECRUITING")) {%>
+      <span class="badge bg-primary">모집중</span>
+      <%}else if(group.status().equals("CLOSED")) { %>
+      <span class="badge bg-secondary">모집 완료</span>
+      <%}else{ %>
+      <%} %>
       <div class="title"><%=group.groupName() %></div>
-      <div class="meta"><%=group.userId() %></div>
-      <div class="meta">개설일자: <%=group.createDate() %></div>
+      <div class="meta">번호 : <%=group.groupNumber() %> </div>
+      <div class="meta">작성자 : <%=group.userId() %></div>
+      <div class="meta">개설일자 : <%=group.createDate() %></div>
+            <%if(group.joinType().equals("AUTO")) {%>
+		<div class="meta">가입 방식 : 자동</div>
+	<%}else if(group.joinType().equals("MANUAL")){ %>
+		<div class="meta">가입 방식 : 그룹장 승인 필요</div>
+		<%} %>
     </div>
-
+	<span><strong>그룹 멤버</strong></span>
+	<br>
     <div class="members">
       <div class="avatars">
       	<%for(int i=0;i<group.groupLimit();i++){
       		if(i==0){ %>
       		<div class="avatar"><%=group.userId() %></div>
       <% }else{ %> 
-    	 	<div class="avatar">학습메이트</div>
+    	 	<div class="avatar">user</div>
       <% }
       		}%>
         <span>그룹인원 : <%=groupCnt %>명  / <%=group.groupLimit()%>명</span>
       </div>
-    </div>
-
+    </div><br>
     <div class="description">
 		<%=group.description() %>
     </div>
-    <%if(group.status().equals("RECRUITING")) {%>
+<% if (group.status().equals("RECRUITING") && loginUser != null) {
+     boolean isAlreadyMember = false;
+         for (GroupMember m : members) {
+             if (m.userId().equals(loginUser.userId())) {
+                 isAlreadyMember = true;
+                 break;
+             }
+         }
+     if(group.userId().equals(loginUser.userId())){
+    	 isAlreadyMember = true;
+     }
+     if (!isAlreadyMember) { %>
     <div class="apply-button">
         <button onclick="openModal()">참여하기</button>
     </div>
-    <%} %>
+<%   }
+}
+%>
+</div>
   </div>
-
+	<%if(loginUser!=null ) {%>
   <div id="applyModal" class="modal">
   <div class="modal-content">
     <span class="close" onclick="closeModal()">&times;</span>
     <h2>스터디 신청</h2>
     <form id="applyForm">
-      <label>이름 <input type="text" name="name" required /></label><br><br>
-      <label>거주지<input type="text" name="location" placeholder="예: 가산동동" required /></label><br><br>
-      <label>학교/전공<input type="text" name="school" placeholder="스터디 관련된 전공일 경우 작성" /></label><br><br>
-      <label>직업<input type="text" name="job" required /></label><br><br>
-      <label>연락처<input type="text" name="contact" required /></label><br><br>
-      <label>신청하는 이유<textarea name="reason" rows="4" required></textarea></label><br><br>
+      <label>이름 <input type="text" name="name" value="<%=loginUser.userName() %>" disabled/></label><br><br>
+      <label>거주지<input type="text" name="location" placeholder="예: 가산동동" value="<%=loginUser.userAddress()%>" disabled/></label><br><br>
+      <label>연락처<input type="text" name="contact" value="<%=loginUser.userPhone() %>" disabled/></label><br><br>
+      <label>신청하는 이유<textarea name="reason" id="reason" rows="4" required></textarea></label><br><br>
       <button type="submit">신청하기</button>
     </form>
   </div>
 </div>
+<%} %>
     </div>
    </section>
    
@@ -435,19 +467,12 @@
       }
   });
 
-
   function openModal() {
-	<% if(loginUser==null){%>
-		alert("로그인한 유저만 사용 가능합니다.");
-		location.assign('<%=request.getContextPath()%>/user/loginview.do');
-	<%}else { %>
-	const userId = "<%=loginUser.userId()%>";
-	const groupUserId = "<%=group.userId()%>";
-	if(userId==groupUserId){
-		alert("이미 참여중인 그룹입니다.");
-		return;
-	}
-	<%}%>
+	  const groupLimit = <%=groupLimit%>;
+	  <% if(groupLimit >=3 ){%>
+	  		alert("그룹은 3개 이상 참여할 수 없습니다.");
+	  		return;
+	  <%} %>
     document.getElementById("applyModal").style.display = "block";
 	
   }
@@ -463,9 +488,51 @@
 
   document.getElementById("applyForm").addEventListener("submit", function (e) {
     e.preventDefault();
-    alert("신청이 완료되었습니다!");
-    closeModal();
-    this.reset();
+    const reason = document.getElementById('reason').value;
+    <%if(loginUser!=null){ %>
+    	const userId = "<%=loginUser.userId() %>";
+    	const userName = "<%=loginUser.userName() %>";
+    	const userAddress = "<%=loginUser.userAddress()%>";
+    	const userPhone = "<%=loginUser.userPhone() %>";
+    	const groupNumber = "<%=group.groupNumber() %>";
+    	const joinType = "<%=group.joinType()%>";
+    	let status = "";
+    	const role = "MEMBER";
+    	if(joinType=="AUTO"){
+    		status = "APPROVED";
+    	}else if(joinType=="MANUAL"){
+    		status = "WAIT";
+    	}
+    <%} %>
+	const jsonData = {
+			userId,
+			userName,
+			userAddress,
+			userPhone,
+			reason,
+			groupNumber,
+			status,
+			role
+	}    
+    fetch("<%=request.getContextPath()%>/study/insertgrouprequest.do",{
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(jsonData)
+    })
+    .then(response=>{
+    	if(!response.ok){
+    		throw new Error(error);
+    		return;
+    	}
+    	alert("신청이 완료되었습니다!");
+        closeModal();
+        location.replace("<%=request.getContextPath()%>/study/grouplist.do");
+    }).catch(error=>{
+    	alert("이미 신청한 스터디 그룹입니다.");
+        closeModal();
+    });
   });
 </script>
    <%@include file="/WEB-INF/views/common/footer.jsp" %>

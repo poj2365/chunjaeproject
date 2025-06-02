@@ -337,7 +337,7 @@ const timeRecordTitle = [
         const userId = '<%=loginUser.userId()%>';
         var calendar = new FullCalendar.Calendar(calendarEl, {
             headerToolbar: {
-                left: 'dayGridMonth,listMonth',
+                left: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth',
                 center: 'title',
                 right: 'prev,next'
               },

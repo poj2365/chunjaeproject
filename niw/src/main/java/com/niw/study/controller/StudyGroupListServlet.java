@@ -43,7 +43,8 @@ public class StudyGroupListServlet extends HttpServlet {
 		User user = (User) session.getAttribute("loginUser");
 		int groupLimit = 0;
 		if(user!=null) {
-			groupLimit = StudyGroupService.SERVICE.searchStudyGroupCountId(user.userId());
+//			groupLimit = StudyGroupService.SERVICE.searchStudyGroupCountId(user.userId());
+			groupLimit = GroupMemberService.SERVICE.groupMemberCountId(user.userId());
 		}
 		request.setAttribute("groupLimit", groupLimit);
 		

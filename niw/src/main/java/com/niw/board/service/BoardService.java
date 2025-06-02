@@ -11,6 +11,7 @@ import java.util.List;
 import com.niw.board.model.dao.BoardDao;
 import com.niw.board.model.dto.Article;
 import com.niw.board.model.dto.Comment;
+import com.niw.board.model.dto.Notice;
 
 public enum BoardService {
 	SERVICE;
@@ -19,6 +20,13 @@ public enum BoardService {
 	public List<Article> searchArticle(int category, String searchData, int likes, String order, int cPage, int numPerPage, int totalData){
 		Connection conn = getConnection();
 		List<Article> articles = BoardDao.DAO.searchArticle(conn, category, searchData, likes, order, cPage, numPerPage, totalData);
+		close(conn);
+		return articles;
+	}
+	
+	public List<Article> searchArticleByUser(String userId, String order, int cPage, int numPerPage, int totalData){
+		Connection conn = getConnection();
+		List<Article> articles = BoardDao.DAO.searchArticleByUser(conn, userId, order, cPage, numPerPage, totalData);
 		close(conn);
 		return articles;
 	}
@@ -174,4 +182,37 @@ public enum BoardService {
 		close(conn);
 		return result;	
 	}
+	
+	public int updateArticle(Article article) {
+		Connection conn = getConnection();
+		int result = BoardDao.DAO.updateArticle(conn, article);
+		if(result > 0) commit(conn);
+		else rollback(conn);
+		close(conn);
+		return result;	
+	}
+	
+	public int updateComment(Comment comment) {
+		Connection conn = getConnection();
+		int result = BoardDao.DAO.updateComment(conn, comment);
+		if(result > 0) commit(conn);
+		else rollback(conn);
+		close(conn);
+		return result;	
+	}
+	
+	public List<Notice> searchNotice(){
+		Connection conn = getConnection();
+		List<Notice> notices = BoardDao.DAO.searchNotice(conn);
+		close(conn);
+		return notices;
+	}
+	public Notice searchNoticeById(int noticeId){
+		Connection conn = getConnection();
+		Notice notice = BoardDao.DAO.searchNoticeById(conn, noticeId);
+		close(conn);
+		return notice;
+	}
+	
+	
 }

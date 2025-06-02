@@ -18,6 +18,7 @@ public enum TimeRecordService {
 		int result = dao.insertTime(conn,tr);
 		if(result>0) JDBCTemplate.commit(conn);
 		else JDBCTemplate.rollback(conn);
+		JDBCTemplate.close(conn);
 		return result;
 	}
 
@@ -38,6 +39,13 @@ public enum TimeRecordService {
 	public List<TimeRecord> searchTimeTodayAll(LocalDateTime startDate, LocalDateTime endDate) {
 		Connection conn = JDBCTemplate.getConnection();
 		List<TimeRecord> trList = dao.searchTimeTodayAll(conn, startDate,endDate);
+		JDBCTemplate.close(conn);
+		return trList;
+	}
+
+	public List<TimeRecord> searchTimeTodayGroup(String groupNumber, LocalDateTime startDate, LocalDateTime endDate) {
+		Connection conn = JDBCTemplate.getConnection();
+		List<TimeRecord> trList = dao.searchTimeTodayGroup(conn,groupNumber, startDate,endDate);
 		JDBCTemplate.close(conn);
 		return trList;
 	}

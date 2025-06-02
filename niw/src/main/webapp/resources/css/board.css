@@ -25,6 +25,14 @@
 }
 
 
+.fixed-embed {
+  display: block;
+  margin: 0 auto 1rem;
+  width: 100%;
+  min-height: 500px;
+  border: 0;
+}
+
 /* 마이페이지 전용 스타일 */
 .mypage-container {
     gap: 30px; /* 20px → 30px로 증가 */

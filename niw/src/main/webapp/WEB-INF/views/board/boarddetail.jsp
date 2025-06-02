@@ -3,10 +3,11 @@
 <%@include file="/WEB-INF/views/common/header.jsp" %>
 <%@ page import="com.niw.board.model.dto.Article, 
 				com.niw.board.model.dto.Comment, 
+				com.niw.board.model.dto.Notice,
 				java.util.List,
 				java.time.LocalDateTime,
 				java.time.Duration"%>
-
+<link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/45.1.0/ckeditor5.css" crossorigin>
 <link rel="stylesheet" href="<%=request.getContextPath()%>/resources/css/board.css">
 
 <% 
@@ -29,6 +30,7 @@
 	List<Integer> likedComment = (List<Integer>) request.getAttribute("likedComment");
 	List<Integer> dislikedComment = (List<Integer>) request.getAttribute("dislikedComment");
 	String queryUrl = request.getQueryString();
+	List<Notice> notices = (List<Notice>) request.getAttribute("notices");
 %>
 <section class="mypage-container row flex-row m-4">
 	<!-- 사이드 네비게이터 -->
@@ -37,7 +39,13 @@
             <div class="profile-pic">
                 <i class="bi bi-person-circle" style="font-size: 60px; color: #ccc;"></i>
             </div>
-            <div class="user-id">Guest</div>
+            <% if(loginUser!=null){%>
+	            <div class="user-id"><%=loginUser.userId() %></div>
+	            <div class="user-name"><%=loginUser.userName() %></div>
+	            <div class="point-info">포인트:<%=loginUser.userPoint() %> P</div>
+            <% }else{%>
+            	<div class="user-id">Guest</div>
+            <% }%>
         </div>
         <div class="menu-section">
             <div class="menu-title" >카테고리</div>
@@ -173,7 +181,7 @@
 					<div class="col-lg-4 d-flex justify-content-end text-end">
 						<%if(user != null && !user.userId().trim().equals("") && (user.userId().equals(article.userId()) || user.userRole().equals("ADMIN"))) {%>
 							<button class="btn btn-danger me-1" onclick="deleteArticle('<%= article.articleId() %>', '/board/boardentrance.do?category=0')"> 삭제 </button>
-							<button class="btn btn-primary me-1" onclick="updateArticle('<%= article.articleId() %>')"> 수정 </button>
+							<button class="btn btn-primary me-1" onclick="location.assign('<%=request.getContextPath()%>/board/modifyarticle.do?articleId=<%=article.articleId() %>')"> 수정 </button>
 						<%} %>
 						<form action="" method="get">
 	    	                <button type="button" class="btn btn-danger me-1" <%= report == 0? "" : "disabled" %> data-bs-toggle="modal" data-bs-target="#reportModal"
@@ -240,7 +248,7 @@
 						<div>
 			                <span><%= comments.get(i).userId() %></span>
 			            </div>
-			            <div class="text-break">
+			            <div class="text-break comment-content">
 			            	<%= comments.get(i).commentContent()%>
 			            </div>
 			            <div class="d-flex justify-content-between align-items-center">
@@ -258,7 +266,7 @@
 									    <%= cldt.toString().split("T")[0] + " " + cldt.toString().split("T")[1].split(":")[0] + ":" + cldt.toString().split("T")[1].split(":")[1] %>
 									<%}%>
 									<%if(comments.get(i).commentModified() == 0) {%>
-										수정됨
+										(수정됨)
 									<%} %>
 			                    </span>
 			                    <span class="col-lg-1  me-3" 
@@ -279,7 +287,7 @@
 			                <div class="d-flex justify-content-between align-items-center">
 				                <%if(user != null && !user.userId().trim().equals("") && (user.userId().equals(article.userId()) || user.userRole().equals("ADMIN"))) {%>
 									<button class="btn btn-danger me-1" onclick="deleteComment('<%= comments.get(i).commentId() %>', '<%=article.articleId() %>')"> 삭제 </button>
-									<button class="btn btn-primary me-1" onclick="updateComment('<%= comments.get(i).commentId() %>')"> 수정 </button>
+									<button class="btn btn-primary me-1" onclick="updateComment(event, '<%= comments.get(i).commentId() %>', '<%= article.articleId() %>')"> 수정 </button>
 								<%} %>
 		                        <form action="" method="get">
 			                        <button <%= reportedComment.get(i) == 0? "" : "disabled" %> type="button" class="btn btn-danger me-1" data-bs-toggle="modal"
@@ -298,7 +306,7 @@
 						<div>
 			                <span style="color:blue"> @<%=comments.get(i).userRef() %> </span> <span><%= comments.get(i).userId() %></span>
 			            </div>
-			            <div class="text-break">
+			            <div class="text-break comment-content">
 			            	<%= comments.get(i).commentContent()%>
 			            </div>
 			            <div class="d-flex justify-content-between align-items-center">
@@ -316,7 +324,7 @@
 									    <%= cldt.toString().split("T")[0] + " " + cldt.toString().split("T")[1].split(":")[0] + ":" + cldt.toString().split("T")[1].split(":")[1] %>
 									<%}%>
 									<%if(comments.get(i).commentModified() == 0) {%>
-										수정됨
+										(수정됨)
 									<%} %>
 			                    </span>
 			                    <span class="col-lg-1  me-3" 
@@ -337,11 +345,11 @@
 			                <div class="d-flex justify-content-between align-items-center">
 			                	<%if(user != null && !user.userId().trim().equals("") && (user.userId().equals(article.userId()) || user.userRole().equals("ADMIN"))) {%>
 									<button class="btn btn-danger me-1" onclick="deleteComment('<%= comments.get(i).commentId()%>', '<%=article.articleId() %>')"> 삭제 </button>
-									<button class="btn btn-primary me-1" onclick="updateComment('<%= comments.get(i).commentId() %>')"> 수정 </button>
+									<button class="btn btn-primary me-1" onclick="updateComment(event, '<%= comments.get(i).commentId() %>', '<%= article.articleId() %>')"> 수정 </button>
 								<%} %>
 		                        <form action="" method="get">
 			                        <button <%= reportedComment.get(i) == 0? "" : "disabled" %> type="button" class="btn btn-danger me-1" data-bs-toggle="modal" data-bs-target="#reportModal"
-			                         data-user-id="<%=user == null? "" : user.userId()%>" data-target-id="<%= comments.get(i).commentId()%>" data-target-type="COMMENTS">
+			                         data-user-id="<%=user == null? "" : user.userId()%>" data-target-id="<%= comments.get(i).commentId() %>" data-target-type="COMMENTS">
 			                            신고
 			                        </button>
 			                	</form>
@@ -379,6 +387,26 @@
 			</div>
 			<hr>
 			<!-- ajax article list -->
+			<div id="notice-container">
+				<%if(notices != null && !notices.isEmpty()) {
+						for(Notice notice : notices){%>
+							<div class="row flex-row justify-content-between align-items-center">
+								<div class="col-lg-8 d-flex align-items-center">
+									<span class="badge bg-danger me-3">공지</span>
+									<span class="overflow-hidden">
+										<a href="<%=request.getContextPath()%>/board/noticedetail.do?noticeId=<%=notice.noticeId()%>" class="text-decoration-none text-black">
+											<%= notice.noticeTitle() %>
+										</a>
+									</span>
+								</div>
+								<ul class="list-unstyled row flex-row g-1 col-lg-3">
+									<li><b>관리자</b> </li>
+								</ul>
+							</div>
+							<hr>
+						<%}
+					}%>
+			</div>
 			<div id="article-container">
 				<%for(Article a : articles){ 
 					boolean tFlag = false;
@@ -520,8 +548,19 @@
 	<!-- 신고 폼 끝 -->
 	
 </section>
+<script src="https://cdn.ckeditor.com/ckeditor5/45.1.0/ckeditor5.umd.js" crossorigin></script>
+<script src="https://cdn.ckeditor.com/ckeditor5/45.1.0/translations/ko.umd.js" crossorigin></script>
+<script src="https://cdn.ckbox.io/ckbox/2.6.1/ckbox.js" crossorigin></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="<%=request.getContextPath()%>/resources/js/board/board.js"></script>
 
+<script>
+	document.addEventListener("DOMContentLoaded", function () {
+	  document.querySelectorAll("iframe").forEach(e => {
+	    e.classList.add("fixed-embed");
+	  });
+	});
+</script>
 <script>
 	let $reportButton = null;
 	$("#reportModal").on('show.bs.modal', (e) => {
@@ -530,5 +569,24 @@
 		$("#reportTargetId").val($reportButton.getAttribute('data-target-id'));
 		$("#reportTargetType").val($reportButton.getAttribute('data-target-type'));
 	});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  document.querySelectorAll("oembed[url]").forEach(el => {
+    const url = el.getAttribute("url");
+    if (url.includes("youtube.com") || url.includes("youtu.be")) {
+      const videoId = new URL(url).searchParams.get("v") ||
+                      url.split("/").pop();
+      const iframe = document.createElement("iframe");
+      iframe.src = "https://www.youtube.com/embed/" + videoId;
+      iframe.width = "100%";
+      iframe.height = "500";
+      iframe.frameBorder = "0";
+      iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+      iframe.allowFullscreen = true;
+      el.replaceWith(iframe);
+    }
+  });
+});
 </script>
 <%@include file="/WEB-INF/views/common/footer.jsp" %>

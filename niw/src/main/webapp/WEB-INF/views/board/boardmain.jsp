@@ -4,18 +4,19 @@
 <%@include file="/WEB-INF/views/common/header.jsp" %>
 <%@ page import="java.util.List, 
 				com.niw.board.model.dto.Article,
+				com.niw.board.model.dto.Notice,
 				java.time.LocalDateTime,
 				java.sql.Timestamp,
 				java.time.LocalDate,
 				java.time.Duration"%>
 <link rel="stylesheet" href="<%=request.getContextPath()%>/resources/css/board.css">
-<script src="<%=request.getContextPath()%>/resources/js/board/board.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
 <% 
 	int category = request.getParameter("category") == null? 0 : Integer.parseInt(request.getParameter("category")); 
 	List<Article> articles = (List<Article>) request.getAttribute("articles");
 	User user = (User) request.getSession().getAttribute("loginUser");
+	List<Notice> notices = (List<Notice>) request.getAttribute("notices");
 %>
 <section class="mypage-container row flex-row m-4">
 	<!-- 사이드 네비게이터 -->
@@ -24,7 +25,13 @@
             <div class="profile-pic">
                 <i class="bi bi-person-circle" style="font-size: 60px; color: #ccc;"></i>
             </div>
-            <div class="user-id">Guest</div>
+            <% if(loginUser!=null){%>
+	            <div class="user-id"><%=loginUser.userId() %></div>
+	            <div class="user-name"><%=loginUser.userName() %></div>
+	            <div class="point-info">포인트:<%=loginUser.userPoint() %> P</div>
+            <% }else{%>
+            	<div class="user-id">Guest</div>
+            <% }%>
         </div>
         <div class="menu-section">
             <div class="menu-title" >카테고리</div>
@@ -76,6 +83,26 @@
 		</div>
 		<hr>
 		<!-- 게시글 리스트 컨테이너 -->
+		<div id="notice-container">
+			<%if(notices != null && !notices.isEmpty()) {
+					for(Notice notice : notices){%>
+						<div class="row flex-row justify-content-between align-items-center">
+							<div class="col-lg-8 d-flex align-items-center">
+								<span class="badge bg-danger me-3">공지</span>
+								<span class="overflow-hidden">
+									<a href="<%=request.getContextPath()%>/board/noticedetail.do?noticeId=<%=notice.noticeId()%>" class="text-decoration-none text-black">
+										<%= notice.noticeTitle() %>
+									</a>
+								</span>
+							</div>
+							<ul class="list-unstyled row flex-row g-1 col-lg-3">
+								<li><b>관리자</b> </li>
+							</ul>
+						</div>
+						<hr>
+					<%}
+				}%>
+		</div>
 		<div id="article-container">
 			<%if(articles != null && !articles.isEmpty()) {
 				for(Article article : articles){
@@ -178,6 +205,15 @@
 	</article>
 	
 </section>
+<script>
+	const CKEDITOR_INITIAL_DATA = "";
+</script>
+<script src="https://cdn.ckeditor.com/ckeditor5/45.1.0/ckeditor5.umd.js" crossorigin></script>
+<script src="https://cdn.ckeditor.com/ckeditor5/45.1.0/translations/ko.umd.js" crossorigin></script>
+<script src="https://cdn.ckbox.io/ckbox/2.6.1/ckbox.js" crossorigin></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="<%=request.getContextPath()%>/resources/js/board/board.js"></script>
+
 
 <%@include file="/WEB-INF/views/common/footer.jsp" %>
+			

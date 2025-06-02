@@ -30,6 +30,9 @@ public class SaveCommentServlet extends HttpServlet {
 		String userId = ((User) request.getSession().getAttribute("loginUser")).userId();
 		int result = BoardService.SERVICE.saveComment(userId, articleId, content, targetId, level);
 		response.sendRedirect(request.getContextPath() + "/board/boarddetail.do?" + url);
+		
+		
+		
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

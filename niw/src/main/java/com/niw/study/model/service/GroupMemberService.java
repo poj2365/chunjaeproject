@@ -43,4 +43,38 @@ public enum GroupMemberService {
 		JDBCTemplate.close(conn);
 		return members;
 	}
+
+	public int groupMemberCountId(String userId) {
+		conn = JDBCTemplate.getConnection();
+		int result = dao.groupMemberCountId(conn, userId);
+		JDBCTemplate.close(conn);
+		return result;
+	}
+	
+	public int deleteGroupMember(String groupNumber) {
+		conn = JDBCTemplate.getConnection();
+		int result = dao.deleteGroupMember(conn, groupNumber);
+		if(result>0) JDBCTemplate.commit(conn);
+		else JDBCTemplate.rollback(conn);
+		JDBCTemplate.close(conn);
+		return result;
+}
+
+	public int deleteGroupMemberById(String userId, String groupNumber) {
+		conn = JDBCTemplate.getConnection();
+		int result = dao.deleteGroupMemberById(conn, userId, groupNumber);
+		if(result>0) JDBCTemplate.commit(conn);
+		else JDBCTemplate.rollback(conn);
+		JDBCTemplate.close(conn);
+		return result;
+	}
+
+	public int updateGroupMember(String userId, String groupNumber, String status) {
+		conn = JDBCTemplate.getConnection();
+		int result = dao.updateGroupMember(conn, userId, groupNumber, status);
+		if(result>0) JDBCTemplate.commit(conn);
+		else JDBCTemplate.rollback(conn);
+		JDBCTemplate.close(conn);
+		return result;
+	}
 }

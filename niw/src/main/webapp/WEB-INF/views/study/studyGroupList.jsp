@@ -244,6 +244,7 @@
             <% }else{%>
             <div class="user-id">Guest</div>
            <%  }%>
+
         </div>
         <div class="menu-section">
             <div class="menu-title">스터디 그룹</div>
@@ -303,14 +304,13 @@
                 <ul class="board-row">
                     <li class="col-no"><%=g.groupNumber()%></li>
                     <li class="col-title">
-                    <%if(g.status().equals("RECRUITING")) {%>
-                    <span class="badge bg-primary">모집중</span>
-                    <%}else if(g.status().equals("CLOSED")) { %>
-                    <span class="badge bg-secondary">모집 완료</span>
-                    <%}else{ %>
-                    
-                    <%} %>
-                         <a href="<%=request.getContextPath()%>/study/groupview.do?no=<%=g.groupNumber()%>">
+                   		<% String status = g.status(); 
+  					 	if ("RECRUITING".equals(status)) { %>
+  					 	<span class="badge bg-primary">모집중</span>
+						<% } else if ("CLOSED".equals(status)) { %>
+  						 <span class="badge bg-secondary">모집 완료</span>
+						<% } %>
+                        <a href="<%=request.getContextPath()%>/study/groupview.do?no=<%=g.groupNumber()%>">
                             <%=g.groupName()%>
                         </a>
                     </li>
@@ -326,7 +326,7 @@
             </ul>
         <% } %>
     </div>
-    <% if(loginUser!=null && groupLimit<3){ %>
+    <% if(loginUser!=null && groupLimit<=3){ %>
     <button class="btn btn-secondary" onclick="location.assign('<%=request.getContextPath() %>/study/groupcreateview.do');">그룹 생성</button>
    	<%} %>
    		<div id="pagebar">
@@ -366,6 +366,7 @@
 	       const doc = parser.parseFromString(html, 'text/html');
 	       const newContent = doc.querySelector('.board-wrapper').innerHTML;
 	       const newPagebar = doc.querySelector('#pagebar').innerHTML;
+	    	console.log(newContent);
 	       document.querySelector('.board-wrapper').innerHTML = newContent;
 	       document.querySelector('#pagebar').innerHTML = newPagebar;
 	     });

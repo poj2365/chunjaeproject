@@ -14,6 +14,7 @@ import javax.servlet.http.HttpSession;
 
 import com.niw.board.model.dto.Article;
 import com.niw.board.model.dto.Comment;
+import com.niw.board.model.dto.Notice;
 import com.niw.board.service.BoardService;
 import com.niw.user.model.dto.User;
 
@@ -127,7 +128,8 @@ public class ArticleDetailServlet extends HttpServlet {
 		while(reportedComment.size() < comment.size()) reportedComment.add(0);
 		while(likedComment.size() < comment.size()) likedComment.add(0);
 		while(dislikedComment.size() < comment.size()) dislikedComment.add(0);
-		
+		List<Notice> notices = BoardService.SERVICE.searchNotice();
+		request.setAttribute("notices", notices);
 		request.setAttribute("bookmark", bookmark);
 		request.setAttribute("report", report);
 		request.setAttribute("likedArticle", likedArticle);

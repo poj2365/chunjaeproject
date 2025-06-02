@@ -36,8 +36,8 @@ public enum TimeRecordDao {
 		try {
 			pstmt=conn.prepareStatement(sql.getProperty("insertTime"));
 			pstmt.setString(1, tr.category());
-			pstmt.setTimestamp(2, new Timestamp(tr.startTime().getTime()));
-			pstmt.setTimestamp(3, new Timestamp(tr.endTime().getTime()));
+			pstmt.setTimestamp(2, tr.startTime());
+			pstmt.setTimestamp(3, tr.endTime());
 			pstmt.setString(4, tr.totalTime());
 			pstmt.setString(5, tr.userId());
 			result = pstmt.executeUpdate();
@@ -51,7 +51,7 @@ public enum TimeRecordDao {
 	
 	TimeRecord getTime(ResultSet rs) throws SQLException {
 		return new TimeRecord(rs.getInt("time_no"), rs.getString("category"),
-				rs.getDate("start_time"), rs.getDate("end_time"),rs.getString("total_time"), rs.getString("user_id"));
+				rs.getTimestamp("start_time"), rs.getTimestamp("end_time"),rs.getString("total_time"), rs.getString("user_id"));
 	}
 
 	public List<TimeRecord> searchTimeToday(Connection conn, String userId, LocalDateTime startDate, LocalDateTime endDate) {
@@ -110,5 +110,26 @@ public enum TimeRecordDao {
 		}
 		return trList;
 	}
+
+	public List<TimeRecord> searchTimeTodayGroup(Connection conn, String groupNumber, LocalDateTime startDate,
+			 LocalDateTime endDate) {
+			List<TimeRecord> trListGroup = new ArrayList<TimeRecord>();
+			try {
+				pstmt = conn.prepareStatement(sql.getProperty("searchTimeTodayGroup"));
+				pstmt.setInt(1, Integer.parseInt(groupNumber));
+				pstmt.setTimestamp(2,  Timestamp.valueOf(startDate));
+				pstmt.setTimestamp(3,  Timestamp.valueOf(endDate));
+				rs = pstmt.executeQuery();
+				while (rs.next()) {
+					trListGroup.add(getTime(rs));
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			} finally {
+				JDBCTemplate.close(rs);
+				JDBCTemplate.close(pstmt);
+			}
+			return trListGroup;
+		}
 }
 
