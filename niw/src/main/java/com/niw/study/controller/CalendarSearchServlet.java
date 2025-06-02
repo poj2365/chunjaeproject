@@ -38,7 +38,7 @@ public class CalendarSearchServlet extends HttpServlet {
 		String jsonData = request.getReader().lines().collect(Collectors.joining());
 //		Gson gson = new GsonBuilder().registerTypeAdapter(Date.class, jsonData);
 //		시리얼라이징 하면 가능
-		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
+		Gson gson = new Gson();
 		
 		Calendar c = gson.fromJson(jsonData, Calendar.class);
 		Calendar calList = CalendarService.SERVICE.searchCalendarById(c);

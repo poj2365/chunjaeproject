@@ -87,7 +87,7 @@ public enum BoardDao {
 	public List<Article> searchArticleByUser(Connection conn, String userId, String order, int cPage, int numPerPage, int totalData){
 		List<Article> articles = new ArrayList<>();
 		try {
-			String sql =  sqlPro.getProperty("searchArticle");
+			String sql =  sqlPro.getProperty("searchArticleByUser");
 			String finalSql = sql.formatted(order);
 			pstmt = conn.prepareStatement(finalSql);
 			pstmt.setString(1, userId);
@@ -106,6 +106,25 @@ public enum BoardDao {
 		return articles;
 	}
 	
+	public List<Article> searchArticleByRecommend(Connection conn, int recommend, String searchData, int numPerPage){
+		List<Article> articles = new ArrayList<>();
+		try {
+			pstmt = conn.prepareStatement(sqlPro.getProperty("searchArticleByRecommend"));
+			pstmt.setInt(1, recommend);
+			pstmt.setString(2, searchData);
+			pstmt.setInt(3, numPerPage);
+			rs = pstmt.executeQuery();
+			while(rs.next()) {
+				articles.add(getArticle(rs));
+			}
+		} catch(SQLException e) {
+			e.printStackTrace();
+		} finally {
+			close(rs);
+			close(pstmt);
+		}
+		return articles;
+	}
 	public int countArticle(Connection conn, int category, String searchData, int likes) {
 		int result = 0;
 		try {
@@ -119,6 +138,24 @@ public enum BoardDao {
 				pstmt.setString(2, searchData);
 				pstmt.setInt(3, likes);
 			}			
+			rs = pstmt.executeQuery();
+			while(rs.next()) {
+				result = rs.getInt(1);
+			}
+		} catch(SQLException e) {
+			e.printStackTrace();
+		} finally {
+			close(rs);
+			close(pstmt);
+		}
+		return result;
+	}
+
+	public int countArticleByUser(Connection conn, String userId) {
+		int result = 0;
+		try {
+			pstmt = conn.prepareStatement(sqlPro.getProperty("countArticleByUser"));
+			pstmt.setString(1, userId);
 			rs = pstmt.executeQuery();
 			while(rs.next()) {
 				result = rs.getInt(1);
@@ -168,6 +205,57 @@ public enum BoardDao {
 		
 		return comments;
 	}
+	
+	public List<Comment> searchCommentByUser(Connection conn, String userId, int cPage, int numPerPage, int totalData){
+		List<Comment> comments = new ArrayList<>();
+		try {
+			pstmt = conn.prepareStatement(sqlPro.getProperty("searchCommentByUser"));
+			pstmt.setString(1, userId);
+			pstmt.setInt(2, (cPage - 1) * numPerPage + 1);
+			pstmt.setInt(3, totalData > cPage * numPerPage? cPage * numPerPage : totalData);
+			rs = pstmt.executeQuery();
+			while(rs.next()) {
+				comments.add(Comment.builder()
+						  .commentId(rs.getInt("comment_id"))
+						  .userId(rs.getString("user_id"))
+						  .articleId(rs.getInt("article_id"))
+						  .commentContent(rs.getString("comment_content"))
+						  .commentLikes(rs.getInt("comment_likes"))
+						  .commentDislikes(rs.getInt("comment_dislikes"))
+						  .commentDateTime(rs.getTimestamp("comment_datetime"))
+						  .commentModified(rs.getInt("comment_modified"))
+						  .commentDelete(rs.getInt("comment_delete"))
+						  .commentRef(rs.getInt("comment_ref"))
+						  .build());
+			}
+		} catch(SQLException e) {
+			e.printStackTrace();
+		} finally {
+			close(rs);
+			close(pstmt);
+		}
+		
+		return comments;
+	}
+	
+	public int countCommentByUser(Connection conn, String userId) {
+		int result = 0;
+		try {
+			pstmt = conn.prepareStatement(sqlPro.getProperty("countCommentByUser"));
+			pstmt.setString(1, userId);
+			rs = pstmt.executeQuery();
+			while(rs.next()) {
+				result = rs.getInt(1);
+			}
+		} catch(SQLException e) {
+			e.printStackTrace();
+		} finally {
+			close(rs);
+			close(pstmt);
+		}
+		return result;
+	}
+	
 	
 	private Comment getComment(ResultSet rs) throws SQLException {
 		return Comment.builder()
@@ -235,6 +323,45 @@ public enum BoardDao {
 		}
 		return bookmark;
 	}
+	
+	public int countBookmarkByUser(Connection conn, String userId) {
+		int result = 0;
+		try {
+			pstmt = conn.prepareStatement(sqlPro.getProperty("countBookmarkByUser"));
+			pstmt.setString(1, userId);
+			rs = pstmt.executeQuery();
+			while(rs.next()) {
+				result = rs.getInt(1);
+			}
+		} catch(SQLException e) {
+			e.printStackTrace();
+		} finally {
+			close(rs);
+			close(pstmt);
+		}
+		return result;
+	}
+	
+	public List<Article> searchBookmarkByUser(Connection conn, String userId, int cPage, int numPerPage, int totalData){
+		List<Article> bookmarks = new ArrayList<>();
+		try {
+			pstmt = conn.prepareStatement(sqlPro.getProperty("searchBookmarkByUser"));
+			pstmt.setString(1, userId);
+			pstmt.setInt(2, (cPage - 1) * numPerPage + 1);
+			pstmt.setInt(3, totalData > cPage * numPerPage? cPage * numPerPage : totalData);
+			rs = pstmt.executeQuery();
+			while(rs.next()) {
+				bookmarks.add(getArticle(rs));
+			}
+		} catch(SQLException e) {
+			e.printStackTrace();
+		} finally {
+			close(rs);
+			close(pstmt);
+		}
+		return bookmarks;
+	}
+	
 	
 	public int searchReport(Connection conn, String userId, int targetId, String targetType) {
 		int result = 0;
@@ -520,6 +647,50 @@ public enum BoardDao {
 		return notice;
 	}
 	
+	public int countNotice(Connection conn) {
+		int result = 0;
+		try {
+			pstmt = conn.prepareStatement(sqlPro.getProperty("countNotice"));
+			rs = pstmt.executeQuery();
+			while(rs.next()) {
+				result = rs.getInt(1);
+			}
+		} catch(SQLException e) {
+			e.printStackTrace();
+		} finally {
+			close(rs);
+			close(pstmt);
+		}
+		return result;
+	}
 	
+	public int saveNotice(Connection conn, Notice notice) {
+		int result = 0;
+		try {
+			pstmt = conn.prepareStatement(sqlPro.getProperty("saveNotice"));
+			pstmt.setString(1, notice.noticeTitle());
+			pstmt.setString(2, notice.noticeContent());
+			result = pstmt.executeUpdate();
+		} catch(SQLException e) {
+			e.printStackTrace();
+		} finally {
+			close(pstmt);
+		}
+		return result;
+	}
+	
+	public int deleteNotice(Connection conn, int noticeId) {
+		int result = 0;
+		try {
+			pstmt = conn.prepareStatement(sqlPro.getProperty("deleteNotice"));
+			pstmt.setInt(1, noticeId);
+			result = pstmt.executeUpdate();
+		} catch(SQLException e) {
+			e.printStackTrace();
+		} finally {
+			close(pstmt);
+		}
+		return result;
+	}
 
 }

@@ -307,6 +307,21 @@ List<GroupMember> members = (List<GroupMember>) request.getAttribute("members");
   color: #aaa;
   cursor: pointer;
 }
+
+    .content-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .content-title {
+        font-size: 24px;
+        font-weight: bold;
+        color: #333;
+    }
 </style>
 <section>
 	<!-- 메인 컨테이너 -->
@@ -354,13 +369,24 @@ List<GroupMember> members = (List<GroupMember>) request.getAttribute("members");
     </div>
 		<!-- 메인 컨텐츠 영역 -->
 		<div class="main-content">
+				<div class="content-header">
+    <h2 class="content-title">내 스터디 그룹</h2>
+</div>
 			<%
 			if (loginUser == null) {
-			%>
-			<h5>조회된 데이터가 없습니다.</h5>
+				%>
+				<script>
+				alert('로그인한 사용자만 이용할 수 있는 메뉴입니다.');
+				location.replace('<%=request.getContextPath() %>/user/loginview.do');
+				</script>
 			<%
-			} else {
+			} else if (groups == null || groups.isEmpty()) {
 			%>
+				<script>
+				alert('그룹 정보가 없습니다.');
+				location.replace('<%=request.getContextPath() %>/study/grouplist.do');
+				</script>
+			<%} else { %>
 			<div class="tabs">
 				<%
 				if (groups != null) {
@@ -701,8 +727,6 @@ function drawChart(groupIndex,groupNumber) {
  });
 };
 
-        
-    
 </script>
 </section>
 <%@include file="/WEB-INF/views/common/footer.jsp"%>

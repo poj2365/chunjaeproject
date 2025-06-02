@@ -257,8 +257,11 @@
 }
 
 .result-summary {
-    text-align: center;
     margin-bottom: 2rem;
+}
+
+.result-summary .d-flex {
+    gap: 1rem;
 }
 
 .result-text {
@@ -268,8 +271,65 @@
     backdrop-filter: blur(10px);
     padding: 1rem 2rem;
     border-radius: 50px;
-    display: inline-block;
     border: 1px solid rgba(26, 138, 142, 0.2);
+    flex: 1;
+    text-align: center;
+}
+
+.upload-section {
+    display: flex;
+    align-items: center;
+}
+
+.btn-upload,
+.btn-permission,
+.btn-login-required {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    white-space: nowrap;
+}
+
+.btn-upload {
+    background: linear-gradient(45deg, var(--bs-blind-gray), var(--bs-blind-dark));
+    color: white;
+}
+
+.btn-upload:hover {
+    background: linear-gradient(45deg, var(--bs-blind-dark), var(--bs-blind-light-gray));
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(26, 138, 142, 0.3);
+}
+
+.btn-permission {
+    background: linear-gradient(45deg, #f6ad55, #ed8936);
+    color: white;
+}
+
+.btn-permission:hover {
+    background: linear-gradient(45deg, #ed8936, #dd6b20);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(237, 137, 54, 0.3);
+}
+
+.btn-login-required {
+    background: linear-gradient(45deg, #cbd5e0, #a0aec0);
+    color: #4a5568;
+}
+
+.btn-login-required:hover {
+    background: linear-gradient(45deg, #a0aec0, #718096);
+    color: white;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(160, 174, 192, 0.3);
 }
 
 .no-results {
@@ -348,6 +408,24 @@
     .filter-btn {
         width: 200px;
     }
+    
+    .result-summary .d-flex {
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .result-text {
+        font-size: 1rem;
+        padding: 0.75rem 1.5rem;
+    }
+    
+    .btn-upload,
+    .btn-permission,
+    .btn-login-required {
+        font-size: 0.9rem;
+        padding: 0.6rem 1.2rem;
+    }
 }
 </style>
 
@@ -415,11 +493,35 @@
             </div>
         </div>
         
-        <!-- 검색 결과 요약 -->
+        <!-- 검색 결과 요약 및 자료 등록 -->
         <div class="result-summary">
-            <div class="result-text">
-                <i class="bi bi-search me-2"></i>
-                총 <strong><%= totalCount %></strong>개의 학습자료를 찾았습니다
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                <div class="result-text">
+                    <i class="bi bi-search me-2"></i>
+                    총 <strong><%= totalCount %></strong>개의 학습자료를 찾았습니다
+                </div>
+                
+                <!-- 자료 등록 버튼 -->
+                <div class="upload-section">
+                    <% if (loginUser != null) { %>
+                        <% if ("instructor".equals(loginUser.userRole())) { %>
+                            <!-- 강사 권한: 자료 등록 -->
+                            <button class="btn-upload" onclick="goToUpload()">
+                                <i class="bi bi-cloud-upload me-2"></i>자료 등록
+                            </button>
+                        <% } else if ("GENERAL".equals(loginUser.userRole())) { %>
+                            <!-- 일반 사용자: 권한 요청 -->
+                            <button class="btn-permission" onclick="requestPermission()">
+                                <i class="bi bi-person-plus me-2"></i>권한 요청
+                            </button>
+                        <% } %>
+                    <% } else { %>
+                        <!-- 비로그인: 로그인 유도 -->
+                        <button class="btn-login-required" onclick="showLoginAlert()">
+                            <i class="bi bi-plus-circle me-2"></i>자료 등록
+                        </button>
+                    <% } %>
+                </div>
             </div>
         </div>
         
@@ -522,7 +624,6 @@
         <% } %>
     </div>
 </div>
-
 <script>
 $(document).ready(function() {
     // 현재 선택된 필터값들
@@ -728,6 +829,23 @@ function downloadMaterial(materialId, materialTitle) {
         
         // 3초 후 스피너 숨김 (다운로드 시작 후)
         setTimeout(hideSpinner, 3000);
+    }
+}
+
+//자료 등록 페이지로 이동 (강사 권한)
+function goToUpload() {
+    location.href = '<%= request.getContextPath() %>/market/upload.do';
+}
+
+// 권한 요청 (일반 사용자)
+function requestPermission() {
+	location.href = '<%= request.getContextPath() %>/instructor/applyview.do';
+}
+
+// 로그인 필요 알림 (비로그인 사용자)
+function showLoginAlert() {
+    if (confirm('자료 등록을 위해서는 로그인이 필요합니다.\n로그인 페이지로 이동하시겠습니까?')) {
+        location.href = '<%= request.getContextPath() %>/user/loginview.do?returnUrl=' + encodeURIComponent(location.href);
     }
 }
 </script>

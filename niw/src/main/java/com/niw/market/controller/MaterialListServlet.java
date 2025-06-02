@@ -29,13 +29,13 @@ public class MaterialListServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
         
-        // 파라미터 받기
+
         String category = request.getParameter("category");
         String grade = request.getParameter("grade");
         String subject = request.getParameter("subject");
         String cPageStr = request.getParameter("cPage");
         
-        // 기본값 설정
+
         if (category == null) category = "전체";
         if (grade == null) grade = "전체";
         if (subject == null) subject = "전체";
@@ -54,20 +54,20 @@ public class MaterialListServlet extends HttpServlet {
         HttpSession session = request.getSession();
         User loginUser=(User)session.getAttribute("loginUser");
         try {
-            // 전체 개수 조회
+            
             int totalCount = dao.getTotalCountByFilter(conn, category, grade, subject);
             
-            // 페이징 계산
+             
             int totalPage = (int) Math.ceil((double) totalCount / PAGE_SIZE);
             if (totalPage == 0) totalPage = 1;
             
             int startRow = (cPage - 1) * PAGE_SIZE + 1;
             int endRow = cPage * PAGE_SIZE;
             
-            // 자료 목록 조회
+            
             List<Material> materials = dao.getMaterialListByFilter(conn, category, grade, subject, startRow, endRow);
             
-            // 페이지바 생성
+          
             String pageBar = generatePageBar(request, cPage, totalPage, category, grade, subject);
             List<Integer> purchases= new ArrayList<>();
             if(loginUser!=null) {
@@ -93,7 +93,7 @@ public class MaterialListServlet extends HttpServlet {
             request.setAttribute("selectedGrade", grade);
             request.setAttribute("selectedSubject", subject);
             
-            // JSP로 포워딩
+    
             request.getRequestDispatcher("/WEB-INF/views/market/marketview.jsp").forward(request, response);
             
         } finally {
@@ -112,8 +112,7 @@ public class MaterialListServlet extends HttpServlet {
         }
         
         StringBuffer pageBar = new StringBuffer("<ul class='pagination justify-content-center'>");
-        
-        // 이전 버튼
+
         if (cPage == 1) {
             pageBar.append("<li class='page-item disabled'>");
             pageBar.append("<a class='page-link' href='#'> prev </a>");
@@ -126,7 +125,7 @@ public class MaterialListServlet extends HttpServlet {
             pageBar.append("</li>");
         }
         
-        // 페이지 번호들
+    
         for (int i = pageNo; i <= pageEnd; i++) {
             if (i == cPage) {
                 pageBar.append("<li class='page-item active'>");
@@ -139,8 +138,7 @@ public class MaterialListServlet extends HttpServlet {
             }
             pageBar.append("</li>");
         }
-        
-        // 다음 버튼
+       
         if (cPage == totalPage) {
             pageBar.append("<li class='page-item disabled'>");
             pageBar.append("<a class='page-link' href='#'> next </a>");
