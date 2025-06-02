@@ -4,7 +4,7 @@
 
 <%
     Material material = (Material) request.getAttribute("material");
-    Boolean isPurchased = (Boolean) request.getAttribute("isPurchased"); // ✅ 구매 여부 별도 받기
+    Boolean isPurchased = (Boolean) request.getAttribute("isPurchased");
     
     if (material == null) {
         response.sendRedirect(request.getContextPath() + "/market/list.do");
@@ -61,6 +61,7 @@
     align-items: center;
     justify-content: center;
     overflow: hidden;
+    position: relative;
 }
 
 .material-thumbnail img {
@@ -72,6 +73,90 @@
 .material-thumbnail i {
     font-size: 4rem;
     color: var(--bs-blind-dark);
+}
+
+/* 썸네일 슬라이더 스타일 */
+.thumbnail-slider {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.slider-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.slider-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: opacity 0.3s ease;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.slider-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 10;
+    opacity: 0;
+}
+
+.thumbnail-slider:hover .slider-btn {
+    opacity: 1;
+}
+
+.prev-btn {
+    left: 10px;
+}
+
+.next-btn {
+    right: 10px;
+}
+
+.slider-btn:hover {
+    background: rgba(0, 0, 0, 0.7);
+    transform: translateY(-50%) scale(1.1);
+}
+
+.slider-dots {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 5px;
+    z-index: 10;
+}
+
+.dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.dot.active {
+    background: white;
+    transform: scale(1.2);
 }
 
 .material-title {
@@ -295,6 +380,27 @@
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
 }
 
+/* 로딩 스피너 */
+.spinner-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.spinner-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 10px;
+    text-align: center;
+}
+
 @media (max-width: 768px) {
     .detail-content {
         grid-template-columns: 1fr;
@@ -334,9 +440,45 @@
                     <div class="material-thumbnail">
                         <% if (material.thumbnailFilePaths() != null && !material.thumbnailFilePaths().isEmpty() 
                                && !material.thumbnailFilePaths().get(0).trim().isEmpty()) { %>
-                            <img src="<%= request.getContextPath() %>/<%= material.thumbnailFilePaths().get(0) %>" 
-                                 alt="<%= material.materialTitle() %>"
-                                 onerror="this.style.display='none'; this.parentNode.innerHTML='<i class=\'bi bi-file-earmark-text\' style=\'font-size: 4rem; color: var(--bs-blind-dark);\'></i>';">
+                            
+                            <% if (material.thumbnailFilePaths().size() == 1) { %>
+                                <!-- 단일 이미지 -->
+                                <img src="<%= request.getContextPath() %>/<%= material.thumbnailFilePaths().get(0) %>" 
+                                     alt="<%= material.materialTitle() %>"
+                                     onerror="this.style.display='none'; this.parentNode.innerHTML='<i class=\'bi bi-file-earmark-text\' style=\'font-size: 4rem; color: var(--bs-blind-dark);\'></i>';">
+                            <% } else { %>
+                                <!-- 다중 이미지 슬라이더 -->
+                                <div class="thumbnail-slider" data-material-id="<%= material.materialId() %>">
+                                    <div class="slider-container">
+                                        <% for(int i = 0; i < material.thumbnailFilePaths().size(); i++) { %>
+                                            <img src="<%= request.getContextPath() %>/<%= material.thumbnailFilePaths().get(i) %>" 
+                                                 alt="<%= material.materialTitle() %> - 이미지 <%= (i+1) %>" 
+                                                 class="slider-image <%= i == 0 ? "active" : "" %>"
+                                                 style="<%= i == 0 ? "z-index: 1;" : "z-index: 0; opacity: 0;" %>"
+                                                 onerror="this.style.display='none';">
+                                        <% } %>
+                                    </div>
+                                    
+                                    <% if (material.thumbnailFilePaths().size() > 1) { %>
+                                        <!-- 슬라이더 컨트롤 -->
+                                        <button class="slider-btn prev-btn" onclick="changeSlide(<%= material.materialId() %>, -1)">
+                                            <i class="bi bi-chevron-left"></i>
+                                        </button>
+                                        <button class="slider-btn next-btn" onclick="changeSlide(<%= material.materialId() %>, 1)">
+                                            <i class="bi bi-chevron-right"></i>
+                                        </button>
+                                        
+                                        <!-- 도트 인디케이터 -->
+                                        <div class="slider-dots">
+                                            <% for(int i = 0; i < material.thumbnailFilePaths().size(); i++) { %>
+                                                <span class="dot <%= i == 0 ? "active" : "" %>" 
+                                                      onclick="currentSlide(<%= material.materialId() %>, <%= i %>)"></span>
+                                            <% } %>
+                                        </div>
+                                    <% } %>
+                                </div>
+                            <% } %>
+                            
                         <% } else { %>
                             <i class="bi bi-file-earmark-text"></i>
                         <% } %>
@@ -423,7 +565,7 @@
                                 <i class="bi bi-download"></i>다운로드
                             </button>
                         <% } else { %>
-                            <button class="btn-purchase" onclick="purchaseMaterial(<%= material.materialId() %>)">
+                            <button class="btn-purchase" onclick="purchaseMaterial(<%= material.materialId() %>, '<%= material.materialTitle() %>', <%= material.materialPrice() %>)">
                                 <i class="bi bi-cart-plus"></i>구매하기
                             </button>
                         <% } %>
@@ -465,6 +607,61 @@
 <% } %>
 
 <script>
+// 슬라이더 기능
+let currentSlideIndex = {};
+
+function changeSlide(materialId, direction) {
+    const slider = document.querySelector(`[data-material-id="\${materialId}"]`);
+    if (!slider) return;
+    
+    const images = slider.querySelectorAll('.slider-image');
+    const dots = slider.querySelectorAll('.dot');
+    
+    if (!currentSlideIndex[materialId]) {
+        currentSlideIndex[materialId] = 0;
+    }
+    
+    // 현재 이미지 숨기기
+    images[currentSlideIndex[materialId]].style.opacity = '0';
+    images[currentSlideIndex[materialId]].style.zIndex = '0';
+    dots[currentSlideIndex[materialId]].classList.remove('active');
+    
+    // 다음/이전 슬라이드 인덱스 계산
+    currentSlideIndex[materialId] += direction;
+    
+    if (currentSlideIndex[materialId] >= images.length) {
+        currentSlideIndex[materialId] = 0;
+    } else if (currentSlideIndex[materialId] < 0) {
+        currentSlideIndex[materialId] = images.length - 1;
+    }
+    
+    // 새 이미지 표시
+    images[currentSlideIndex[materialId]].style.opacity = '1';
+    images[currentSlideIndex[materialId]].style.zIndex = '1';
+    dots[currentSlideIndex[materialId]].classList.add('active');
+}
+
+function currentSlide(materialId, slideIndex) {
+    const slider = document.querySelector(`[data-material-id="\${materialId}"]`);
+    if (!slider) return;
+    
+    const images = slider.querySelectorAll('.slider-image');
+    const dots = slider.querySelectorAll('.dot');
+    
+    // 현재 이미지 숨기기
+    if (currentSlideIndex[materialId] !== undefined) {
+        images[currentSlideIndex[materialId]].style.opacity = '0';
+        images[currentSlideIndex[materialId]].style.zIndex = '0';
+        dots[currentSlideIndex[materialId]].classList.remove('active');
+    }
+    
+    // 선택된 이미지 표시
+    currentSlideIndex[materialId] = slideIndex;
+    images[slideIndex].style.opacity = '1';
+    images[slideIndex].style.zIndex = '1';
+    dots[slideIndex].classList.add('active');
+}
+
 $(document).ready(function() {
     // 카드 애니메이션
     $('.detail-card').css({
@@ -495,19 +692,59 @@ $(document).ready(function() {
 });
 
 // 자료 구매
-function purchaseMaterial(materialId) {
+function purchaseMaterial(materialId, materialTitle, price) {
     <% if (loginUser == null) { %>
         alert('로그인이 필요한 서비스입니다.');
         location.href = '<%= request.getContextPath() %>/user/loginview.do';
         return;
     <% } %>
     
-    if (confirm('이 자료를 구매하시겠습니까?')) {
-        // 구매 처리 로직 (추후 구현)
-        alert('구매 기능은 준비 중입니다.');
+    if (!confirm(`'\${materialTitle}' 자료를 \${price.toLocaleString()}원에 구매하시겠습니까?`)) {
+        return;
     }
+    
+    const button = $(`.btn-purchase[data-material-id="\${materialId}"]`);
+    button.prop('disabled', true).html('<i class="bi bi-hourglass-split me-1"></i>처리중...');
+    
+    showSpinner('구매 처리 중...');
+    
+    $.ajax({
+        url: '<%= request.getContextPath() %>/market/purchase.do',
+        type: 'POST',
+        data: { materialId: materialId },
+        dataType: 'json',
+        success: function(response) {
+            hideSpinner();
+            
+            if (response.success) {
+                alert(`구매가 완료되었습니다!\n\${response.materialTitle}\n결제 금액: \${response.price.toLocaleString()}원`);
+                
+                // 버튼을 다운로드 버튼으로 변경
+                button.removeClass('btn-purchase')
+                      .addClass('btn-download')
+                      .prop('disabled', false)
+                      .html('<i class="bi bi-download me-1"></i>다운로드')
+                      .attr('onclick', `event.stopPropagation(); downloadMaterial(\${materialId}, '\${materialTitle}')`);
+                
+                // 구매한 자료 ID 목록에 추가 (새로고침 없이 상태 유지)
+                window.purchasedMaterialIds = window.purchasedMaterialIds || [];
+                if (!window.purchasedMaterialIds.includes(materialId)) {
+                    window.purchasedMaterialIds.push(materialId);
+                }
+                
+            } else {
+                alert(response.message);
+                button.prop('disabled', false).html('<i class="bi bi-cart-plus me-1"></i>구매하기');
+            }
+        },
+        error: function(xhr, status, error) {
+            hideSpinner();
+            console.error('구매 요청 실패:', xhr.responseText);
+            alert('구매 처리 중 오류가 발생했습니다. 다시 시도해주세요.');
+            button.prop('disabled', false).html('<i class="bi bi-cart-plus me-1"></i>구매하기');
+        }
+    });
 }
-
 // 구매한 자료 다운로드
 function downloadMaterial(materialId) {
     <% if (loginUser == null) { %>
@@ -531,6 +768,24 @@ $('#previewModal').on('shown.bs.modal', function() {
         'opacity': '1'
     }, 300).css('transform', 'scale(1)');
 });
+
+function showSpinner(message = '처리 중...') {
+    const spinner = $(`
+        <div class="spinner-overlay">
+            <div class="spinner-content">
+                <div class="spinner-border text-primary mb-2" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mb-0">${message}</p>
+            </div>
+        </div>
+    `);
+    $('body').append(spinner);
+}
+
+function hideSpinner() {
+    $('.spinner-overlay').remove();
+}
 </script>
 
 <%@ include file="/WEB-INF/views/common/footer.jsp" %>

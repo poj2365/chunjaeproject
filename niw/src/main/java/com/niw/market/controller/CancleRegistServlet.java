@@ -47,9 +47,11 @@ public class CancleRegistServlet extends HttpServlet {
 		HttpSession session = request.getSession();
 		User user = (User) session.getAttribute("loginUser");
 		Material material = (Material) session.getAttribute("material");
+		
 		System.out.println(material.savedFileName());
 		System.out.println("ss" + request.getParameter("savedFileName"));
 		System.out.println("삭제실행");
+		
 		if (request.getParameter("savedFileName").equals(material.savedFileName())) {
 			System.out.println("삭제완료");
 			String filePath = material.materialFilePath() + File.separator + material.savedFileName();

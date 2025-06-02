@@ -54,15 +54,20 @@ public class RegistMaterialServlet extends HttpServlet {
 		String originalFileName=material.originalFileName();
 		String savedFileName=material.savedFileName();
 		String materialDescription=request.getParameter("materialDescription");
+		
 		int materialPrice = Integer.parseInt(request.getParameter("price"));
 		int materialPage = material.materialPage();
+		
 		String previewPath=material.previewPath();
 		String[] pages=request.getParameterValues("selectedPreviewPages");
+		
 		List<String> thumbnailFilePaths= new ArrayList<>();
+		
 		for(int i=0;i<pages.length;i++) {
-			thumbnailFilePaths.add(previewPath+"/"+savedFileName.substring(0,savedFileName.lastIndexOf("."))+"_preview_page"+pages[i]);
+			thumbnailFilePaths.add("resources/upload/market/"+userId+"/material/previews/"+savedFileName.substring(0,savedFileName.lastIndexOf("."))+"_preview_page"+pages[i]+".png");
 		}
-		String materialFilePath=material.materialFilePath();
+		
+		String materialFilePath="resources/upload/market/"+userId+"/material"+savedFileName;
 		String materialStatus=null;
 		String materialCategory=request.getParameter("category");
 		String materialGrade=request.getParameter("grade");
