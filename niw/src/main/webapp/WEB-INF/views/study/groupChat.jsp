@@ -317,7 +317,7 @@ int groupNumber = (int) request.getAttribute("groupNumber");
     });
     
         //접속요청을 서버에 보냄
-        let socket=new WebSocket("ws://localhost:9090<%=request.getContextPath()%>/study/groupchat?groupNumber=" + groupNumber);
+        let socket=new WebSocket("ws://13.124.190.205:8080<%=request.getContextPath()%>/study/groupchat?groupNumber=" + groupNumber);
         //핸들러 등록하기
         socket.onopen=(response)=>{
             console.log(response);
