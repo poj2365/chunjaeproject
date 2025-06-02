@@ -39,6 +39,15 @@ public enum BoardService {
 		close(conn);
 		return result;
 	}
+
+	public int countArticleByUser(String userId) {
+		Connection conn = getConnection();
+		int result = BoardDao.DAO.countArticleByUser(conn, userId);
+		if(result > 0) commit(conn);
+		else rollback(conn);
+		close(conn);
+		return result;
+	}
 	
 	public Article searchArticleById(int articleId) {
 		Connection conn = getConnection();
@@ -50,6 +59,20 @@ public enum BoardService {
 	public List<Comment> searchCommentByArticle(int articleId) {
 		Connection conn = getConnection();
 		List<Comment> comments = BoardDao.DAO.searchCommentByArticle(conn, articleId);
+		close(conn);
+		return comments;
+	}
+	
+	public int countCommentByUser(String userId) {
+		Connection conn = getConnection();
+		int result = BoardDao.DAO.countCommentByUser(conn, userId);
+		close(conn);
+		return result;
+	}
+	
+	public List<Comment> searchCommentByUser(String userId, int cPage, int numPerPage, int totalData){
+		Connection conn = getConnection();
+		List<Comment> comments = BoardDao.DAO.searchCommentByUser(conn, userId, cPage, numPerPage, totalData);
 		close(conn);
 		return comments;
 	}
@@ -77,6 +100,20 @@ public enum BoardService {
 		int bookmark = BoardDao.DAO.searchBookmark(conn, userId, articleId);
 		close(conn);
 		return bookmark;
+	}
+	
+	public int countBookmarkByUser(String userId) {
+		Connection conn = getConnection();
+		int result = BoardDao.DAO.countBookmarkByUser(conn, userId);
+		close(conn);
+		return result;
+	}
+	
+	public List<Article> searchBookmarkByUser(String userId, int cPage, int numPerPage, int totalData){
+		Connection conn = getConnection();
+		List<Article> bookmarks = BoardDao.DAO.searchBookmarkByUser(conn, userId, cPage, numPerPage, totalData);
+		close(conn);
+		return bookmarks;
 	}
 	
 	public int searchReport(String userId, int targetId, String targetType) {

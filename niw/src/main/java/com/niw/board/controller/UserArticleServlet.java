@@ -15,7 +15,7 @@ import com.niw.board.model.dto.Article;
 import com.niw.board.service.BoardService;
 import com.niw.user.model.dto.User;
 
-@WebServlet("/user/myPosts.do")
+@WebServlet("/user/myarticle.do")
 public class UserArticleServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
@@ -28,11 +28,11 @@ public class UserArticleServlet extends HttpServlet {
 		User user = (User) request.getSession().getAttribute("loginUser");
 		if(user != null) {
 			int category = 0;
-			int cPage = 1, numPerPage = 10, pageBarSize = 5;
+			int cPage = 1, numPerPage = 5, pageBarSize = 5;
 			if(request.getParameter("cPage") != null) {
 				cPage = Integer.parseInt(request.getParameter("cPage"));
 			}
-			int totalData = BoardService.SERVICE.countArticle(category, "", 0);
+			int totalData = BoardService.SERVICE.countArticleByUser(user.userId());
 			int totalPage = (totalData - 1) / numPerPage + 1; 
 			int pageNo = 1, pageEnd = totalPage;
 			if(pageBarSize < totalPage) {
@@ -49,22 +49,18 @@ public class UserArticleServlet extends HttpServlet {
 	        if (cPage == 1) {
 	            pageBar.append("<li class='page-item disabled'><a class='page-link' href='#'>prev</a></li>");
 	        } else {
-	            pageBar.append("<li class='page-item'><a class='page-link' href='")
-	                   .append(request.getContextPath())
-	                   .append("/user/myPosts.do?cPage=")
-	                   .append(cPage - 1)
-	                   .append("'>prev</a></li>");
+	            pageBar.append("<li class='page-item'><a class='page-link' onclick=\"loadData('")
+	                   .append(pageNo > 1? pageNo - 1 : 1)
+	                   .append("')\">prev</a></li>");
 	        }
 
 	        for (int i = pageNo; i <= pageEnd; i++) {
 	            if (i == cPage) {
 	                pageBar.append("<li class='page-item active'><a class='page-link' href='#'>").append(i).append("</a></li>");
 	            } else {
-	                pageBar.append("<li class='page-item'><a class='page-link' href='")
-	                       .append(request.getContextPath())
-	                       .append("/user/myPosts.do?cPage=")
+	                pageBar.append("<li class='page-item'><a class='page-link' onclick=\"loadData('")
 	                       .append(i)
-	                       .append("'>")
+	                       .append("')\">")
 	                       .append(i)
 	                       .append("</a></li>");
 	            }
@@ -73,11 +69,9 @@ public class UserArticleServlet extends HttpServlet {
 	        if (cPage == totalPage) {
 	            pageBar.append("<li class='page-item disabled'><a class='page-link' href='#'>next</a></li>");
 	        } else {
-	            pageBar.append("<li class='page-item'><a class='page-link' href='")
-	                   .append(request.getContextPath())
-	                   .append("/user/myPosts.do?cPage=")
-	                   .append(cPage + 1)
-	                   .append("'>next</a></li>");
+	            pageBar.append("<li class='page-item'><a class='page-link' onclick=\"loadData('")
+	                   .append(pageEnd < totalPage? pageEnd + 1 : totalPage)
+	                   .append("')\">next</a></li>");
 	        }
 
 	        pageBar.append("</ul>");
@@ -87,9 +81,8 @@ public class UserArticleServlet extends HttpServlet {
 
 	        response.setContentType("application/json; charset=UTF-8");
 	        response.getWriter().write(new Gson().toJson(Map.of(
-	            "articles", articles,
-	            "url", request.getContextPath() + "/boarddetail.do?articleId=",
-	            "totalPages", totalPage
+	            "list", articles,
+	            "pageBar", pageBar
 	        )));
 		}
 	}
