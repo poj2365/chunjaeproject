@@ -3,7 +3,7 @@ package com.niw.market.model.service;
 import java.sql.Connection;
 import java.util.List;
 
-import com.niw.common.JDBCTemplate;
+import static com.niw.common.JDBCTemplate.*;
 import com.niw.market.model.dao.MaterialDao;
 import com.niw.market.model.dto.Material;
 
@@ -12,27 +12,25 @@ public enum MaterialService {
     
     private MaterialDao dao = MaterialDao.DAO;
     
-    /**
-     * 자료 등록
-     */
+
     public int registMaterial(Material material) {
-        Connection conn = JDBCTemplate.getConnection();
+        Connection conn = getConnection();
         int result = 0;
         
         try {
             result = dao.registMaterial(conn, material);
             
             if (result > 0) {
-                JDBCTemplate.commit(conn);
+               commit(conn);
             } else {
-                JDBCTemplate.rollback(conn);
+                rollback(conn);
             }
             
         } catch (Exception e) {
             e.printStackTrace();
-            JDBCTemplate.rollback(conn);
+           rollback(conn);
         } finally {
-            JDBCTemplate.close(conn);
+           close(conn);
         }
         
         return result;
@@ -42,7 +40,7 @@ public enum MaterialService {
      * 자료 상세 조회 (조회수 증가 포함)
      */
     public Material getMaterialDetail(int materialId) {
-        Connection conn = JDBCTemplate.getConnection();
+        Connection conn = getConnection();
         Material material = null;
         
         try {
@@ -54,29 +52,27 @@ public enum MaterialService {
                 int updateResult = dao.increaseViewCount(conn, materialId);
                 
                 if (updateResult > 0) {
-                    JDBCTemplate.commit(conn);
+                   commit(conn);
                     // 조회수가 증가된 자료 다시 조회
                     material = dao.searchById(conn, materialId);
                 } else {
-                    JDBCTemplate.rollback(conn);
+                  rollback(conn);
                 }
             }
             
         } catch (Exception e) {
             e.printStackTrace();
-            JDBCTemplate.rollback(conn);
+           rollback(conn);
         } finally {
-            JDBCTemplate.close(conn);
+           close(conn);
         }
         
         return material;
     }
     
-    /**
-     * 자료 조회 (조회수 증가 없음)
-     */
+
     public Material getMaterialById(int materialId) {
-        Connection conn = JDBCTemplate.getConnection();
+        Connection conn = getConnection();
         Material material = null;
         
         try {
@@ -84,7 +80,7 @@ public enum MaterialService {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            JDBCTemplate.close(conn);
+          close(conn);
         }
         
         return material;
@@ -92,7 +88,7 @@ public enum MaterialService {
     
   
     public MaterialListResult getMaterialList(String category, String grade, String subject, int currentPage, int pageSize) {
-        Connection conn = JDBCTemplate.getConnection();
+        Connection conn = getConnection();
         MaterialListResult result = new MaterialListResult();
         
         try {
@@ -123,7 +119,7 @@ public enum MaterialService {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            JDBCTemplate.close(conn);
+            close(conn);
         }
         
         return result;
@@ -141,24 +137,24 @@ public enum MaterialService {
     
  
     public boolean increaseViewCount(int materialId) {
-        Connection conn = JDBCTemplate.getConnection();
+        Connection conn = getConnection();
         boolean result = false;
         
         try {
             int updateResult = dao.increaseViewCount(conn, materialId);
             
             if (updateResult > 0) {
-                JDBCTemplate.commit(conn);
+              commit(conn);
                 result = true;
             } else {
-                JDBCTemplate.rollback(conn);
+               rollback(conn);
             }
             
         } catch (Exception e) {
             e.printStackTrace();
-            JDBCTemplate.rollback(conn);
+           rollback(conn);
         } finally {
-            JDBCTemplate.close(conn);
+            close(conn);
         }
         
         return result;
@@ -166,24 +162,24 @@ public enum MaterialService {
     
     
     public boolean increaseDownloadCount(int materialId) {
-        Connection conn = JDBCTemplate.getConnection();
+        Connection conn = getConnection();
         boolean result = false;
         
         try {
             int updateResult = dao.increaseDownloadCount(conn, materialId);
             
             if (updateResult > 0) {
-                JDBCTemplate.commit(conn);
+               commit(conn);
                 result = true;
             } else {
-                JDBCTemplate.rollback(conn);
+                rollback(conn);
             }
             
         } catch (Exception e) {
             e.printStackTrace();
-            JDBCTemplate.rollback(conn);
+            rollback(conn);
         } finally {
-            JDBCTemplate.close(conn);
+            close(conn);
         }
         
         return result;

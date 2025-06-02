@@ -5,6 +5,7 @@
 
 <%
     List<Material> materials = (List<Material>) request.getAttribute("materials");
+    List<Integer> purchasedMaterialIds = (List<Integer>) request.getAttribute("purchases");
     String pageBar = (String) request.getAttribute("pageBar");
     Integer totalCount = (Integer) request.getAttribute("totalCount");
     String selectedCategory = (String) request.getAttribute("selectedCategory");
@@ -14,6 +15,7 @@
     if (selectedCategory == null) selectedCategory = "전체";
     if (selectedGrade == null) selectedGrade = "전체";
     if (selectedSubject == null) selectedSubject = "전체";
+    if (purchasedMaterialIds == null) purchasedMaterialIds = java.util.Collections.emptyList();
 %>
 
 <style>
@@ -128,6 +130,9 @@
 
 .card-content {
     padding: 1.5rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 .card-category {
@@ -196,11 +201,13 @@
 .card-actions {
     display: flex;
     justify-content: flex-end;
-    margin-top: 1rem;
+    margin-top: auto;
+    padding-top: 1rem;
 }
 
 .btn-card-download,
-.btn-card-purchase {
+.btn-card-purchase,
+.btn-card-purchased {
     padding: 0.5rem 1rem;
     border: none;
     border-radius: 25px;
@@ -235,6 +242,18 @@
     background: linear-gradient(45deg, var(--bs-blind-dark), var(--bs-blind-light-gray));
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(26, 138, 142, 0.3);
+}
+
+.btn-card-purchased {
+    background: linear-gradient(45deg, #48bb78, #38a169);
+    color: white;
+    cursor: default;
+}
+
+.btn-card-purchase:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
 }
 
 .result-summary {
@@ -292,6 +311,27 @@
     background: linear-gradient(45deg, var(--bs-blind-gray), var(--bs-blind-dark));
     color: white;
     transform: translateY(-2px);
+}
+
+/* 로딩 스피너 */
+.spinner-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.spinner-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 10px;
+    text-align: center;
 }
 
 @media (max-width: 768px) {
@@ -441,14 +481,23 @@
                                     </div>
                                 </div>
                                 
-                                <!-- 구매하기 버튼 -->
-                                <div class="card-actions mt-3">
-                                    <% if (material.materialPrice() == 0) { %>
-                                        <button class="btn-card-download" onclick="event.stopPropagation(); downloadMaterial(<%= material.materialId() %>)">
+                                <!-- 구매/다운로드 버튼 -->
+                                <div class="card-actions">
+                                    <% if (purchasedMaterialIds.contains(material.materialId())) { %>
+                                        <!-- 이미 구매한 자료 -->
+                                        <button class="btn-card-download" onclick="event.stopPropagation(); downloadMaterial(<%= material.materialId() %>, '<%= material.materialTitle() %>')">
+                                            <i class="bi bi-download me-1"></i>다운로드
+                                        </button>
+                                    <% } else if (material.materialPrice() == 0) { %>
+                                        <!-- 무료 자료 -->
+                                        <button class="btn-card-download" onclick="event.stopPropagation(); downloadMaterial(<%= material.materialId() %>, '<%= material.materialTitle() %>')">
                                             <i class="bi bi-download me-1"></i>무료 다운로드
                                         </button>
                                     <% } else { %>
-                                        <button class="btn-card-purchase" onclick="event.stopPropagation(); purchaseMaterial(<%= material.materialId() %>)">
+                                        <!-- 유료 자료 구매 -->
+                                        <button class="btn-card-purchase" 
+                                                onclick="event.stopPropagation(); purchaseMaterial(<%= material.materialId() %>, '<%= material.materialTitle() %>', <%= material.materialPrice() %>)"
+                                                data-material-id="<%= material.materialId() %>">
                                             <i class="bi bi-cart-plus me-1"></i>구매하기
                                         </button>
                                     <% } %>
@@ -511,15 +560,6 @@ $(document).ready(function() {
         location.href = '<%= request.getContextPath() %>/market/detail.do?id=' + materialId;
     });
     
-    // 페이지네이션 클릭 이벤트
-    $(document).on('click', '.pagination .page-link', function(e) {
-        e.preventDefault();
-        const href = $(this).attr('href');
-        if (href && href !== '#') {
-            location.href = href;
-        }
-    });
-    
     // 카테고리에 따른 학년 버튼 조정
     function adjustGradeButtons(category) {
         const gradeButtons = $('#gradeButtons .filter-btn');
@@ -552,39 +592,12 @@ $(document).ready(function() {
             cPage: page
         };
         
-        // 로딩 애니메이션 표시
-        showLoading();
-        
         // 페이지 이동
         location.href = url + '?' + $.param(params);
     }
     
-    // 로딩 애니메이션
-    function showLoading() {
-        $('.material-grid').html(`
-            <div style="grid-column: 1 / -1; text-align: center; padding: 3rem;">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Loading...</span>
-                </div>
-                <p class="text-muted mt-2">자료를 불러오는 중...</p>
-            </div>
-        `);
-    }
-    
     // 초기 로드시 학년 버튼 조정
     adjustGradeButtons(currentCategory);
-    
-    // 이미지 로딩 에러 처리
-    $('.card-thumbnail').on('error', function() {
-        console.log('이미지 로딩 실패:', $(this).attr('src'));
-        $(this).hide();
-        $(this).parent().html('<i class="bi bi-file-earmark-text"></i>');
-    });
-    
-    // 이미지 로딩 성공 확인
-    $('.card-thumbnail').on('load', function() {
-        console.log('이미지 로딩 성공:', $(this).attr('src'));
-    });
     
     // 카드 호버 애니메이션
     $('.material-card').hover(
@@ -625,29 +638,96 @@ $(document).ready(function() {
     });
 });
 
-// 자료 구매하기
-function purchaseMaterial(materialId) {
-    <% if (loginUser == null) { %>
-        alert('로그인이 필요한 서비스입니다.');
-        location.href = '<%= request.getContextPath() %>/user/loginview.do';
-        return;
-    <% } %>
-    
-    // 상세페이지로 이동해서 구매 진행
-    location.href = '<%= request.getContextPath() %>/market/detail.do?id=' + materialId;
+// 로딩 스피너 표시/숨김
+function showSpinner(message = '처리 중...') {
+    const spinner = $(`
+        <div class="spinner-overlay">
+            <div class="spinner-content">
+                <div class="spinner-border text-primary mb-2" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mb-0">${message}</p>
+            </div>
+        </div>
+    `);
+    $('body').append(spinner);
 }
 
-// 무료 자료 다운로드
-function downloadMaterial(materialId) {
+function hideSpinner() {
+    $('.spinner-overlay').remove();
+}
+
+// 자료 구매하기
+function purchaseMaterial(materialId, materialTitle, price) {
     <% if (loginUser == null) { %>
         alert('로그인이 필요한 서비스입니다.');
         location.href = '<%= request.getContextPath() %>/user/loginview.do';
         return;
     <% } %>
     
-    if (confirm('이 자료를 다운로드하시겠습니까?')) {
-        // 바로 다운로드 처리
+    if (!confirm(`'\${materialTitle}' 자료를 \${price.toLocaleString()}원에 구매하시겠습니까?`)) {
+        return;
+    }
+    
+    const button = $(`.btn-card-purchase[data-material-id="\${materialId}"]`);
+    button.prop('disabled', true).html('<i class="bi bi-hourglass-split me-1"></i>처리중...');
+    
+    showSpinner('구매 처리 중...');
+    
+    $.ajax({
+        url: '<%= request.getContextPath() %>/market/purchase.do',
+        type: 'POST',
+        data: { materialId: materialId },
+        dataType: 'json',
+        success: function(response) {
+            hideSpinner();
+            
+            if (response.success) {
+                alert(`구매가 완료되었습니다!\n\${response.materialTitle}\n결제 금액: \${response.price.toLocaleString()}원`);
+                
+                // 버튼을 다운로드 버튼으로 변경
+                button.removeClass('btn-card-purchase')
+                      .addClass('btn-card-download')
+                      .prop('disabled', false)
+                      .html('<i class="bi bi-download me-1"></i>다운로드')
+                      .attr('onclick', `event.stopPropagation(); downloadMaterial(\${materialId}, '\${materialTitle}')`);
+                
+                // 구매한 자료 ID 목록에 추가 (새로고침 없이 상태 유지)
+                window.purchasedMaterialIds = window.purchasedMaterialIds || [];
+                if (!window.purchasedMaterialIds.includes(materialId)) {
+                    window.purchasedMaterialIds.push(materialId);
+                }
+                
+            } else {
+                alert(response.message);
+                button.prop('disabled', false).html('<i class="bi bi-cart-plus me-1"></i>구매하기');
+            }
+        },
+        error: function(xhr, status, error) {
+            hideSpinner();
+            console.error('구매 요청 실패:', xhr.responseText);
+            alert('구매 처리 중 오류가 발생했습니다. 다시 시도해주세요.');
+            button.prop('disabled', false).html('<i class="bi bi-cart-plus me-1"></i>구매하기');
+        }
+    });
+}
+
+// 자료 다운로드
+function downloadMaterial(materialId, materialTitle) {
+    <% if (loginUser == null) { %>
+        alert('로그인이 필요한 서비스입니다.');
+        location.href = '<%= request.getContextPath() %>/user/loginview.do';
+        return;
+    <% } %>
+    
+    if (confirm(`'\${materialTitle}' 자료를 다운로드하시겠습니까?`)) {
+        showSpinner('다운로드 준비 중...');
+        
+        // 다운로드 페이지로 이동
         location.href = '<%= request.getContextPath() %>/market/download.do?id=' + materialId;
+        
+        // 3초 후 스피너 숨김 (다운로드 시작 후)
+        setTimeout(hideSpinner, 3000);
     }
 }
 </script>
