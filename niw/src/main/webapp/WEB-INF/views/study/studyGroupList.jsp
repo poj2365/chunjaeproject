@@ -227,6 +227,13 @@
         font-weight: bold;
         color: #333;
     }
+   .clickable-ul {
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+.clickable-ul:hover {
+    color: #4ecdc4;
+}
 </style>
 <section>
 <!-- 메인 컨테이너 -->
@@ -301,7 +308,7 @@
         <!-- 게시글 리스트 -->
         <% if (studygroups != null && !studygroups.isEmpty()) {
             for (StudyGroup g : studygroups) { %>
-                <ul class="board-row">
+                <ul class="board-row clickable-ul" onclick="goToGroup(<%=g.groupNumber()%>)">
                     <li class="col-no"><%=g.groupNumber()%></li>
                     <li class="col-title">
                    		<% String status = g.status(); 
@@ -310,9 +317,7 @@
 						<% } else if ("CLOSED".equals(status)) { %>
   						 <span class="badge bg-secondary">모집 완료</span>
 						<% } %>
-                        <a href="<%=request.getContextPath()%>/study/groupview.do?no=<%=g.groupNumber()%>">
                             <%=g.groupName()%>
-                        </a>
                     </li>
                     <li class="col-writer"><%=g.userId()%></li>
                     <li class="col-date"><%=g.createDate()%></li>
@@ -371,5 +376,9 @@
 	       document.querySelector('#pagebar').innerHTML = newPagebar;
 	     });
 	 });
+   
+   function goToGroup(groupNumber) {
+	    location.href = '<%=request.getContextPath()%>/study/groupview.do?no=' + groupNumber;
+	}
    </script>
    <%@include file="/WEB-INF/views/common/footer.jsp" %>
