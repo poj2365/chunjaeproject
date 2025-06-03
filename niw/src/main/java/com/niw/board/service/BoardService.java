@@ -31,9 +31,25 @@ public enum BoardService {
 		return articles;
 	}
 	
+	public List<Article> searchArticleByRecommend(int recommend, String searchData, int numPerPage){
+		Connection conn = getConnection();
+		List<Article> articles = BoardDao.DAO.searchArticleByRecommend(conn, recommend, searchData, numPerPage);
+		close(conn);
+		return articles;
+	}
+	
 	public int countArticle(int category, String searchData, int likes) {
 		Connection conn = getConnection();
 		int result = BoardDao.DAO.countArticle(conn, category, searchData, likes);
+		if(result > 0) commit(conn);
+		else rollback(conn);
+		close(conn);
+		return result;
+	}
+
+	public int countArticleByUser(String userId) {
+		Connection conn = getConnection();
+		int result = BoardDao.DAO.countArticleByUser(conn, userId);
 		if(result > 0) commit(conn);
 		else rollback(conn);
 		close(conn);
@@ -50,6 +66,20 @@ public enum BoardService {
 	public List<Comment> searchCommentByArticle(int articleId) {
 		Connection conn = getConnection();
 		List<Comment> comments = BoardDao.DAO.searchCommentByArticle(conn, articleId);
+		close(conn);
+		return comments;
+	}
+	
+	public int countCommentByUser(String userId) {
+		Connection conn = getConnection();
+		int result = BoardDao.DAO.countCommentByUser(conn, userId);
+		close(conn);
+		return result;
+	}
+	
+	public List<Comment> searchCommentByUser(String userId, int cPage, int numPerPage, int totalData){
+		Connection conn = getConnection();
+		List<Comment> comments = BoardDao.DAO.searchCommentByUser(conn, userId, cPage, numPerPage, totalData);
 		close(conn);
 		return comments;
 	}
@@ -77,6 +107,20 @@ public enum BoardService {
 		int bookmark = BoardDao.DAO.searchBookmark(conn, userId, articleId);
 		close(conn);
 		return bookmark;
+	}
+	
+	public int countBookmarkByUser(String userId) {
+		Connection conn = getConnection();
+		int result = BoardDao.DAO.countBookmarkByUser(conn, userId);
+		close(conn);
+		return result;
+	}
+	
+	public List<Article> searchBookmarkByUser(String userId, int cPage, int numPerPage, int totalData){
+		Connection conn = getConnection();
+		List<Article> bookmarks = BoardDao.DAO.searchBookmarkByUser(conn, userId, cPage, numPerPage, totalData);
+		close(conn);
+		return bookmarks;
 	}
 	
 	public int searchReport(String userId, int targetId, String targetType) {
@@ -214,5 +258,28 @@ public enum BoardService {
 		return notice;
 	}
 	
+	public int countNotice() {
+		Connection conn = getConnection();
+		int result = BoardDao.DAO.countNotice(conn);
+		close(conn);
+		return result;
+	}
 	
+	public int saveNotice(Notice notice) {
+		Connection conn = getConnection();
+		int result = BoardDao.DAO.saveNotice(conn, notice);
+		if(result > 0) commit(conn);
+		else rollback(conn);
+		close(conn);
+		return result;
+	}
+	
+	public int deleteNotice(int noticeId) {
+		Connection conn = getConnection();
+		int result = BoardDao.DAO.deleteNotice(conn, noticeId);
+		if(result > 0) commit(conn);
+		else rollback(conn);
+		close(conn);
+		return result;
+	}
 }

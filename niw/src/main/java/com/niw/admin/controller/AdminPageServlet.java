@@ -1,32 +1,26 @@
-package com.niw.study.controller;
+package com.niw.admin.controller;
 
 import java.io.IOException;
-import java.sql.Date;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.websocket.Session;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.niw.study.model.dto.Calendar;
-import com.niw.study.model.service.CalendarService;
+import com.niw.common.CommonTemplate;
 
 /**
- * Servlet implementation class CalendarSearchServlet
+ * Servlet implementation class AdminPageServlet
  */
-@WebServlet("/study/calendarsearchbydate.do")
-public class CalendarSearchServlet extends HttpServlet {
+@WebServlet("/admin/adminpage.do")
+public class AdminPageServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public CalendarSearchServlet() {
+    public AdminPageServlet() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -35,16 +29,7 @@ public class CalendarSearchServlet extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String jsonData = request.getReader().lines().collect(Collectors.joining());
-//		Gson gson = new GsonBuilder().registerTypeAdapter(Date.class, jsonData);
-//		시리얼라이징 하면 가능
-		Gson gson = new Gson();
-		
-		Calendar c = gson.fromJson(jsonData, Calendar.class);
-		Calendar calList = CalendarService.SERVICE.searchCalendarById(c);
-		
-		response.setContentType("application/json;charset=utf-8");
-		new Gson().toJson(calList,response.getWriter());
+		request.getRequestDispatcher(CommonTemplate.WEB_VIEWS+"/admin/adminpage.jsp").forward(request, response);
 	}
 
 	/**

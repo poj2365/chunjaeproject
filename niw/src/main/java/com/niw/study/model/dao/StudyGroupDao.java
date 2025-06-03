@@ -229,4 +229,39 @@ public enum StudyGroupDao {
 		return result;
 	}
 
+	public List<StudyGroup> searchStudyGroupMain(Connection conn) {
+		List<StudyGroup> studygroups = new ArrayList();
+		try {
+			pstmt=conn.prepareStatement(sql.getProperty("searchStudyGroupMain"));
+			rs=pstmt.executeQuery();
+			while(rs.next()) {
+				studygroups.add(getStudygroup(rs));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally {
+			JDBCTemplate.close(rs);
+			JDBCTemplate.close(pstmt);
+		}
+		return studygroups;
+	}
+
+	public List<StudyGroup> mainSearchStudyGroup(Connection conn, String keyWord) {
+		List<StudyGroup> studygroups = new ArrayList();
+		try {
+			pstmt=conn.prepareStatement(sql.getProperty("mainSearchStudyGroup"));
+			pstmt.setString(1, keyWord);
+			rs=pstmt.executeQuery();
+			while(rs.next()) {
+				studygroups.add(getStudygroup(rs));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally {
+			JDBCTemplate.close(rs);
+			JDBCTemplate.close(pstmt);
+		}
+		return studygroups;
+	}
+
 }

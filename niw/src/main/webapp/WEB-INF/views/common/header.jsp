@@ -19,7 +19,7 @@ User loginUser= (User)session.getAttribute("loginUser");
 <html>
 <head>
 <meta charset="UTF-8">
-<title>나의 첫 프로젝트</title>
+<title>학습메이트 - 함께 성장하는 학습 커뮤니티 </title>
 
 <script src="<%=request.getContextPath()%>/resources/js/jquery-3.7.1.min.js"></script>
   <!-- 폰트 -->
@@ -44,13 +44,17 @@ User loginUser= (User)session.getAttribute("loginUser");
             <!-- 비로그인 상태 메뉴 -->
             <a href="<%=request.getContextPath()%>/user/loginview.do" class="active"><i class="bi bi-person-circle me-1"></i>로그인</a>
             <a href="<%=request.getContextPath()%>/user/enrollview.do"><i class="bi bi-person-plus me-1"></i>회원가입</a>
-            <a href="<%=request.getContextPath()%>/cs/main.do"><i class="bi bi-headset me-1"></i>고객센터</a>
+            <a href="https://open.kakao.com/o/scWgCCzh"><i class="bi bi-headset me-1"></i>고객센터</a>
           <% } else { %>
             <!-- 로그인 상태 메뉴 -->
             <a href="<%=request.getContextPath()%>/user/logout.do"><i class="bi bi-box-arrow-right me-1"></i>로그아웃</a>
+            <%if(loginUser.userRole().equals("ADMIN")){ %>
+            <a href="<%=request.getContextPath()%>/admin/adminpage.do"><i class="bi bi-person-gear me-1"></i>관리자 페이지</a>
+            <%}else { %>
             <a href="<%=request.getContextPath()%>/user/mypage.do"><i class="bi bi-person-gear me-1"></i>마이페이지</a>
-            <a href="<%=request.getContextPath()%>/message/list.do"><i class="bi bi-envelope me-1"></i>쪽지</a>
-            <a href="<%=request.getContextPath()%>/cs/main.do"><i class="bi bi-headset me-1"></i>고객센터</a>
+            <%} %>
+            <%-- <a href="<%=request.getContextPath()%>/message/list.do"><i class="bi bi-envelope me-1"></i>쪽지</a> --%>
+            <a href="https://open.kakao.com/o/scWgCCzh"><i class="bi bi-headset me-1"></i>고객센터</a>
           <% } %>
         </div>
       </div>
@@ -73,7 +77,7 @@ User loginUser= (User)session.getAttribute("loginUser");
         <div class="col-lg-6 col-md-7 col-12 mt-3 mt-md-0">
           <div class="blind-search">
             <i class="bi bi-search blind-search-icon"></i>
-            <input type="text" class="form-control" placeholder="찾고 싶은 학습자료를 검색해보세요">
+            <input type="text" class="form-control" id="search" placeholder="찾고 싶은 학습자료를 검색해보세요">
           </div>
         </div>
         <div class="col-lg-3 col-md-1 d-none d-md-block">
@@ -129,6 +133,9 @@ User loginUser= (User)session.getAttribute("loginUser");
           </a>
           <div class="custom-dropdown-menu">
             <a class="custom-dropdown-item" href="<%=request.getContextPath()%>/study/grouplist.do">스터디 모집</a>
+            <%if(loginUser!=null){ %>
+            <a class="custom-dropdown-item" href="<%=request.getContextPath()%>/study/groupdetail.do">내 스터디 그룹</a>
+            <%} %>
             <div class="custom-dropdown-divider"></div>
             <a class="custom-dropdown-item" href="<%=request.getContextPath()%>/study/timerecord.do">공부 시간 기록</a>
             <a class="custom-dropdown-item" href="<%=request.getContextPath()%>/study/timeranking.do">랭킹</a>
@@ -212,6 +219,14 @@ User loginUser= (User)session.getAttribute("loginUser");
     const myPoint =()=>{
     	location.assign('<%=request.getContextPath()%>/point/mypoint.do');
     }
+    
+    // 엔터키로 검색
+    document.querySelector('.form-control').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+        	const keyWord = document.getElementById('search').value;
+        	location.assign('<%=request.getContextPath()%>/search.do?keyWord='+keyWord);
+        }
+    });
   </script>
 
 

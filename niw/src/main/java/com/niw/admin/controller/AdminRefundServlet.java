@@ -1,4 +1,4 @@
-package com.niw.user.mypage.controller;
+package com.niw.admin.controller;
 
 import java.io.IOException;
 import javax.servlet.ServletException;
@@ -9,19 +9,23 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.niw.common.CommonTemplate;
 
-@WebServlet("/user/mypage/activity.do")
-public class MyActivityServlet extends HttpServlet {
+
+@WebServlet("/admin/adminpage/refund.do")
+public class AdminRefundServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
-    public MyActivityServlet() {
+ 
+    public AdminRefundServlet() {
         super();
     }
 
+
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		request.getRequestDispatcher(CommonTemplate.WEB_VIEWS+"/user/mypage/myboard.jsp").forward(request, response);
+		request.getRequestDispatcher(CommonTemplate.WEB_VIEWS + "/admin/adminrefund.jsp").forward(request, response);
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
 		doGet(request, response);
 	}
 

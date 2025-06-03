@@ -1,0 +1,216 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@include file="/WEB-INF/views/common/header.jsp" %>
+<%
+if(loginUser == null || !loginUser.userRole().equals("ADMIN")) {
+	response.sendRedirect(request.getContextPath() + "/user/loginview.do");
+	return;
+}
+%>
+<style>
+    /* 마이페이지 전용 스타일 */
+    .mypage-container {
+        max-width: 1400px; /* 1200px → 1400px로 증가 */
+        margin: 30px auto;
+        display: flex;
+        gap: 30px; /* 20px → 30px로 증가 */
+        flex: 1;
+        padding: 0 20px; /* 15px → 20px로 증가 */
+    }
+    
+    /* 사이드바 스타일 */
+    .sidebar {
+        width: 260px; /* 240px → 220px로 축소 */
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        padding: 20px 0;
+        flex-shrink: 0; /* 사이드바 크기 고정 */
+    }
+    
+    .profile-section {
+        padding: 0 20px 20px;
+        border-bottom: 1px solid #eee;
+        text-align: center;
+    }
+    
+    .profile-pic {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background-color: #f0f0f0;
+        margin: 0 auto 15px;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border: 3px solid var(--bs-primary-light);
+    }
+    
+    .profile-pic img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .user-id {
+        font-weight: bold;
+        margin-bottom: 5px;
+        font-size: 18px;
+        color: #333;
+    }
+    
+    .user-name {
+        color: #666;
+        margin-bottom: 10px;
+    }
+    
+    .point-info {
+        font-size: 16px;
+        color: var(--bs-blind-dark);
+        margin-top: 10px;
+        font-weight: bold;
+    }
+    
+    .menu-section {
+        padding: 20px 0;
+    }
+    
+    .menu-title {
+        padding: 0 20px;
+        margin-bottom: 10px;
+        font-size: 14px;
+        color: #888;
+        font-weight: bold;
+    }
+    
+    .menu-item {
+        padding: 12px 20px;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+    }
+    
+    .menu-item i {
+        margin-right: 10px;
+        font-size: 18px;
+    }
+    
+    .menu-item:hover {
+        background-color: var(--bs-primary-light);
+        color: var(--bs-blind-dark);
+    }
+    
+    .menu-item.active {
+        background-color: var(--bs-primary-light);
+        color: var(--bs-blind-dark);
+        border-left: 3px solid var(--bs-blind-dark);
+        font-weight: bold;
+    }
+    
+    /* 메인 컨텐츠 스타일 */
+    .main-content {
+        flex: 1;
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        padding: 30px;
+        min-height: 450px;
+    }
+    
+    .loading-content {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 400px;
+        flex-direction: column;
+        color: #888;
+    }
+    
+    .loading-spinner {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid var(--bs-blind-dark);
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin-bottom: 20px;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    /* 반응형 스타일 */
+    @media (max-width: 768px) {
+        .mypage-container {
+            flex-direction: column;
+        }
+        
+        .sidebar {
+            width: 100%;
+        }
+    }
+</style>
+
+<!-- 메인 컨테이너 -->
+<div class="mypage-container">
+    <!-- 사이드바 영역 -->
+    <div class="sidebar">
+        <div class="profile-section">
+            <div class="profile-pic">
+                <i class="bi bi-person-circle" style="font-size: 60px; color: #ccc;"></i>
+            </div>
+            <div class="user-id"><%=loginUser.userId()%></div>
+            <div class="user-name"><%=loginUser.userName()%></div>
+            <div class="point-info">포인트: <%=loginUser.userPoint()%>P</div>
+        </div>
+        <!-- 공지작성 -->
+        <div class="menu-section">
+            <div class="menu-title">공지</div>
+            <ul>
+                <li class="menu-item" data-tab="notice">
+                    <i class="bi bi-person"></i>공지작성
+                </li>
+            </ul>
+        </div>
+        
+        <!-- 신고내역처리 -->
+        <div class="menu-section">
+            <div class="menu-title">신고</div>
+            <ul>
+                <li class="menu-item active" data-tab="report">
+                    <i class="bi bi-person"></i>신고내역처리
+                </li>
+            </ul>
+        </div>
+
+        
+        <!-- 필요시 추가 -->
+        <div class="menu-section">
+            <div class="menu-title">신고</div>
+            <ul>
+                <li class="menu-item" data-tab="더미">
+                    <i class="bi bi-person"></i>더미
+                </li>
+            </ul>
+         </div>
+
+    </div>
+    
+    <!-- 메인 컨텐츠 영역 -->
+    <div class="main-content">
+        <!-- 초기 로딩 시 회원정보 표시 -->
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <p>페이지를 불러오는 중입니다...</p>
+        </div>
+    </div>
+</div>
+<script>
+	
+	
+</script>
+<%@ include file="/WEB-INF/views/common/footer.jsp"%>

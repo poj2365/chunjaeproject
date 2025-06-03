@@ -376,9 +376,7 @@ const insertRecommend = (e, recType, boardType, userId) => {
 			const recommendFlag = data['recommendFlag'];
 			const recommend = data['recommend'];
 			const changeArticle = data['changeArticle'];
-			console.log(recommendFlag);
-			console.log(recommend);
-			console.log(changeArticle);
+
 			if(recType == '1'){
 				if(changeArticle > 0 && recommend > 0){
 					if(recommendFlag == 0){

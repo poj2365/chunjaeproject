@@ -1,6 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="com.niw.user.model.dto.User"%>
 <%@ include file="/WEB-INF/views/common/header.jsp"%>
+<script src="<%=request.getContextPath()%>/resources/js/jquery-3.7.1.min.js"></script>
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.17/index.global.min.js'></script>
 <%
 if (loginUser == null) {
 	response.sendRedirect(request.getContextPath() + "/user/loginview.do");
@@ -182,6 +184,12 @@ if (loginUser == null) {
                 <li class="menu-item" data-tab="activity">
                     <i class="bi bi-clock-history"></i>활동 내역
                 </li>
+                <li class="menu-item" data-tab="studygroup">
+                    <i class="bi bi-people"></i>내 스터디 그룹
+                </li>
+                <li class="menu-item" data-tab="calendar">
+                    <i class="bi bi-calendar-check"></i>스터디 플래너
+                </li>
                 <li class="menu-item" data-tab="point">
                     <i class="bi bi-coin"></i>포인트 내역
                 </li>
@@ -246,6 +254,9 @@ function loadTabContent(tabId) {
         data: { fromMypage: 'true' },
         success: function(data) {
             $('.main-content').html(data);
+            if(tabId=="calendar"){
+            	initCalendar();
+            }
         },
         error: function(xhr, status, error) {
             $('.main-content').html(`

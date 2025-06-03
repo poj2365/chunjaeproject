@@ -1,4 +1,4 @@
-package com.niw.study.controller;
+package com.niw.user.mypage.controller;
 
 import java.io.IOException;
 import java.util.List;
@@ -10,24 +10,23 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import com.niw.study.model.dto.Calendar;
-import com.niw.study.model.dto.TimeRecord;
-import com.niw.study.model.service.CalendarService;
+import com.niw.study.model.dto.GroupMember;
+import com.niw.study.model.dto.StudyGroup;
+import com.niw.study.model.service.GroupMemberService;
 import com.niw.study.model.service.StudyGroupService;
-import com.niw.study.model.service.TimeRecordService;
 import com.niw.user.model.dto.User;
 
 /**
- * Servlet implementation class CalenderServlet
+ * Servlet implementation class MyStudyGroupServlet
  */
-@WebServlet("/study/calender.do")
-public class CalendarServlet extends HttpServlet {
+@WebServlet("/user/mypage/studygroup.do")
+public class MyStudyGroupServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public CalendarServlet() {
+    public MyStudyGroupServlet() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -36,18 +35,19 @@ public class CalendarServlet extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		System.out.println("test");
 		HttpSession session = request.getSession();
 		User user = (User) session.getAttribute("loginUser");
-		List<Calendar> c = null;
-		List<TimeRecord> trList = null;
-		if(user!=null) {
-			trList = TimeRecordService.SERVICE.searchTime(user.userId());
-			c = CalendarService.SERVICE.searchCalendar(user.userId());
+		if(user!=null) {			
+			List<StudyGroup> groups = StudyGroupService.SERVICE.searchStudyGroupUserId(user.userId());
+			request.setAttribute("groups", groups);
+			List<GroupMember> members = GroupMemberService.SERVICE.searchGroupMemberId(user.userId());
+			request.setAttribute("members", members);
+			System.out.println(groups);
+			System.out.println(members);
 		}
 		
-		request.setAttribute("calendar", c);
-		request.setAttribute("trList", trList);
-		request.getRequestDispatcher("/WEB-INF/views/study/calendar.jsp").forward(request, response);
+		request.getRequestDispatcher("/WEB-INF/views/user/mypage/myStudyGroup.jsp").forward(request, response);
 	}
 
 	/**
