@@ -442,7 +442,9 @@ List<GroupMember> members = (List<GroupMember>) request.getAttribute("members");
 					for(GroupMember m : members){
 						if(m.groupNumber()==g.groupNumber()){ 
 							i++;
-						}
+							%>
+							<span><%=m.userId() %></span><br>
+						<%}
 					} %>
 					<span>그룹인원 : <%=i%>명 / <%=g.groupLimit()%>명
 					</span><br>
@@ -471,9 +473,6 @@ List<GroupMember> members = (List<GroupMember>) request.getAttribute("members");
 					<%}else{ %>
 					<button type="button" onclick="openModal2(<%=g.groupNumber()%>)" class="btn btn-danger">
 						<i class="bi bi-person-slash"></i> 그룹 탈퇴하기
-					</button>
-					<button type="button" onclick="groupManage(<%=g.groupNumber()%>)" class="btn btn-success">
-						<i class="bi bi-person"></i> 그룹 멤버 확인
 					</button>
 					<%} %>
 					<button type="button" onclick="groupChat(<%=g.groupNumber()%>)" class="btn btn-primary">
