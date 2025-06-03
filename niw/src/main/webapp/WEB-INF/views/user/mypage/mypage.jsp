@@ -243,6 +243,7 @@ function loadTabContent(tabId) {
     $.ajax({
         url: '<%=request.getContextPath()%>/user/mypage/' + tabId + '.do',
         type: 'GET',
+        data: { fromMypage: 'true' },
         success: function(data) {
             $('.main-content').html(data);
         },

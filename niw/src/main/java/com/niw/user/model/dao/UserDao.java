@@ -42,6 +42,21 @@ public enum UserDao {
 		return user;
 	}
 	
+	public int updateUser(Connection conn, String userId, String phone, String address) {
+		int result = 0;
+		try {
+			pstmt = conn.prepareStatement(sql.getProperty("updateUser"));
+			pstmt.setString(1, phone);
+			pstmt.setString(2, address);
+			pstmt.setString(3, userId);
+			result = pstmt.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			close(pstmt);
+		}
+		return result;
+	}
 	
 	public String findId(Connection conn, String userName, String userEmail) {
 		String result= null;
