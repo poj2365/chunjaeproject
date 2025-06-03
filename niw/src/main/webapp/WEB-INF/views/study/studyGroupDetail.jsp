@@ -466,11 +466,14 @@ List<GroupMember> members = (List<GroupMember>) request.getAttribute("members");
 						<i class="bi bi-person-slash"></i> 그룹 삭제하기
 					</button>
 					<button type="button" onclick="groupManage(<%=g.groupNumber()%>)" class="btn btn-success">
-						<i class="bi bi-gear"></i> 그룹원 관리
+						<i class="bi bi-gear"></i> 그룹 멤버 관리
 					</button>
 					<%}else{ %>
 					<button type="button" onclick="openModal2(<%=g.groupNumber()%>)" class="btn btn-danger">
 						<i class="bi bi-person-slash"></i> 그룹 탈퇴하기
+					</button>
+					<button type="button" onclick="groupManage(<%=g.groupNumber()%>)" class="btn btn-success">
+						<i class="bi bi-person"></i> 그룹 멤버 확인
 					</button>
 					<%} %>
 					<button type="button" onclick="groupChat(<%=g.groupNumber()%>)" class="btn btn-primary">

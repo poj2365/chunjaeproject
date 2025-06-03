@@ -300,7 +300,12 @@ List<GroupMember> members = (List<GroupMember>) request.getAttribute("members");
 			</div>
 			<!-- 상세 정보 -->
 			<div class="content-card">
-				<div class="container mt-4" id="requestSection">
+			<div class="container mt-4" id="requestSection">
+			<% int index = 0;
+				for(GroupMember gm : members){ 
+			if(gm.userId().equals(loginUser.userId()) && gm.role().equals("OWNER")) {
+				index++;
+			%>
 					<h3 class="mb-4 text-center">신청자 목록</h3>
 					<h6 class="mb-4 text-center">신청자를 클릭하면 해당 신청자를 그룹 멤버에 추가할 수
 						있습니다.</h6>
@@ -349,11 +354,18 @@ List<GroupMember> members = (List<GroupMember>) request.getAttribute("members");
 							</tbody>
 						</table>
 					</div>
+				
+				<%}
+				}
+				if(index==0){
+				%>
+					<h5 class="mb-4 text-center">열람할 권한이 없습니다.</h5>
+				<% }
+				%>
 				</div>
-
 				<div class="container mt-4" id="memberSection" style="display:none;">
 					<h3 class="mb-4 text-center">그룹 멤버 목록</h3>
-					<h6 class="mb-4 text-center">멤버를 클릭하면 해당 멤버를 추방할 수 있습니다.</h6>
+					<h6 class="mb-4 text-center">그룹장일 경우 멤버를 클릭하면 해당 멤버를 추방할 수 있습니다.</h6>
 					<div class="table-responsive">
 						<table
 							class="table table-bordered table-hover align-middle text-center shadow-sm">
@@ -371,10 +383,15 @@ List<GroupMember> members = (List<GroupMember>) request.getAttribute("members");
 									<td colspan="4"><h5 class="mb-4 text-center">그룹 멤버가
 											없습니다.</h5></td>
 								</tr>
-								<%}else{ %>
-								<% for(GroupMember gm : members){ %>
+								<%}else{
+								 for(GroupMember gm : members){
+									 if(gm.userId().equals(loginUser.userId()) && gm.role().equals("OWNER")) {
+									 %>
 								<tr style="cursor: pointer;"
 									onclick="groupManage('<%=gm.userId() %>')">
+									<%}else { %>
+									<tr>
+									<%} %>
 									<td><%=gm.userId() %></td>
 									<%if(gm.role().equals("OWNER")) {%>
 									<td>그룹장</td>
