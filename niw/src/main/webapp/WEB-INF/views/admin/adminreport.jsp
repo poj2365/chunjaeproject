@@ -171,8 +171,8 @@ if(loginUser == null || !loginUser.userRole().equals("ADMIN")) {
         <div class="menu-section">
             <div class="menu-title">공지</div>
             <ul>
-                <li class="menu-item active" data-tab="notice">
-                    <i class="bi bi-person"></i>공지 확인
+                <li class="menu-item" data-tab="notice">
+                    <i class="bi bi-person"></i>공지작성
                 </li>
             </ul>
         </div>
@@ -181,8 +181,8 @@ if(loginUser == null || !loginUser.userRole().equals("ADMIN")) {
         <div class="menu-section">
             <div class="menu-title">신고</div>
             <ul>
-                <li class="menu-item" data-tab="report">
-                    <i class="bi bi-person"></i>신고 내역
+                <li class="menu-item active" data-tab="report">
+                    <i class="bi bi-person"></i>신고내역처리
                 </li>
             </ul>
         </div>
@@ -190,10 +190,10 @@ if(loginUser == null || !loginUser.userRole().equals("ADMIN")) {
         
         <!-- 필요시 추가 -->
         <div class="menu-section">
-            <div class="menu-title">환불 요청 목록</div>
+            <div class="menu-title">신고</div>
             <ul>
-                <li class="menu-item" data-tab="refund">
-                    <i class="bi bi-person"></i>환불 요청 목록
+                <li class="menu-item" data-tab="더미">
+                    <i class="bi bi-person"></i>더미
                 </li>
             </ul>
          </div>
@@ -210,54 +210,7 @@ if(loginUser == null || !loginUser.userRole().equals("ADMIN")) {
     </div>
 </div>
 <script>
-$(document).ready(function() {
-    // 페이지 로드 시 기본 탭(회원정보) 로드
-    loadTabContent('notice');
-    
-    // 사이드바 메뉴 클릭 이벤트
-    $('.menu-item').on('click', function() {
-        var $this = $(this);
-        var tabId = $this.data('tab');
-        
-        // 메뉴 활성화 표시
-        $('.menu-item').removeClass('active');
-        $this.addClass('active');
-        
-        // 해당 탭 콘텐츠 로드
-        loadTabContent(tabId);
-    });
-});
-
-// 탭 콘텐츠 로드 함수
-function loadTabContent(tabId) {
-    // 로딩 표시
-    $('.main-content').html(`
-        <div class="loading-content">
-            <div class="loading-spinner"></div>
-            <p>페이지를 불러오는 중입니다...</p>
-        </div>
-    `);
-    
-    // AJAX로 해당 탭 페이지 로드
-    $.ajax({
-        url: '<%=request.getContextPath()%>/admin/adminpage/' + tabId + '.do',
-        type: 'GET',
-        success: function(data) {
-            $('.main-content').html(data);
-        },
-        error: function(xhr, status, error) {
-            $('.main-content').html(`
-                <div class="loading-content">
-                    <i class="bi bi-exclamation-triangle" style="font-size: 48px; color: #dc3545; margin-bottom: 20px;"></i>
-                    <p>페이지를 불러오는데 실패했습니다.</p>
-                    <button class="btn btn-primary" onclick="loadTabContent('` + tabId + `')">다시 시도</button>
-                </div>
-            `);
-        }
-    });
-}
-
+	
+	
 </script>
-
-
 <%@ include file="/WEB-INF/views/common/footer.jsp"%>

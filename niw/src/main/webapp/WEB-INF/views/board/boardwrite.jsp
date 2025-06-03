@@ -73,7 +73,7 @@
 				</div>
 			</div>
 			<input type="hidden" id="content" name="content">
-			</form>
+		</form>
 	</article>
 </section>
 <script>

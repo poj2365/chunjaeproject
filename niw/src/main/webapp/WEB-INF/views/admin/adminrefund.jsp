@@ -354,173 +354,220 @@ if (loginUser == null) {
 	}
 </style>
 
- <h2 class="content-title">포인트 내역 조회</h2>
+ <h2 class="content-title">환불 요청 기록</h2>
 
+<!-- 환불 요청 관리 테이블 (관리자용) -->
 <div class="content-section">
-    <h3 class="section-title">보유 포인트 <span class="badge"><%=loginUser.userPoint()%>P</span></h3>
-    <div class="content-section">
-        <form id="point-filter-form">
-            <div class="row">
-                <div class="col-md-3 mb-3">
-                    <label class="form-label">시작일</label>
-                    <input type="date" id="start-date" name="startDate" class="form-input">
-                </div>
-                <div class="col-md-3 mb-3">
-                    <label class="form-label">종료일</label>
-                    <input type="date" id="end-date" name="endDate" class="form-input">
-                </div>
-                <div class="col-md-3 mb-3">
-                    <label class="form-label">구분</label>
-                    <select id="point-type" name="pointType" class="form-input">
-                        <option value="all">전체</option>
-                        <option value="plus">적립(+)</option>
-                        <option value="minus">사용(-)</option>
-                    </select>
-                </div>
-                <div class="col-md-3 mb-3 d-flex align-items-end">
-                    <button type="submit" class="btn btn-primary w-100" >
-                        <i class="bi bi-search me-1"></i>검색
-                    </button>
-                </div>
-            </div>
-        </form>
-    </div>
-    
-    <div class="tabs">
-        <div class="tab-item active" data-type="all">전체</div>
-        <div class="tab-item" data-type="plus">적립</div>
-        <div class="tab-item" data-type="minus">사용</div>
-    </div>
-    
-    <div id="point-history-content">
-        <table class="point-history">
-            <thead>
-                <tr>
-                    <th>날짜</th>
-                    <th>내용</th>
-                    <th>포인트</th>
-                    <th>잔여 포인트</th>
-                </tr>
-            </thead>
-            <tbody id="point-history-tbody">
-              
-            </tbody>
-        </table>
-        
-        <div class="pagination" id="point-pagination">
-            <!-- 페이지네이션은 동적으로 생성 -->
-        </div>
-    </div>
+    <h3 class="section-title">환불 요청 관리</h3>
+    <table class="refund-table">
+        <thead>
+            <tr>
+                <th>번호</th>
+                <th>회원ID</th>
+                <th>이름</th>
+                <th>요청일</th>
+                <th>환불 포인트</th>
+                <th>은행</th>
+                <th>계좌번호</th>
+                <th>상태</th>
+                <th>관리</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- 예시 데이터, 추후 서버 데이터로 반복 -->
+            <tr>
+                <td>1</td>
+                <td>user123</td>
+                <td>홍길동</td>
+                <td>2025-06-02</td>
+                <td class="point-minus">10,000P</td>
+                <td>국민</td>
+                <td>123-45-67890</td>
+                <td>
+                    <span class="badge status-pending">대기</span>
+                </td>
+                <td>
+                    <button class="btn btn-success btn-sm me-1">수락</button>
+                    <button class="btn btn-danger btn-sm">거절</button>
+                </td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>user456</td>
+                <td>임꺽정</td>
+                <td>2025-06-01</td>
+                <td class="point-minus">25,000P</td>
+                <td>신한</td>
+                <td>001-22-33333</td>
+                <td>
+                    <span class="badge status-done">승인</span>
+                </td>
+                <td>
+                    <button class="btn btn-outline-secondary btn-sm" disabled>처리완료</button>
+                </td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>user789</td>
+                <td>이몽룡</td>
+                <td>2025-05-30</td>
+                <td class="point-minus">5,000P</td>
+                <td>우리</td>
+                <td>002-33-44444</td>
+                <td>
+                    <span class="badge status-reject">거절</span>
+                </td>
+                <td>
+                    <button class="btn btn-outline-secondary btn-sm" disabled>처리완료</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
 </div>
 
-<!-- 환불 신청 섹션 -->
-<div class="content-section">
-    <h3 class="section-title">포인트 환불</h3>
-    <table class="info-table">
-        <tr>
-            <th>잔여 포인트</th>
-            <td>
-                <span class="point-large"><%=loginUser.userPoint()%>P</span>
-                <button id="refund-request-btn" class="btn btn-secondary" style="float: right;" 
-                onclick="location.assign('<%=request.getContextPath()%>/point/refundpoint.do')">
-               <i class="bi bi-cash-coin me-1"></i>환불 신청
-                </button>
-            </td>
-        </tr>
-    </table>
-    <p class="mt-3 text-muted">※ 환불 시 잔여 포인트의 10%가 수수료로 차감됩니다.</p>
-	</div>
+<style>
+/* 환불 요청 테이블 전용 스타일 */
+.refund-table {
+    width: 100%;
+    border-collapse: collapse;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 0 0 1px #eee;
+    background: #fff;
+    font-size: 16px;
+    margin-bottom: 25px;
+}
+.refund-table th, .refund-table td {
+    padding: 15px 10px;
+    text-align: center;
+    border-bottom: 1px solid #f0f0f0;
+    vertical-align: middle;
+}
+.refund-table th {
+    background: var(--bs-primary-light);
+    color: #333;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+}
+.refund-table td.point-minus {
+    color: #ff6b6b;
+    font-weight: bold;
+}
+.refund-table tr:last-child td {
+    border-bottom: none;
+}
+
+/* 상태 뱃지 */
+.badge {
+    display: inline-block;
+    padding: 5px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: bold;
+}
+.status-pending {
+    background: #fff8c0;
+    color: #b19613;
+    border: 1px solid #f4e192;
+}
+.status-done {
+    background: #daf7e6;
+    color: #27ae60;
+    border: 1px solid #a7e9c6;
+}
+.status-reject {
+    background: #ffe0e6;
+    color: #d83a5e;
+    border: 1px solid #ffb1c7;
+}
+
+/* 버튼 스타일 */
+.btn-sm {
+    padding: 6px 12px;
+    font-size: 14px;
+    border-radius: 8px;
+    margin-bottom: 2px;
+}
+.btn-success {
+    background: #27ae60;
+    color: #fff;
+    border: none;
+    transition: background 0.15s;
+}
+.btn-success:hover { background: #219150; }
+.btn-danger {
+    background: #e74c3c;
+    color: #fff;
+    border: none;
+    transition: background 0.15s;
+}
+.btn-danger:hover { background: #c44132; }
+.btn-outline-secondary {
+    background: #f5f6f7;
+    color: #aaa;
+    border: 1px solid #eee;
+}
+.btn-outline-secondary:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+.me-1 { margin-right: 6px; }
+
+/* 반응형 */
+@media (max-width: 768px) {
+    .refund-table, .refund-table th, .refund-table td {
+        font-size: 14px;
+        padding: 8px 4px;
+    }
+    .refund-table th, .refund-table td {
+        white-space: nowrap;
+    }
+}
+</style>
 
 <script>
-	 $(document).ready(() => {
-		    let allPointHistory = []; // 배열을 생성
-		    $.get("<%=request.getContextPath()%>/point/pointhistory.do?userId=<%=loginUser.userId()%>")
-		    .done(data => {
-		    	console.log(data);
-		        allPointHistory = data; // 가지고 온 리스트를 저장 
-		        displayPointHistory(allPointHistory); // 처음엔 전체 보여줌
-		    })
-		    .fail(error => {
-		        $('#point-history-tbody').html(`<tr>
-		            <td colspan="4" style="text-align: center; padding: 50px;">데이터를 불러올 수 없습니다.</td>
-		        </tr>`);
-		        console.log(error);
-		    });
-		      
-		    
-		    $('.tab-item').on('click', function() {
-		        $('.tab-item').removeClass('active');
-		        $(this).addClass('active');
-		        const type = $(this).data('type'); 
-		        filterPointHistory(type);
-		    });
-
-		    // 필터링 함수
-		    function filterPointHistory(type) {
-		        let filteredData = [];
-		        if (type === 'all') {
-		            filteredData = allPointHistory;
-		        } else if (type === 'plus') {
-		            filteredData = allPointHistory.filter(row => (parseInt(row.changePoint) || 0) > 0);
-		        } else if (type === 'minus') {
-		            filteredData = allPointHistory.filter(row => (parseInt(row.changePoint) || 0) < 0);
+		$(document).ready(() => {
+		    $.ajax({
+		        url: '<%=request.getContextPath()%>/admin/adminpage/refundlist.do',
+		        type: 'GET',
+		        dataType: 'json', // json 반환 권장
+		        success: function(list) {
+		            // 테이블 바디에 반복해서 row 추가
+		            const $tbody = $('.refund-table tbody');
+		            $tbody.empty();
+		            if (list.length === 0) {
+		                $tbody.append('<tr><td colspan="9">환불 요청이 없습니다.</td></tr>');
+		            } else {
+		                list.forEach((row, idx) => {
+		                    $tbody.append(`
+		                        <tr>
+		                            <td>${idx + 1}</td>
+		                            <td>${row.userId}</td>
+		                            <td>${row.userName}</td>
+		                            <td>${row.refundDate}</td>
+		                            <td class="point-minus">${row.refundPoint.toLocaleString()}P</td>
+		                            <td>${row.refundBank}</td>
+		                            <td>${row.refundAccount}</td>
+		                            <td>
+		                                <span class="badge ${row.status === '대기' ? 'status-pending' : row.status === '승인' ? 'status-done' : 'status-reject'}">
+		                                    ${row.status}
+		                                </span>
+		                            </td>
+		                            <td>
+		                                ${
+		                                  row.status === '대기'
+		                                    ? `<button class="btn btn-success btn-sm me-1" data-id="${row.refundId}">수락</button>
+		                                       <button class="btn btn-danger btn-sm" data-id="${row.refundId}">거절</button>`
+		                                    : `<button class="btn btn-outline-secondary btn-sm" disabled>처리완료</button>`
+		                                }
+		                            </td>
+		                        </tr>
+		                    `);
+		                });
+		            }
 		        }
-		        displayPointHistory(filteredData);
-		    }
-
-		    // 표 그리기 함수
-		    function displayPointHistory(data) {
-		        const pointHistory = document.getElementById('point-history-tbody');
-		        pointHistory.innerHTML = '';
-		        if (data.length === 0) {
-		            pointHistory.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 50px;">데이터가 없습니다.</td></tr>`;
-		        } else {
-		            data.forEach(row => {
-		                const tr = document.createElement('tr');
-		                const tdDate = document.createElement('td');
-		                tdDate.textContent = row["date"];
-		                const tdContent = document.createElement('td');
-		                tdContent.textContent = row["content"];
-		                const tdChangePoint = document.createElement('td');
-		                tdChangePoint.style.textAlign = 'right';
-		                
-		                const changePoint = parseInt(row["changePoint"]) || 0;
-		                if (changePoint > 0) {
-		                    tdChangePoint.style.color = '#28a745'; 
-		                    tdChangePoint.textContent = '+' + changePoint + 'P';
-		                } else if (changePoint < 0) {
-		                    tdChangePoint.style.color = '#dc3545'; 
-		                    tdChangePoint.textContent = changePoint + 'P';
-		                } else {
-		                    tdChangePoint.textContent = changePoint + 'P';
-		                }
-		                
-		                const tdMyPoint = document.createElement('td');
-		                tdMyPoint.style.textAlign = 'right';
-		                tdMyPoint.textContent = row["myPoint"] + 'P';
-		                tr.appendChild(tdDate);
-		                tr.appendChild(tdContent);
-		                tr.appendChild(tdChangePoint);
-		                tr.appendChild(tdMyPoint);
-		                pointHistory.appendChild(tr); 
-		            });
-		        }
-		    }
+		    });
 		});
-	 
-	 /* 	$('#point-filter-form').on('submit', function(e) {
-		    e.preventDefault(); // 이 코드가 
-		    
-		    const startDate = $('#start-date').val();
-		    const endDate = $('#end-date').val();
-		    const pointType = $('#point-type').val();
-		    
-		    if ()
-		    
-		    
-		    
-		}); */
-	 	
-	 
-
+	
+	
 </script>

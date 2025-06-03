@@ -647,6 +647,50 @@ public enum BoardDao {
 		return notice;
 	}
 	
+	public int countNotice(Connection conn) {
+		int result = 0;
+		try {
+			pstmt = conn.prepareStatement(sqlPro.getProperty("countNotice"));
+			rs = pstmt.executeQuery();
+			while(rs.next()) {
+				result = rs.getInt(1);
+			}
+		} catch(SQLException e) {
+			e.printStackTrace();
+		} finally {
+			close(rs);
+			close(pstmt);
+		}
+		return result;
+	}
 	
+	public int saveNotice(Connection conn, Notice notice) {
+		int result = 0;
+		try {
+			pstmt = conn.prepareStatement(sqlPro.getProperty("saveNotice"));
+			pstmt.setString(1, notice.noticeTitle());
+			pstmt.setString(2, notice.noticeContent());
+			result = pstmt.executeUpdate();
+		} catch(SQLException e) {
+			e.printStackTrace();
+		} finally {
+			close(pstmt);
+		}
+		return result;
+	}
+	
+	public int deleteNotice(Connection conn, int noticeId) {
+		int result = 0;
+		try {
+			pstmt = conn.prepareStatement(sqlPro.getProperty("deleteNotice"));
+			pstmt.setInt(1, noticeId);
+			result = pstmt.executeUpdate();
+		} catch(SQLException e) {
+			e.printStackTrace();
+		} finally {
+			close(pstmt);
+		}
+		return result;
+	}
 
 }

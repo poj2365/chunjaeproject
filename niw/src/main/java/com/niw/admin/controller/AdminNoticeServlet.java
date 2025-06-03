@@ -1,4 +1,4 @@
-package com.niw.board.controller;
+package com.niw.admin.controller;
 
 import java.io.IOException;
 import java.util.List;
@@ -11,27 +11,26 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.google.gson.Gson;
-import com.niw.board.model.dto.Article;
+import com.niw.board.model.dto.Notice;
 import com.niw.board.service.BoardService;
 import com.niw.user.model.dto.User;
 
-@WebServlet("/user/mybookmark.do")
-public class UserBookmarkServlet extends HttpServlet {
+@WebServlet("/admin/notice.do")
+public class AdminNoticeServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
-    public UserBookmarkServlet() {
+    public AdminNoticeServlet() {
         super();
     }
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		User user = (User) request.getSession().getAttribute("loginUser");
 		if(user != null) {
-			int category = 0;
 			int cPage = 1, numPerPage = 5, pageBarSize = 5;
 			if(request.getParameter("cPage") != null) {
 				cPage = Integer.parseInt(request.getParameter("cPage"));
 			}
-			int totalData = BoardService.SERVICE.countBookmarkByUser(user.userId());
+			int totalData = BoardService.SERVICE.countNotice();
 			int totalPage = (totalData - 1) / numPerPage + 1; 
 			int pageNo = 1, pageEnd = totalPage;
 			if(pageBarSize < totalPage) {
@@ -48,7 +47,7 @@ public class UserBookmarkServlet extends HttpServlet {
 	        if (cPage == 1) {
 	            pageBar.append("<li class='page-item disabled'><a class='page-link' href='#'>prev</a></li>");
 	        } else {
-	            pageBar.append("<li class='page-item'><a class='page-link' onclick=\"loadData('")
+	            pageBar.append("<li class='page-item'><a class='page-link' onclick=\"loadNotice('")
 	                   .append(pageNo > 1? pageNo - 1 : 1)
 	                   .append("')\">prev</a></li>");
 	        }
@@ -57,7 +56,7 @@ public class UserBookmarkServlet extends HttpServlet {
 	            if (i == cPage) {
 	                pageBar.append("<li class='page-item active'><a class='page-link' href='#'>").append(i).append("</a></li>");
 	            } else {
-	                pageBar.append("<li class='page-item'><a class='page-link' onclick=\"loadData('")
+	                pageBar.append("<li class='page-item'><a class='page-link' onclick=\"loadNotice('")
 	                       .append(i)
 	                       .append("')\">")
 	                       .append(i)
@@ -68,19 +67,17 @@ public class UserBookmarkServlet extends HttpServlet {
 	        if (cPage == totalPage) {
 	            pageBar.append("<li class='page-item disabled'><a class='page-link' href='#'>next</a></li>");
 	        } else {
-	            pageBar.append("<li class='page-item'><a class='page-link' onclick=\"loadData('")
+	            pageBar.append("<li class='page-item'><a class='page-link' onclick=\"loadNotice('")
 	                   .append(pageEnd < totalPage? pageEnd + 1 : totalPage)
 	                   .append("')\">next</a></li>");
 	        }
 
-	        pageBar.append("</ul>");
-			
-	        List<Article> articles = BoardService.SERVICE.searchBookmarkByUser(
-	                user.userId(), cPage, numPerPage, totalData);
+	        pageBar.append("</ul>");			
+			List<Notice> notices = BoardService.SERVICE.searchNotice();
 
 	        response.setContentType("application/json; charset=UTF-8");
 	        response.getWriter().write(new Gson().toJson(Map.of(
-	            "list", articles,
+	            "list", notices,
 	            "pageBar", pageBar
 	        )));
 		}

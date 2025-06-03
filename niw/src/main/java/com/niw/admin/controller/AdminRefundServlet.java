@@ -1,4 +1,4 @@
-package com.niw.user.mypage.controller;
+package com.niw.admin.controller;
 
 import java.io.IOException;
 import javax.servlet.ServletException;
@@ -9,32 +9,21 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.niw.common.CommonTemplate;
 
-/**
- * Servlet implementation class MyPointServlet
- */
-@WebServlet("/user/mypage/point.do")
-public class MyPointServlet extends HttpServlet {
+
+@WebServlet("/admin/adminpage/refund.do")
+public class AdminRefundServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public MyPointServlet() {
+ 
+    public AdminRefundServlet() {
         super();
-        // TODO Auto-generated constructor stub
     }
 
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
+
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		request.getRequestDispatcher(CommonTemplate.WEB_VIEWS+"/user/mypage/mypoint.jsp").forward(request, response);
+		request.getRequestDispatcher(CommonTemplate.WEB_VIEWS + "/admin/adminrefund.jsp").forward(request, response);
 	}
 
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		doGet(request, response);

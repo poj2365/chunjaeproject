@@ -15,7 +15,8 @@ public class PointService {
 
 	private static final PointService SERVICE = new PointService();
 
-	private PointService() {}
+	private PointService() {
+	}
 
 	public static PointService ponitService() {
 		return SERVICE;
@@ -35,63 +36,68 @@ public class PointService {
 		JDBCTemplate.close(conn);
 		return result;
 	}
-	
+
 	public int refundPointHistoy(PointRefund p) {
 		Connection conn = JDBCTemplate.getConnection();
 		int result = dao.refundPointHistory(conn, p);
 		if (result > 0) {
-			JDBCTemplate.commit(conn);	
+			JDBCTemplate.commit(conn);
 		} else {
-			JDBCTemplate.rollback(conn);	
+			JDBCTemplate.rollback(conn);
 		}
 		JDBCTemplate.close(conn);
 		return result;
 	}
-	
+
 	public int refundFileHistoy(PointRefund p) {
 		Connection conn = JDBCTemplate.getConnection();
 		int result = dao.refundFileHistory(conn, p);
 		if (result > 0) {
-			JDBCTemplate.commit(conn);	
+			JDBCTemplate.commit(conn);
 		} else {
-			JDBCTemplate.rollback(conn);	
+			JDBCTemplate.rollback(conn);
 		}
 		JDBCTemplate.close(conn);
 		return result;
 	}
 
-	
-	public int chargePoint(int addpoint, String userId ) {
+	public int chargePoint(int addpoint, String userId) {
 		Connection conn = JDBCTemplate.getConnection();
 		int result = dao.chargePoint(conn, userId, addpoint);
 		if (result > 0) {
-			JDBCTemplate.commit(conn);	
+			JDBCTemplate.commit(conn);
 		} else {
-			JDBCTemplate.rollback(conn);	
+			JDBCTemplate.rollback(conn);
 		}
 		JDBCTemplate.close(conn);
 		return result;
 	}
-	
-	public List<PointHistory> searchPointHistory(String userId){
+
+	public List<PointHistory> searchPointHistory(String userId) {
 		List<PointHistory> historys = new ArrayList<PointHistory>();
 		Connection conn = JDBCTemplate.getConnection();
-		historys = dao.searchPointHistory(conn,userId);
+		historys = dao.searchPointHistory(conn, userId);
 		JDBCTemplate.close(conn);
 		return historys;
 	}
-	
+
 	public List<PointMyFile> showMyFiles(String userId) {
 		List<PointMyFile> files = new ArrayList<PointMyFile>();
 		Connection conn = JDBCTemplate.getConnection();
-		files = dao.showMyFiles(conn,userId);
+		files = dao.showMyFiles(conn, userId);
 		JDBCTemplate.close(conn);
 		return files;
 	}
-
+	
+	public List<PointRefund> showAllRefundList(){
+		List<PointRefund> lists = new ArrayList<PointRefund>();
+		Connection conn = JDBCTemplate.getConnection();
+		//lists = dao.showAllRefundList(conn);
+		JDBCTemplate.close(conn);
+		return lists;
+		
+	}
 	
 	
-	
-
 
 }

@@ -190,5 +190,21 @@ public class PointDao {
 		}
 		return files;
 	}
+	
+//	public List<PointRefund> showAllRefundList (Connection conn){
+//		List<PointMyFile> lists = new ArrayList<PointMyFile>();
+//		try {
+//			pstmt = conn.prepareStatement(sql.getProperty("showAllRefundList"));
+//			rs = pstmt.executeQuery();
+//			
+//			while (rs.next()) {
+//				String userId = rs.getString("user_id");
+//				
+//			}
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		}
+//		
+//	}
 
 }
