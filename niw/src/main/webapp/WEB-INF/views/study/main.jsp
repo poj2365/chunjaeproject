@@ -10,9 +10,6 @@
     cursor: pointer;
     transition: background-color 0.2s;
 }
-.clickable-ul:hover {
-    background-color: #f1f1f1;
-}
     </style>
  <!-- 게시글 리스트 -->
         <% if (studygroups != null && !studygroups.isEmpty()) {

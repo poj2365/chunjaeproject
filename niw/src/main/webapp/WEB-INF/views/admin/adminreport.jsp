@@ -1,216 +1,122 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
-<%@include file="/WEB-INF/views/common/header.jsp" %>
-<%
-if(loginUser == null || !loginUser.userRole().equals("ADMIN")) {
-	response.sendRedirect(request.getContextPath() + "/user/loginview.do");
-	return;
-}
-%>
-<style>
-    /* 마이페이지 전용 스타일 */
-    .mypage-container {
-        max-width: 1400px; /* 1200px → 1400px로 증가 */
-        margin: 30px auto;
-        display: flex;
-        gap: 30px; /* 20px → 30px로 증가 */
-        flex: 1;
-        padding: 0 20px; /* 15px → 20px로 증가 */
-    }
     
-    /* 사이드바 스타일 */
-    .sidebar {
-        width: 260px; /* 240px → 220px로 축소 */
-        background-color: white;
-        border-radius: 12px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        padding: 20px 0;
-        flex-shrink: 0; /* 사이드바 크기 고정 */
-    }
-    
-    .profile-section {
-        padding: 0 20px 20px;
-        border-bottom: 1px solid #eee;
-        text-align: center;
-    }
-    
-    .profile-pic {
-        width: 100px;
-        height: 100px;
-        border-radius: 50%;
-        background-color: #f0f0f0;
-        margin: 0 auto 15px;
-        overflow: hidden;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        border: 3px solid var(--bs-primary-light);
-    }
-    
-    .profile-pic img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-    
-    .user-id {
-        font-weight: bold;
-        margin-bottom: 5px;
-        font-size: 18px;
-        color: #333;
-    }
-    
-    .user-name {
-        color: #666;
-        margin-bottom: 10px;
-    }
-    
-    .point-info {
-        font-size: 16px;
-        color: var(--bs-blind-dark);
-        margin-top: 10px;
-        font-weight: bold;
-    }
-    
-    .menu-section {
-        padding: 20px 0;
-    }
-    
-    .menu-title {
-        padding: 0 20px;
-        margin-bottom: 10px;
-        font-size: 14px;
-        color: #888;
-        font-weight: bold;
-    }
-    
-    .menu-item {
-        padding: 12px 20px;
-        transition: all 0.2s;
-        display: flex;
-        align-items: center;
-        cursor: pointer;
-    }
-    
-    .menu-item i {
-        margin-right: 10px;
-        font-size: 18px;
-    }
-    
-    .menu-item:hover {
-        background-color: var(--bs-primary-light);
-        color: var(--bs-blind-dark);
-    }
-    
-    .menu-item.active {
-        background-color: var(--bs-primary-light);
-        color: var(--bs-blind-dark);
-        border-left: 3px solid var(--bs-blind-dark);
-        font-weight: bold;
-    }
-    
-    /* 메인 컨텐츠 스타일 */
-    .main-content {
-        flex: 1;
-        background-color: white;
-        border-radius: 12px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        padding: 30px;
-        min-height: 450px;
-    }
-    
-    .loading-content {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 400px;
-        flex-direction: column;
-        color: #888;
-    }
-    
-    .loading-spinner {
-        border: 4px solid #f3f3f3;
-        border-top: 4px solid var(--bs-blind-dark);
-        border-radius: 50%;
-        width: 40px;
-        height: 40px;
-        animation: spin 1s linear infinite;
-        margin-bottom: 20px;
-    }
-    
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-    
-    /* 반응형 스타일 */
-    @media (max-width: 768px) {
-        .mypage-container {
-            flex-direction: column;
-        }
-        
-        .sidebar {
-            width: 100%;
-        }
-    }
-</style>
 
-<!-- 메인 컨테이너 -->
-<div class="mypage-container">
-    <!-- 사이드바 영역 -->
-    <div class="sidebar">
-        <div class="profile-section">
-            <div class="profile-pic">
-                <i class="bi bi-person-circle" style="font-size: 60px; color: #ccc;"></i>
-            </div>
-            <div class="user-id"><%=loginUser.userId()%></div>
-            <div class="user-name"><%=loginUser.userName()%></div>
-            <div class="point-info">포인트: <%=loginUser.userPoint()%>P</div>
-        </div>
-        <!-- 공지작성 -->
-        <div class="menu-section">
-            <div class="menu-title">공지</div>
-            <ul>
-                <li class="menu-item" data-tab="notice">
-                    <i class="bi bi-person"></i>공지작성
-                </li>
-            </ul>
-        </div>
-        
-        <!-- 신고내역처리 -->
-        <div class="menu-section">
-            <div class="menu-title">신고</div>
-            <ul>
-                <li class="menu-item active" data-tab="report">
-                    <i class="bi bi-person"></i>신고내역처리
-                </li>
-            </ul>
-        </div>
-
-        
-        <!-- 필요시 추가 -->
-        <div class="menu-section">
-            <div class="menu-title">신고</div>
-            <ul>
-                <li class="menu-item" data-tab="더미">
-                    <i class="bi bi-person"></i>더미
-                </li>
-            </ul>
-         </div>
-
-    </div>
-    
-    <!-- 메인 컨텐츠 영역 -->
-    <div class="main-content">
-        <!-- 초기 로딩 시 회원정보 표시 -->
-        <div class="loading-content">
-            <div class="loading-spinner"></div>
-            <p>페이지를 불러오는 중입니다...</p>
-        </div>
-    </div>
+<!-- 초기 로딩 시 회원정보 표시 -->
+<div class="report-container">
+	<div class="loading-content">
+	    <div class="loading-spinner"></div>
+	    <p>페이지를 불러오는 중입니다...</p>
+	</div>
 </div>
+<div class="report-pagebar">
+	
+</div>
+
 <script>
+	$(document).ready(loadReport('1'));
 	
+	function loadReport(cPage) {
+		fetch(getContextPath() + "/board/searchReport.do?cPage=" + cPage, {
+			method: "POST",
+	        headers: {
+	        	"Content-type":"application/json;charset=utf-8"
+	        }
+		})
+		.then(response => {
+			if(response.ok){
+				return response.json();
+			} else {
+				throw new Error('load report fail');
+			}
+		})
+		.then(data => {
+			const reports = data['reports'];
+			const pageBar = data['pageBar'];
+			
+			$(".report-pagebar").html(pageBar);
+			const $container = $(".report-container");
+			$container.html($("<h2>").text("신고 내역"));
+			if(reports != null && reports.length > 0){
+				for(let report of reports){
+					console.log(report);
+					$container.append(getReport(report)).append($("<hr>"));
+				}
+			} else {
+				$container.append($("<div>").addClass("text-center").append($("<b>").text("조회된 결과가 없습니다."))).append($("<hr>"))
+			}
+			
+		})
+	}
 	
+	function getReport(report) {
+		const $form = $("<div>").addClass("row flex-row justify-content-between align-item-center").css("min-width", "800px");
+		const $container = $("<div>").addClass("col-lg-6 d-flex align-items-center");
+		const $rType = $("<span>").addClass("badge me-3");
+		if(report['reportType'] == 'spam') {
+			$rType.addClass("bg-warning");
+			$rType.text("스팸")
+		} else if(report['reportType'] == 'abuse'){
+			$rType.addClass("bg-danger");
+			$rType.text("욕설")
+		} else if(report['reportType'] == 'illegal'){
+			$rType.addClass("bg-dark");
+			$rType.text("불법")
+		} else{
+			$rType.addClass("bg-secondary");
+			$rType.text("기타")
+		}
+		$container.append($rType);
+		const $title = $("<span>").addClass("overflow-hidden me-2");
+		if(report['boardType'] == 'ARTICLE') $title.text("[게시글] " + (report['reportContent'] == null? '상세내역 없음': report['reportContent']));
+		else if(report['boardType'] == 'COMMENTS') $title.text("[댓글] " + (report['reportContent'] == null? '상세내역 없음': report['reportContent']));				
+		$container.append($title);
+		const $selector = $("<div>").addClass("d-flex justify-content-end align-items-center col-lg-4");
+		const $button = $("<button>").addClass("btn btn-primary me-2")
+									 .attr({
+										 "type": "button"
+										 })
+									 .text("이동")
+									 .on("click", function() {
+										 		location.assign(getContextPath() + "/board/boarddetail.do?articleId=" + report['articleId']);
+										});
+		const $treat = $("<button>").addClass("btn btn-danger")
+									.attr({
+										 "type": "button"
+										 })
+									 .text("처리")
+									 .on("click", function(){
+										 deleteReport(report['reportId']);
+									 });
+		$selector.append($button).append($treat);
+		$form.append($container).append($selector);
+		return $form;
+	}
+	
+	function deleteReport(reportId) {
+		const deleteConfirm = confirm("신고내역을 처리하시겠습니까?");
+		if(deleteConfirm){
+			fetch(getContextPath() + "/board/deleteReport.do?reportId=" + reportId, {
+				method: "GET",
+	            headers: {
+	            	"Content-type":"application/json;charset=utf-8"
+	            }
+			})
+			.then(response => {
+				if(response.ok){
+					return response.json();
+				} else {
+					throw new Error('delete report fail');
+				}
+			})
+			.then(data => {
+				if(data > 0){
+					alert('신고를 처리하였습니다.')
+				} else {
+					alert('신고 처리에 실패하였습니다.')
+				}
+				loadReport(1);
+			})
+		}
+	}
 </script>
-<%@ include file="/WEB-INF/views/common/footer.jsp"%>

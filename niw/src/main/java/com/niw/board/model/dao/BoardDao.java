@@ -15,6 +15,7 @@ import java.util.Properties;
 import com.niw.board.model.dto.Article;
 import com.niw.board.model.dto.Comment;
 import com.niw.board.model.dto.Notice;
+import com.niw.board.model.dto.Report;
 
 public enum BoardDao {
 	DAO;
@@ -693,4 +694,78 @@ public enum BoardDao {
 		return result;
 	}
 
+	public int updateNotice(Connection conn, Notice notice) {
+		int result = 0;
+		try {
+			pstmt = conn.prepareStatement(sqlPro.getProperty("updateNotice"));
+			pstmt.setString(1, notice.noticeTitle());
+			pstmt.setString(2, notice.noticeContent());
+			pstmt.setInt(3, notice.noticeId());
+			result = pstmt.executeUpdate();
+		} catch(SQLException e) {
+			e.printStackTrace();
+		} finally {
+			close(pstmt);
+		}
+		return result;
+	}
+	
+	public int countReportByAdmin(Connection conn) {
+		int result = 0;
+		try {
+			pstmt = conn.prepareStatement(sqlPro.getProperty("countReportByAdmin"));
+			rs = pstmt.executeQuery();
+			while(rs.next()) {
+				result += rs.getInt(1);
+			}
+		} catch(SQLException e) {
+			e.printStackTrace();
+		} finally {
+			close(pstmt);
+		}
+		return result;
+	}
+	
+	public List<Report> searchReportByAdmin(Connection conn){
+		List<Report> reports = new ArrayList<>();
+		try {
+			pstmt = conn.prepareStatement(sqlPro.getProperty("searchReportByAdmin"));
+			rs = pstmt.executeQuery();
+			while(rs.next()) {
+				reports.add(getReport(rs));
+			}
+		} catch(SQLException e) {
+			e.printStackTrace();
+		} finally {
+			close(rs);
+			close(pstmt);
+		}
+		return reports;
+ 	}
+	
+	private Report getReport(ResultSet rs) throws SQLException{
+		return Report.builder()
+					 .reportId(rs.getInt("report_id"))
+					 .articleId(rs.getInt("article_id"))
+					 .userId(rs.getString("user_id"))
+					 .reportType(rs.getString("report_type"))
+					 .reportContent(rs.getString("report_content"))
+					 .boardType(rs.getString("board_type"))
+					 .reportYn(rs.getString("report_yn"))
+					 .build();
+	}
+	
+	public int deleteReportByAdmin(Connection conn, int reportId) {
+		int result = 0;
+		try {
+			pstmt = conn.prepareStatement(sqlPro.getProperty("deleteReportByAdmin"));
+			pstmt.setInt(1, reportId);
+			result = pstmt.executeUpdate();
+		} catch(SQLException e) {
+			e.printStackTrace();
+		} finally {
+			close(pstmt);
+		}
+		return result;
+	}
 }

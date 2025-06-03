@@ -6,7 +6,7 @@
 <%
 	Notice notice = (Notice) request.getAttribute("notice");
 %>
-
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <link rel="stylesheet" href="<%=request.getContextPath()%>/resources/css/board.css">
 <section class="mypage-container row flex-row m-4">
 	<!-- 사이드 네비게이터 -->
@@ -59,10 +59,6 @@
 		</div>
     </article>
 </section>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-<script src="https://cdn.ckeditor.com/ckeditor5/45.1.0/ckeditor5.umd.js" crossorigin></script>
-<script src="https://cdn.ckeditor.com/ckeditor5/45.1.0/translations/ko.umd.js" crossorigin></script>
-<script src="https://cdn.ckbox.io/ckbox/2.6.1/ckbox.js" crossorigin></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="<%=request.getContextPath()%>/resources/js/board/board.js"></script>
 <%@include file="/WEB-INF/views/common/footer.jsp" %>
