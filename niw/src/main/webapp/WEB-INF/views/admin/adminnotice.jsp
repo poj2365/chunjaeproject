@@ -255,6 +255,47 @@
 		$form.append($header).append($mainContainer).append($hiddenInput);
 		return $form;
 	}
+	
+	function getModifier(title, noticeId) {
+		const $form = $("<form>").attr({
+			"action": getContextPath() + "/board/updateNotice.do",
+			"method": "post"
+		})
+		const $header = $("<div>").addClass("d-flex flex-column justify-content-end align-items-end mb-3");
+		const $title = $("<input>").addClass("form-control col-lg-9").attr({
+		    type: "text",
+		    placeholder: "제목을 입력하세요",
+		    name: "title"
+		}).val(title);
+		const $button = $("<button>").attr("type", "submit").addClass("mb-2 col-lg-1 btn btn-primary").text("수정");
+		$header.append($button).append($title);
+
+		const $mainContainer = $("<div>").addClass("main-container");
+
+		const $editorContainer = $("<div>")
+		  .addClass("editor-container editor-container_classic-editor")
+		  .attr("id", "editor-container");
+
+		const $innerEditor = $("<div>").addClass("editor-container__editor");
+		const $editor = $("<div>").attr("id", "editor");
+
+		$innerEditor.append($editor);
+		$editorContainer.append($innerEditor);
+		$mainContainer.append($editorContainer);
+
+		const $hiddenInput = $("<input>").attr({
+		  type: "hidden",
+		  id: "content",
+		  name: "content"
+		});
+		const $hiddenId = $("<input>").attr({
+			type: "hidden",
+			name: "id",
+			value: noticeId
+		});
+		$form.append($header).append($mainContainer).append($hiddenInput).append($hiddenId);
+		return $form;
+	}
 </script>
 
 <script>
@@ -292,7 +333,27 @@
 	}
 	
 	function loadUpdateNotice(noticeId) {
-		
+		fetch(getContextPath() + "/admin/searchenoticebyid.do?noticeId=" + noticeId, {
+            method: "GET",
+            headers: {
+            	"Content-type":"application/json;charset=utf-8"
+            }
+        })
+        .then(response => {
+			if(response.ok){
+				return response.json();
+			} else {
+				throw new Error('adminnoticeupdate load fail');
+			}
+		})
+		.then(data => {
+			const title = data['title'];
+			const content = data['content'];			
+			const $form = getModifier(title, noticeId);
+			const $container = $("#main-container");
+			$container.html($form);
+			makeEditor(content);
+		});
 	}
 
 	function loadNotice(cPage) {
@@ -328,10 +389,6 @@
 	$(document).ready(loadNotice('1'));
 </script>
 
-<script src="https://cdn.ckeditor.com/ckeditor5/45.1.0/ckeditor5.umd.js" crossorigin></script>
-<script src="https://cdn.ckeditor.com/ckeditor5/45.1.0/translations/ko.umd.js" crossorigin></script>
-<script src="https://cdn.ckbox.io/ckbox/2.6.1/ckbox.js" crossorigin></script>
-
 <script>
 /*CKEditor */
 /*
@@ -339,7 +396,38 @@
  * https://ckeditor.com/ckeditor-5/builder/?redirect=portal#installation/NoNgNARATAdCMAYKQCwGY0IBxQKxZQE5cBGEtKELBEXUghYwrEFE3QqIkZCAawD2yBGGAkwIkeKkBdSAGMARgBNlKEIQgygA
  */
 
-const makeEditor = () => {
+window.editorInstance = window.editorInstance || null;
+
+function makeEditor(initialData) {
+
+ 	if (editorInstance) {
+ 		editorInstance.destroy()
+ 			.then(() => {
+ 				editorInstance = null;
+ 				recreateEditorElement();
+ 				createNewEditor(initialData);
+ 			})
+ 			.catch(error => {
+ 				console.error('기존 에디터 제거 실패:', error);
+ 			});
+ 	} else {
+ 		recreateEditorElement();
+ 		createNewEditor(initialData);
+ 	}
+ }
+
+
+function recreateEditorElement() {
+    const container = document.querySelector('#editor').parentElement;
+    const oldEditor = document.querySelector('#editor');
+    if (oldEditor) oldEditor.remove();
+
+    const newEditor = document.createElement('div');
+    newEditor.id = 'editor';
+    container.appendChild(newEditor);
+}
+
+function createNewEditor(initialData) {
 	const {
 		ClassicEditor,
 		Autoformat,
@@ -527,7 +615,7 @@ const makeEditor = () => {
 				'ckboxImageEdit'
 			]
 		},
-		initialData: '',
+		initialData: initialData,
 		language: 'ko',
 		licenseKey: LICENSE_KEY,
 		link: {
@@ -569,6 +657,7 @@ const makeEditor = () => {
 	
 	ClassicEditor.create(document.querySelector('#editor'), editorConfig)
 	.then(editor => {
+		editorInstance = editor;
 		$("form").submit(() => {
 			$("#content").val(editor.getData());
 		})

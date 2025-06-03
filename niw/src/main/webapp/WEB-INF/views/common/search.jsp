@@ -1,11 +1,35 @@
-<%@page import="com.niw.study.model.dto.StudyGroup"%>
+<%@page import="com.niw.study.model.dto.StudyGroup, com.niw.board.model.dto.Article"%>
 <%@page import="java.util.List"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@include file="/WEB-INF/views/common/header.jsp"%>
 <%
 List<StudyGroup> studygroups = (List<StudyGroup>) request.getAttribute("studygroups");
+List<Article> articles = (List<Article>) request.getAttribute("articles");
 %>
+
+<script>
+	function getContextPath() {
+		return "/" + window.location.pathname.split("/")[1];
+	}
+	
+	function timeFormat(datetime) {
+		const ldt = new Date(datetime);
+		const now = new Date();
+		if(!(ldt.toDateString() === now.toDateString())){
+			return ldt.toISOString().split("T")[0];
+		}
+		const diffMs = now - ldt;
+		const diffSec = Math.floor(diffMs / 1000);
+		const diffMin = Math.floor(diffSec / 60);
+		const diffHr = Math.floor(diffMin / 60);
+		if (diffHr > 0) return diffHr + '시간전';
+		if (diffMin > 0) return diffMin + '분전';
+		return diffSec + '초전';
+	}
+</script>
+
+
 <style>
 .card-section {
 	margin-bottom: 30px;
@@ -98,9 +122,28 @@ List<StudyGroup> studygroups = (List<StudyGroup>) request.getAttribute("studygro
 				<h5 class="mb-0">자유 게시판</h5>
 			</div>
 			<div class="card-body">
-
-				<p class="text-muted">검색 결과가 없습니다.</p>
-
+				<%if(articles != null && !articles.isEmpty()) {
+					for(Article article : articles) {%>
+					<ul class="post-item clickable-ul row flex-row"
+						onclick="boardDetail('<%=article.articleId()%>')">
+					<li class="post-title overflow-hidden col-lg-6 d-flex align-items-center">
+						<%if(article.articleCategory() == 1) {%>
+							<span class="badge bg-secondary me-2"> 일반 </span>
+						<%} else if(article.articleCategory() == 2) {%>
+							<span class="badge bg-primary me-2"> 질문 </span>
+						<%}%>
+						<%= article.articleTitle() %>
+					</li>
+					<li class="post-title col-lg-2"><%= article.userId()%></li>
+					<li class="post-title col-lg-2">
+						<script>
+						    document.write(timeFormat('<%= article.articleDateTime().toInstant().toString() %>'));
+						</script>
+					</li>
+				</ul>
+				<%}} else { %>
+					<p class="text-muted">검색 결과가 없습니다.</p>
+				<%} %>
 			</div>
 		<div class="board-header resource">
 				<h5 class="mb-0">자료 게시판</h5>
@@ -157,4 +200,9 @@ function goToGroup(groupNumber) {
 document.getElementById('study').addEventListener('click', () => {
 	location.assign('<%=request.getContextPath()%>/study/grouplist.do');
 });
+
+function boardDetail(articleId) {
+	location.assign(getContextPath() + '/board/boarddetail.do?articleId=' + articleId);
+}
+
 </script>

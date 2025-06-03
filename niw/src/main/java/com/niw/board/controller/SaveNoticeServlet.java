@@ -47,11 +47,11 @@ public class SaveNoticeServlet extends HttpServlet {
 			    .addAttributes("p", "class", "style")
 			    .addAttributes("oembed", "url")
 			); 
-			BoardService.SERVICE.saveNotice(Notice.builder()
-												  .noticeTitle(title)
-												  .noticeContent(content)
-												  .build());
-			response.sendRedirect(request.getContextPath() + "/admin/adminpage.do");
+		BoardService.SERVICE.saveNotice(Notice.builder()
+											  .noticeTitle(title)
+											  .noticeContent(content)
+											  .build());
+		response.sendRedirect(request.getContextPath() + "/admin/adminpage.do");
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

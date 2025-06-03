@@ -31,7 +31,10 @@ User loginUser= (User)session.getAttribute("loginUser");
    <link rel="stylesheet" href=" <%=request.getContextPath()%>/resources/css/common.css">
   <link rel="stylesheet" href=" <%=request.getContextPath()%>/resources/css/header.css">
   <link rel="stylesheet" href=" <%=request.getContextPath()%>/resources/css/footer.css">
- 
+	<!-- CKEditor -->
+	<script src="https://cdn.ckeditor.com/ckeditor5/45.1.0/ckeditor5.umd.js" crossorigin></script>
+	<script src="https://cdn.ckeditor.com/ckeditor5/45.1.0/translations/ko.umd.js" crossorigin></script>
+	<script src="https://cdn.ckbox.io/ckbox/2.6.1/ckbox.js" crossorigin></script> 
 </head>
 <body>
   <!-- 상단 메뉴 -->

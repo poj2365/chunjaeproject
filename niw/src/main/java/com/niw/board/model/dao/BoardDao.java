@@ -693,4 +693,19 @@ public enum BoardDao {
 		return result;
 	}
 
+	public int updateNotice(Connection conn, Notice notice) {
+		int result = 0;
+		try {
+			pstmt = conn.prepareStatement(sqlPro.getProperty("updateNotice"));
+			pstmt.setString(1, notice.noticeTitle());
+			pstmt.setString(2, notice.noticeContent());
+			pstmt.setInt(3, notice.noticeId());
+			result = pstmt.executeUpdate();
+		} catch(SQLException e) {
+			e.printStackTrace();
+		} finally {
+			close(pstmt);
+		}
+		return result;
+	}
 }

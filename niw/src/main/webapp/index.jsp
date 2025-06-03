@@ -271,9 +271,10 @@
 
 <!-- board -->
 <script>
-	const getContextPath = () => {
+	function getContextPath() {
 		return "/" + window.location.pathname.split("/")[1];
 	}
+
 
 	const loadArticle = (searchData) => {
 		fetch(getContextPath() + "/main/article.do", {

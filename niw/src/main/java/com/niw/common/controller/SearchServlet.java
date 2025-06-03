@@ -9,6 +9,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.niw.board.model.dto.Article;
+import com.niw.board.service.BoardService;
 import com.niw.common.CommonTemplate;
 import com.niw.study.model.dto.StudyGroup;
 import com.niw.study.model.service.StudyGroupService;
@@ -35,7 +37,9 @@ public class SearchServlet extends HttpServlet {
 		String keyWord = request.getParameter("keyWord");
 		List<StudyGroup> studygroups = StudyGroupService.SERVICE.mainSearchStudyGroup(keyWord);
 		request.setAttribute("studygroups", studygroups);
-		
+
+		List<Article> articles = BoardService.SERVICE.searchArticleByRecommend(10, keyWord, 5);
+		request.setAttribute("articles", articles);
 		request.getRequestDispatcher(CommonTemplate.WEB_VIEWS+"/common/search.jsp").forward(request, response);
 	}
 

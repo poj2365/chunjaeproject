@@ -208,7 +208,7 @@
 	}
 	
 	
-	const getContextPath = () => {
+	function getContextPath() {
 		return "/" + window.location.pathname.split("/")[1];
 	}
 </script>
