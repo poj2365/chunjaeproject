@@ -242,9 +242,9 @@ rotate(
 			<div class="menu-section">
 				<div class="menu-title">스터디 그룹</div>
 				<ul>
-					<li class="menu-item " data-tab="grouplist"><i
+					<li class="menu-item active" data-tab="grouplist"><i
 						class="bi bi-person-plus"></i>스터디 모집</li>
-					<li class="menu-item active" data-tab="studygroup"><i
+					<li class="menu-item " data-tab="studygroup"><i
 						class="bi bi-people"></i>내 스터디 그룹</li>
 				</ul>
 			</div>
