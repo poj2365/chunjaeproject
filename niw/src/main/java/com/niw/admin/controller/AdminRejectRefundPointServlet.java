@@ -7,24 +7,28 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.niw.common.CommonTemplate;
-
-
-@WebServlet("/admin/adminpage/refund.do")
-public class AdminRefundServlet extends HttpServlet {
+/**
+ * Servlet implementation class AdminRejectRefundPointServlet
+ */
+@WebServlet("/admin/rejectPointRefund.do")
+public class AdminRejectRefundPointServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
- 
-    public AdminRefundServlet() {
+    
+    public AdminRejectRefundPointServlet() {
         super();
     }
 
-
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		System.out.println("들어왓닝");
-		request.getRequestDispatcher(CommonTemplate.WEB_VIEWS+"/admin/adminrefund.jsp").forward(request, response);
+		response.getWriter().append("Served at: ").append(request.getContextPath());
 	}
 
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		doGet(request, response);
