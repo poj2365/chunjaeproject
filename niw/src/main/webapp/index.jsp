@@ -296,7 +296,6 @@
 			const $container = $(".best-container");
 			$container.html("");
 			for(let article of articles) {
-				console.log(article);
 				const $ul = $("<ul>").addClass("post-item clickable-ul row flex-row")
 									 .on("click", function() {
 										 boardDetail(article['articleId']);
