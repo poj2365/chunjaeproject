@@ -276,5 +276,4 @@ function loadTabContent(tabId) {
 
 
 
-
 <%@ include file="/WEB-INF/views/common/footer.jsp" %>

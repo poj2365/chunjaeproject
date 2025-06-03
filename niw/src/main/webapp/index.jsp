@@ -172,7 +172,7 @@
 					<div class="board-header best">
 						<h3 class="board-title">베스트</h3>
 					</div>
-					<div class="board-content">
+					<div class="board-content best-container">
 						<div class="post-item">
 							<div class="post-info">
 								<a href="#" class="post-title">데이터를 불러오고 있습니다...</a>
@@ -253,7 +253,8 @@
     	  }
     	});
     
-    
+    // board
+       loadArticle("");
     }); 
 
         // 광고 배너 클릭 이벤트
@@ -261,6 +262,76 @@
             btn.addEventListener('click', function() {
                 location.assign("https://www.genia.academy/");
             });
-        });
+            
+       
+	   });
+</script>
+    
+    
 
-    </script>
+<!-- board -->
+<script>
+	const getContextPath = () => {
+		return "/" + window.location.pathname.split("/")[1];
+	}
+
+	const loadArticle = (searchData) => {
+		fetch(getContextPath() + "/main/article.do", {
+			method: "post",
+			headers: {
+				"Content-type":"application/json;charset=utf-8"
+			},
+			body: JSON.stringify(searchData)
+		})
+		.then(response => {
+			if(response.ok){
+				return response.json();
+			} else {
+				throw new Error('index loadArticle fail');
+			}
+		})
+		.then(data => {
+			const articles = data;
+			const $container = $(".best-container");
+			$container.html("");
+			for(let article of articles) {
+				console.log(article);
+				const $ul = $("<ul>").addClass("post-item clickable-ul row flex-row")
+									 .on("click", function() {
+										 boardDetail(article['articleId']);
+									 })
+				const $title = $("<li>").addClass("post-title overflow-hidden col-lg-6 d-flex align-items-center");
+				const $category = $("<span>").addClass("badge me-2");
+				switch(article['articleCategory']){
+					case 1: $category.addClass("bg-secondary").text("일반"); break;
+					case 2: $category.addClass("bg-primary").text("질문"); break;
+				}
+				$title.append($category).append(" " + article['articleTitle']);
+				$ul.append($title);
+				$ul.append($("<li>").addClass("post-title col-lg-2").text(article['userId']))
+				   .append($("<li>").addClass("post-title col-lg-2").text(timeFormat(article['articleDateTime'])));					
+				$container.append($ul);
+			}
+		})
+	}
+	
+	function boardDetail(articleId) {
+		location.assign(getContextPath() + '/board/boarddetail.do?articleId=' + articleId);
+	}
+	
+	function timeFormat(datetime) {
+		const ldt = new Date(datetime);
+		const now = new Date();
+		if(!(ldt.toDateString() === now.toDateString())){
+			return ldt.toISOString().split("T")[0];
+		}
+		const diffMs = now - ldt;
+		const diffSec = Math.floor(diffMs / 1000);
+		const diffMin = Math.floor(diffSec / 60);
+		const diffHr = Math.floor(diffMin / 60);
+		if (diffHr > 0) return diffHr + '시간전';
+		if (diffMin > 0) return diffMin + '분전';
+		return diffSec + '초전';
+	}
+</script>
+	

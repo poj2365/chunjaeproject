@@ -175,12 +175,12 @@
 	</div>
 </div>
 <script>
-	const getContextPath = () => {
+	function getContextPath() {
 		return "/" + window.location.pathname.split("/")[1];
 	}
 	
 	
-	const getNotice = (notice) => {
+	function getNotice(notice) {
 		const $form = $("<div>").addClass("row flex-row justify-content-between align-items-center").css("minWidth", "800px");
 		const $main = $("<div>").addClass("col-lg-8 d-flex align-items-center");
 		const $badge = $("<span>").addClass("badge bg-danger me-3").text("공지");
@@ -220,7 +220,7 @@
 		return $form;
 	}
 	
-	const getWriter = () => {
+	function getWriter() {
 		const $form = $("<form>").attr({
 			"action": getContextPath() + "/board/saveNotice.do",
 			"method": "post"
@@ -258,7 +258,7 @@
 </script>
 
 <script>
-	const deleteNotice = (noticeId) => {
+	function deleteNotice(noticeId) {
 		const deleteConfirm = confirm("정말로 삭제하시겠습니까?");
 		if(deleteConfirm){
 			fetch(getContextPath() + "/board/deleteNotice.do?noticeId=" + noticeId, {
@@ -285,17 +285,17 @@
 		}
 	}
 
-	const loadNoticeWrite = () => {
+	function loadNoticeWrite() {
 		const $container = $("#main-container");
 		$container.html(getWriter());
 		makeEditor("");
 	}
 	
-	const loadUpdateNotice = (noticeId) => {
+	function loadUpdateNotice(noticeId) {
 		
 	}
 
-	const loadNotice = (cPage) => {
+	function loadNotice(cPage) {
 		const $container = $("#notice-container");
 		const $pageBar = $("#notice-pagebar");
 		fetch(getContextPath() + "/admin/notice.do?cPage=" + cPage, {
@@ -325,7 +325,7 @@
 		})
 	}
 
-	$(document).ready(loadNotice(1));
+	$(document).ready(loadNotice('1'));
 </script>
 
 <script src="https://cdn.ckeditor.com/ckeditor5/45.1.0/ckeditor5.umd.js" crossorigin></script>
