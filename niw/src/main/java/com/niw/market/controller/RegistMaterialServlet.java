@@ -67,7 +67,7 @@ public class RegistMaterialServlet extends HttpServlet {
 			thumbnailFilePaths.add("resources/upload/market/"+userId+"/material/previews/"+savedFileName.substring(0,savedFileName.lastIndexOf("."))+"_preview_page"+pages[i]+".png");
 		}
 		
-		String materialFilePath="resources/upload/market/"+userId+"/material"+savedFileName;
+		String materialFilePath="resources/upload/market/"+userId+"/material/"+savedFileName;
 		String materialStatus=null;
 		String materialCategory=request.getParameter("category");
 		String materialGrade=request.getParameter("grade");

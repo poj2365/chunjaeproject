@@ -186,6 +186,15 @@ if(loginUser == null || !loginUser.userRole().equals("ADMIN")) {
                 </li>
             </ul>
         </div>
+              
+        <div class="menu-section">
+            <div class="menu-title">권한관리</div>
+            <ul>
+                <li class="menu-item" data-tab="instructor">
+                    <i class="bi bi-person"></i>권한 요청 목록
+                </li>
+            </ul>
+        </div>
 
         
         <!-- 필요시 추가 -->

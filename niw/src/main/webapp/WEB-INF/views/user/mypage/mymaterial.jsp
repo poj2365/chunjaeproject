@@ -499,52 +499,9 @@ var isInMypage = <%=request.getParameter("fromMypage") != null ? "true" : "false
 
 // 다운로드 함수
 function downloadMaterial(materialId) {
-    if(confirm('이 자료를 다운로드하시겠습니까?')) {
-        var $btn = $('button[data-material-id="' + materialId + '"].btn-download');
-        var originalText = $btn.html();
-        $btn.prop('disabled', true).html('<i class="bi bi-download"></i>다운로드 중...');
-        
-        $.ajax({
-            url: '<%=request.getContextPath()%>/material/download.do',
-            type: 'POST',
-            data: { materialId: materialId },
-            success: function(response) {
-                if(response.success) {
-                    // 파일 다운로드 처리
-                    if(response.downloadUrl) {
-                        window.location.href = response.downloadUrl;
-                    } else {
-                        // 파일을 직접 다운로드하는 경우
-                        var link = document.createElement('a');
-                        link.href = '<%=request.getContextPath()%>/material/download.do?materialId=' + materialId;
-                        link.download = '';
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-                    }
-                    
-                    // 다운로드 수 업데이트를 위해 현재 페이지 새로고침
-                    setTimeout(function() {
-                        if (isInMypage) {
-                            // 마이페이지 내부에서 실행중이면 AJAX로 새로고침
-                            loadMaterialPage(currentPage);
-                        } else {
-                            // 직접 접근이면 일반 새로고침
-                            location.reload();
-                        }
-                    }, 1000);
-                } else {
-                    alert('다운로드에 실패했습니다: ' + (response.message || '알 수 없는 오류'));
-                }
-            },
-            error: function(xhr, status, error) {
-                console.error('Download error:', error);
-                alert('서버 오류가 발생했습니다. 다시 시도해주세요.');
-            },
-            complete: function() {
-                $btn.prop('disabled', false).html(originalText);
-            }
-        });
+    if (confirm('이 자료를 다운로드하시겠습니까?')) {
+        // 새 창에서 다운로드
+        window.open('<%= request.getContextPath() %>/market/download.do?id=' + materialId, '_blank');
     }
 }
 
