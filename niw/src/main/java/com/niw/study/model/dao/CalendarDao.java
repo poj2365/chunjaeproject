@@ -75,8 +75,7 @@ public enum CalendarDao {
 		Calendar calendar = null;
 		try {
 			pstmt = conn.prepareStatement(sql.getProperty("searchCalendarById"));
-			pstmt.setString(1, c.userId());
-			pstmt.setTimestamp(2, new Timestamp(c.startTime().getTime()));
+			pstmt.setInt(1, c.calendarNo());
 			rs = pstmt.executeQuery();
 			if (rs.next()) {
 				calendar=getCalendar(rs);
@@ -84,6 +83,7 @@ public enum CalendarDao {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		System.out.println(calendar);
 		return calendar;
 	}
 

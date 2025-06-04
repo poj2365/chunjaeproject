@@ -3,7 +3,9 @@
  <%@ page import="com.niw.market.model.dto.Material" %>
  <%@ include file="/WEB-INF/views/common/header.jsp"%>
  
-
+<%
+	String introduce=(String)request.getAttribute("introduce");
+%>
 
 <style>
 :root {
@@ -715,7 +717,7 @@
 							<div class="mb-3">
 								<label class="form-label">강사 소개</label>
 								<textarea class="form-control" name="teacherIntro" rows="3"
-									placeholder="강사님의 경력이나 교육 철학 등을 간략히 소개해주세요."></textarea>
+									><%=introduce %></textarea>
 							</div>
 
 							<div class="mb-3">

@@ -355,6 +355,10 @@ List<TimeRecord> trList = (List<TimeRecord>) request.getAttribute("trList");
             
             // 시작 버튼 클릭 이벤트
             startBtn.addEventListener('click', function() {
+                <%if(loginUser==null){%>
+                alert("데이터 저장에 실패하였습니다. 로그인 후 사용 가능한 기능입니다.");
+                status.textContent = '';
+                <% }else {%>
                 if (!isRunning) {
                     if (!isPaused) {
                         startTime = Date.now();
@@ -414,10 +418,6 @@ List<TimeRecord> trList = (List<TimeRecord>) request.getAttribute("trList");
             
             function saveTime(time, startTimeObj, endTimeObj) {
             	status.textContent = '데이터 저장 중...';
-                <%if(loginUser==null){%>
-                alert("데이터 저장에 실패하였습니다. 로그인 후 사용 가능한 기능입니다.");
-                status.textContent = '';
-                <% }else {%>
                 const totalTime = formattedTime(time);
                 const category = "test";
                 const userId = '<%=loginUser.userId()%>';

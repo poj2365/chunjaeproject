@@ -30,6 +30,21 @@ public enum InstructorApplicationDao {
 		}
 	}
 
+	public InstructorApplication searchByUserId(Connection conn, String applicationId) {
+		InstructorApplication application = null;
+		try (PreparedStatement pstmt = conn.prepareStatement(sqlProp.getProperty("searchById"))) {
+			pstmt.setString(1, applicationId);
+			try (ResultSet rs = pstmt.executeQuery()) {
+				if (rs.next()) {
+					application = getInstructorApplication(rs);
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return application;
+	}
+	
 	public int instructorApply(Connection conn, InstructorApplication instructorApplication) {
 		int result = 0;
 

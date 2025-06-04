@@ -159,7 +159,7 @@ if (loginUser != null) {
 								<span>또는</span>
 							</div>
 
-							<div class="row g-2 mb-4">
+<!-- 							<div class="row g-2 mb-4">
 								<div class="col-6">
 									<button type="button"
 										class="btn w-100 btn-google d-flex align-items-center justify-content-center"
@@ -178,7 +178,7 @@ if (loginUser != null) {
 											alt="네이버" style="height: 25px;" class="me-2"> 네이버 로그인
 									</button>
 								</div>
-							</div>
+							</div> -->
 
 							<div class="text-center login-options">
 								<p class="mb-0">
@@ -186,6 +186,7 @@ if (loginUser != null) {
 										href="<%=request.getContextPath()%>/auth/register<%if (redirect != null && !redirect.isEmpty()) {%>?redirect=<%=redirect%><%}%>"
 										class="fw-bold text-primary">회원가입</a>
 								</p>
+								<span></span>
 							</div>
 						</form>
 					</div>
