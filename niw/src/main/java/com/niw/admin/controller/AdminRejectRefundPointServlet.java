@@ -7,6 +7,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.niw.point.model.service.PointService;
+
 /**
  * Servlet implementation class AdminRejectRefundPointServlet
  */
@@ -23,7 +25,16 @@ public class AdminRejectRefundPointServlet extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		response.getWriter().append("Served at: ").append(request.getContextPath());
+		Long refundId = Long.parseLong(request.getParameter("refundId"));
+		
+		int updateresult = PointService.ponitService().rejectPointRefund(refundId);
+		
+		 response.setContentType("text/plain; charset=UTF-8");
+		    if (updateresult > 0) {
+		        response.getWriter().write("success");
+		    } else {
+		        response.getWriter().write("fail");
+		    }
 	}
 
 	/**

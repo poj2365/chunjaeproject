@@ -47,6 +47,8 @@ public class CalendarServlet extends HttpServlet {
 		
 		request.setAttribute("calendar", c);
 		request.setAttribute("trList", trList);
+		System.out.println(trList);
+		System.out.println(c);
 		request.getRequestDispatcher("/WEB-INF/views/study/calendar.jsp").forward(request, response);
 	}
 

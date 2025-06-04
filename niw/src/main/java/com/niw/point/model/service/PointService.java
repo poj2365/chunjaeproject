@@ -99,10 +99,19 @@ public class PointService {
 		
 	}
 	
-	public int approvePointRefund(Long refundId) {
+	public int approvePointRefund(Long refundId,String userId,int pointAmount) {
 		int result = 0;
 		Connection conn = JDBCTemplate.getConnection();
-		result = dao.approvePointRefund(conn,refundId);
+		result = dao.approvePointRefund(conn,refundId,userId,pointAmount);
+		JDBCTemplate.close(conn);
+		return result;
+		
+	}
+	
+	public int rejectPointRefund(Long refundId) {
+		int result = 0;
+		Connection conn = JDBCTemplate.getConnection();
+		result = dao.rejectPointRefund(conn,refundId);
 		JDBCTemplate.close(conn);
 		return result;
 		

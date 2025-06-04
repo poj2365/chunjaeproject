@@ -272,6 +272,7 @@ List<TimeRecord> trList = (List<TimeRecord>) request.getAttribute("trList");
      	.then(data => {
          	const labels = data.map(item => item.userId);
 		 	const totalTime = data.map(item => totalMinute(item.totalTime));
+		 	console.log(labels);
          // Chart 생성
          new Chart(document.getElementById('studyChart').getContext('2d'), {
              type: 'bar',
