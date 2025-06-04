@@ -16,7 +16,7 @@ import com.niw.point.model.dto.Point;
 import com.niw.point.model.dto.PointHistory;
 import com.niw.point.model.dto.PointMyFile;
 import com.niw.point.model.dto.PointRefund;
-import com.niw.user.model.dto.User;
+import com.niw.point.model.dto.PointRefundList;
 
 public class PointDao {
 	
@@ -191,20 +191,50 @@ public class PointDao {
 		return files;
 	}
 	
-//	public List<PointRefund> showAllRefundList (Connection conn){
-//		List<PointMyFile> lists = new ArrayList<PointMyFile>();
-//		try {
-//			pstmt = conn.prepareStatement(sql.getProperty("showAllRefundList"));
-//			rs = pstmt.executeQuery();
-//			
-//			while (rs.next()) {
-//				String userId = rs.getString("user_id");
-//				
-//			}
-//		} catch (SQLException e) {
-//			e.printStackTrace();
-//		}
-//		
-//	}
+	public List<PointRefundList> showAllRefundList (Connection conn){
+		List<PointRefundList> lists = new ArrayList<PointRefundList>();
+		try {
+			pstmt = conn.prepareStatement(sql.getProperty("showAllRefundList"));
+			rs = pstmt.executeQuery();
+			
+			while (rs.next()) {
+				String refundId= rs.getString("refund_id");
+				String userId = rs.getString("user_id");
+				String userName = rs.getString("user_name");
+				Date refundDate = rs.getDate("refund_date");
+				int pointAmount = rs.getInt("refund_point");
+				String bank = rs.getString("refund_bank");
+				String bankAccount = rs.getString("refund_account");
+				String status = rs.getString("refund_status");
+				PointRefundList list = 
+						new PointRefundList(refundId,userId,userName,refundDate,pointAmount,bank,bankAccount,status);
+				lists.add(list);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			JDBCTemplate.close(rs);
+			JDBCTemplate.close(pstmt);
+		} return lists;
+		
+	}
+	
+	public int approvePointRefund (Connection conn, Long refundId) {
+		int result =0;
+		try {
+			pstmt= conn.prepareStatement(sql.getProperty("approveRefund"));
+			pstmt.setLong(1,refundId);
+			result = pstmt.executeUpdate();
+		
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			JDBCTemplate.close(rs);
+			JDBCTemplate.close(pstmt);
+		}
+		return result;
+	}
+		
+	
 
 }

@@ -352,82 +352,7 @@ if (loginUser == null) {
 	  background: #fff !important;
 	  font-size: 18px !important;
 	}
-</style>
-
- <h2 class="content-title">환불 요청 기록</h2>
-
-<!-- 환불 요청 관리 테이블 (관리자용) -->
-<div class="content-section">
-    <h3 class="section-title">환불 요청 관리</h3>
-    <table class="refund-table">
-        <thead>
-            <tr>
-                <th>번호</th>
-                <th>회원ID</th>
-                <th>이름</th>
-                <th>요청일</th>
-                <th>환불 포인트</th>
-                <th>은행</th>
-                <th>계좌번호</th>
-                <th>상태</th>
-                <th>관리</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- 예시 데이터, 추후 서버 데이터로 반복 -->
-            <tr>
-                <td>1</td>
-                <td>user123</td>
-                <td>홍길동</td>
-                <td>2025-06-02</td>
-                <td class="point-minus">10,000P</td>
-                <td>국민</td>
-                <td>123-45-67890</td>
-                <td>
-                    <span class="badge status-pending">대기</span>
-                </td>
-                <td>
-                    <button class="btn btn-success btn-sm me-1">수락</button>
-                    <button class="btn btn-danger btn-sm">거절</button>
-                </td>
-            </tr>
-            <tr>
-                <td>2</td>
-                <td>user456</td>
-                <td>임꺽정</td>
-                <td>2025-06-01</td>
-                <td class="point-minus">25,000P</td>
-                <td>신한</td>
-                <td>001-22-33333</td>
-                <td>
-                    <span class="badge status-done">승인</span>
-                </td>
-                <td>
-                    <button class="btn btn-outline-secondary btn-sm" disabled>처리완료</button>
-                </td>
-            </tr>
-            <tr>
-                <td>3</td>
-                <td>user789</td>
-                <td>이몽룡</td>
-                <td>2025-05-30</td>
-                <td class="point-minus">5,000P</td>
-                <td>우리</td>
-                <td>002-33-44444</td>
-                <td>
-                    <span class="badge status-reject">거절</span>
-                </td>
-                <td>
-                    <button class="btn btn-outline-secondary btn-sm" disabled>처리완료</button>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-</div>
-
-<style>
-/* 환불 요청 테이블 전용 스타일 */
-.refund-table {
+	.refund-table {
     width: 100%;
     border-collapse: collapse;
     border-radius: 10px;
@@ -525,49 +450,200 @@ if (loginUser == null) {
 }
 </style>
 
+ <h2 class="content-title">환불 요청 기록</h2>
+
+<!-- 환불 요청 관리 테이블 (관리자용) -->
+<div class="content-section">
+    <h3 class="section-title">환불 요청 관리</h3>
+    <table class="refund-table">
+        <thead>
+            <tr>
+                <th>번호</th>
+                <th>회원ID</th>
+                <th>이름</th>
+                <th>요청일</th>
+                <th>환불 포인트</th>
+                <th>은행</th>
+                <th>계좌번호</th>
+                <th>상태</th>
+                <th>관리</th>
+            </tr>
+        </thead>
+        <tbody id="refundPointList">
+           
+        </tbody>
+    </table>
+</div>
+
+<style>
+/* 환불 요청 테이블 전용 스타일 */
+
+</style>
+
 <script>
-		$(document).ready(() => {
-		    $.ajax({
-		        url: '<%=request.getContextPath()%>/admin/adminpage/refundlist.do',
-		        type: 'GET',
-		        dataType: 'json', // json 반환 권장
-		        success: function(list) {
-		            // 테이블 바디에 반복해서 row 추가
-		            const $tbody = $('.refund-table tbody');
-		            $tbody.empty();
-		            if (list.length === 0) {
-		                $tbody.append('<tr><td colspan="9">환불 요청이 없습니다.</td></tr>');
-		            } else {
-		                list.forEach((row, idx) => {
-		                    $tbody.append(`
-		                        <tr>
-		                            <td>${idx + 1}</td>
-		                            <td>${row.userId}</td>
-		                            <td>${row.userName}</td>
-		                            <td>${row.refundDate}</td>
-		                            <td class="point-minus">${row.refundPoint.toLocaleString()}P</td>
-		                            <td>${row.refundBank}</td>
-		                            <td>${row.refundAccount}</td>
-		                            <td>
-		                                <span class="badge ${row.status === '대기' ? 'status-pending' : row.status === '승인' ? 'status-done' : 'status-reject'}">
-		                                    ${row.status}
-		                                </span>
-		                            </td>
-		                            <td>
-		                                ${
-		                                  row.status === '대기'
-		                                    ? `<button class="btn btn-success btn-sm me-1" data-id="${row.refundId}">수락</button>
-		                                       <button class="btn btn-danger btn-sm" data-id="${row.refundId}">거절</button>`
-		                                    : `<button class="btn btn-outline-secondary btn-sm" disabled>처리완료</button>`
-		                                }
-		                            </td>
-		                        </tr>
-		                    `);
-		                });
-		            }
-		        }
-		    });
-		});
+	$(document).ready(function() {
+	    $.get('<%=request.getContextPath()%>/admin/adminpage/refundlist.do', function(data) {
+			console.log(data);
+	        // data가 배열 형태로 올 때
+	        renderRefundList(data);
+	    });
+	});
 	
+	function renderRefundList(list) {
+	    const tbody = document.getElementById('refundPointList');
+	    tbody.innerHTML = ''; // tbody 비우기
+
+	    if (!list || list.length === 0) {
+	        const tr = document.createElement('tr');
+	        const td = document.createElement('td');
+	        td.colSpan = 9;
+	        td.style.textAlign = 'center';
+	        td.style.padding = '40px';
+	        td.textContent = '데이터가 없습니다.';
+	        tr.appendChild(td);
+	        tbody.appendChild(tr);
+	        return;
+	    }
+
+	    list.forEach((row, idx) => {
+	        const tr = document.createElement('tr');
+
+	        // 1. 번호
+	        const tdNum = document.createElement('td');
+	        tdNum.textContent = idx + 1;
+	        tr.appendChild(tdNum);
+
+	        // 2. 유저ID
+	        const tdUserId = document.createElement('td');
+	        tdUserId.textContent = row.userId;
+	        tr.appendChild(tdUserId);
+
+	        // 3. 이름
+	        const tdUserName = document.createElement('td');
+	        tdUserName.textContent = row.userName;
+	        tr.appendChild(tdUserName);
+
+	        // 4. 환불날짜
+	        const tdDate = document.createElement('td');
+	        tdDate.textContent = row.refundDate;
+	        tr.appendChild(tdDate);
+
+	        // 5. 포인트 (콤마 + P)
+	        const tdPoint = document.createElement('td');
+	        tdPoint.className = 'point-minus';
+	        tdPoint.style.textAlign = 'right';
+	        tdPoint.textContent =  Number((row.pointAmount)*-1).toLocaleString() + 'P';
+	        tr.appendChild(tdPoint);
+
+	        // 6. 은행명
+	        const tdBank = document.createElement('td');
+	        tdBank.textContent = row.bank;
+	        tr.appendChild(tdBank);
+
+	        // 7. 계좌번호
+	        const tdAccount = document.createElement('td');
+	        tdAccount.textContent = row.banckAccount;
+	        tr.appendChild(tdAccount);
+
+	        // 8. 상태 뱃지
+	        const tdStatus = document.createElement('td');
+	        const span = document.createElement('span');
+	        if (row.status === 'WAIT') {
+	            span.className = 'badge status-pending';
+	            span.textContent = '대기';
+	        } else if (row.status === 'APPROVED') {
+	            span.className = 'badge status-done';
+	            span.textContent = '승인';
+	        } else {
+	            span.className = 'badge status-reject';
+	            span.textContent = '거절';
+	        }
+	        tdStatus.appendChild(span);
+	        tr.appendChild(tdStatus);
+
+	        // 9. 버튼
+	        const tdBtn = document.createElement('td');
+	        if (row.status === 'WAIT') {
+	            const acceptBtn = document.createElement('button');
+	            acceptBtn.className = 'btn btn-success btn-sm me-1';
+	            acceptBtn.textContent = '수락';
+	            acceptBtn.dataset.id = row.refundId;
+
+	            const rejectBtn = document.createElement('button');
+	            rejectBtn.className = 'btn btn-danger btn-sm';
+	            rejectBtn.textContent = '거절';
+	            rejectBtn.dataset.id = row.refundId;
+
+	            tdBtn.appendChild(acceptBtn);
+	            tdBtn.appendChild(rejectBtn);
+	        } else {
+	            const doneBtn = document.createElement('button');
+	            doneBtn.className = 'btn btn-outline-secondary btn-sm';
+	            doneBtn.textContent = '처리완료';
+	            doneBtn.disabled = true;
+	            tdBtn.appendChild(doneBtn);
+	        }
+	        tr.appendChild(tdBtn);
+
+	    
+	        tbody.appendChild(tr);
+	    });
+	}
 	
+	document.getElementById('refundPointList').addEventListener('click', function(e) {
+	    if (e.target.classList.contains('btn-success')) {
+	        // 수락 버튼
+	        const refundId = e.target.dataset.id;
+	        if (confirm('해당 환불을 승인하시겠습니까?')) {
+	            approveRefund(refundId);
+	        }
+	    }
+	    if (e.target.classList.contains('btn-danger')) {
+	        // 거절 버튼
+	        const refundId = e.target.dataset.id;
+	        if (confirm('해당 환불을 거절하시겠습니까?')) {
+	            rejectRefund(refundId);
+	        }
+	    }
+	});
+	
+	function approveRefund(refundId) {
+	    $.ajax({
+	        url: '<%=request.getContextPath()%>/admin/approvePointRefund.do', 
+	        method: 'POST',
+	        data: { refundId: refundId },
+	        success: function(result) {
+	            if(result === "success") {
+	                alert('승인 완료!');
+	                
+	                location.reload(); 
+	            } else {
+	                alert('승인 실패!');
+	            }
+	        },
+	        error: function() {
+	            alert('서버 오류!');
+	        }
+	    });
+	}
+	
+	function rejectRefund(refundId) {
+	    $.ajax({
+	        url: '<%=request.getContextPath()%>/admin/rejectPointRefund.do', 
+	        method: 'POST',
+	        data: { refundId: refundId },
+	        success: function(result) {
+	            if(result === "success") {
+	                alert('거절 완료!');
+	                location.reload(); // 혹은 ajax로 목록만 새로 불러오기
+	            } else {
+	                alert('거절 실패!');
+	            }
+	        },
+	        error: function() {
+	            alert('서버 오류!');
+	        }
+	    });
+	}
+
 </script>
