@@ -177,9 +177,9 @@
         
         <!-- 하단 링크 -->
         <div class="bottom-links">
-            <a href="userLoginView">로그인</a>
+            <a href="<%=request.getContextPath() %>/user/loginview.do">로그인</a>
             <span>|</span>
-            <a href="userSignupView">회원가입</a>
+            <a href="<%=request.getContextPath() %>/user/enrollview.do">회원가입</a>
             <span>|</span>
             <a href="index.jsp">메인화면</a>
         </div>
