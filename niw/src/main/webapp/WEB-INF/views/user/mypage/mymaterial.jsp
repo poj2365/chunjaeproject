@@ -1,4 +1,22 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="java.util.List" %>
+<%@ page import="com.niw.market.model.dto.PurchasedMaterial" %>
+
+<%
+    List<PurchasedMaterial> materials = (List<PurchasedMaterial>)request.getAttribute("materials");
+    String pageBar = (String)request.getAttribute("pageBar");
+    
+    Integer totalCount = (Integer)request.getAttribute("totalCount");
+    Integer totalAmount = (Integer)request.getAttribute("totalAmount");
+    Integer totalDownloads = (Integer)request.getAttribute("totalDownloads");
+    Integer totalReviews = (Integer)request.getAttribute("totalReviews");
+    
+    // null 체크
+    if (totalCount == null) totalCount = 0;
+    if (totalAmount == null) totalAmount = 0;
+    if (totalDownloads == null) totalDownloads = 0;
+    if (totalReviews == null) totalReviews = 0;
+%>
 
 <style>
     .content-header {
@@ -14,209 +32,6 @@
         font-size: 24px;
         font-weight: bold;
         color: #333;
-    }
-    
-    .filter-section {
-        background-color: #f8f9fa;
-        border-radius: 10px;
-        padding: 20px;
-        margin-bottom: 30px;
-    }
-    
-    .form-input {
-        width: 100%;
-        padding: 12px 15px;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        font-size: 16px;
-        transition: all 0.2s;
-    }
-    
-    .form-input:focus {
-        border-color: var(--bs-blind-dark);
-        box-shadow: 0 0 0 3px rgba(36, 177, 181, 0.2);
-        outline: none;
-    }
-    
-    .form-label {
-        display: block;
-        margin-bottom: 8px;
-        font-weight: bold;
-        color: #444;
-    }
-    
-    .material-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        gap: 20px;
-        margin-bottom: 30px;
-    }
-    
-    .material-card {
-        background-color: white;
-        border-radius: 10px;
-        overflow: hidden;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        transition: transform 0.2s, box-shadow 0.2s;
-    }
-    
-    .material-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-    }
-    
-    .material-img {
-        height: 160px;
-        background-color: #f0f0f0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        position: relative;
-    }
-    
-    .material-img img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-    
-    .material-img .placeholder-icon {
-        font-size: 48px;
-        color: #ccc;
-    }
-    
-    .download-badge {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        background-color: rgba(0, 0, 0, 0.7);
-        color: white;
-        padding: 4px 8px;
-        border-radius: 4px;
-        font-size: 12px;
-    }
-    
-    .material-info {
-        padding: 20px;
-    }
-    
-    .material-title {
-        font-weight: bold;
-        margin-bottom: 8px;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        height: 3em;
-        line-height: 1.5;
-    }
-    
-    .material-meta {
-        font-size: 14px;
-        color: #888;
-        margin-bottom: 8px;
-    }
-    
-    .material-price {
-        font-weight: bold;
-        color: var(--bs-blind-dark);
-        font-size: 16px;
-        margin-bottom: 15px;
-    }
-    
-    .material-date {
-        font-size: 12px;
-        color: #aaa;
-        margin-bottom: 10px;
-    }
-    
-    .material-actions {
-        display: flex;
-        gap: 8px;
-    }
-    
-    .material-actions .btn {
-        flex: 1;
-        padding: 8px 12px;
-        font-size: 14px;
-        border-radius: 6px;
-        text-align: center;
-        transition: all 0.2s;
-    }
-    
-    .btn-download {
-        background-color: var(--bs-blind-dark);
-        color: white;
-        border: none;
-    }
-    
-    .btn-download:hover {
-        background-color: var(--bs-blind-gray);
-    }
-    
-    .btn-download:disabled {
-        background-color: #ccc;
-        cursor: not-allowed;
-    }
-    
-    .btn-review {
-        background-color: #f8f9fa;
-        color: #333;
-        border: 1px solid #ddd;
-    }
-    
-    .btn-review:hover {
-        background-color: #e9ecef;
-    }
-    
-    .pagination {
-        display: flex;
-        justify-content: center;
-        margin-top: 30px;
-    }
-    
-    .page-item {
-        margin: 0 5px;
-    }
-    
-    .page-link {
-        display: block;
-        padding: 8px 12px;
-        border-radius: 6px;
-        transition: all 0.2s;
-        text-decoration: none;
-        color: #333;
-    }
-    
-    .page-link:hover {
-        background-color: #f5f6f7;
-    }
-    
-    .page-item.active .page-link {
-        background-color: var(--bs-blind-dark);
-        color: white;
-    }
-    
-    .empty-state {
-        text-align: center;
-        padding: 80px 20px;
-        color: #888;
-    }
-    
-    .empty-state i {
-        font-size: 64px;
-        margin-bottom: 20px;
-        color: #ddd;
-    }
-    
-    .empty-state h3 {
-        margin-bottom: 10px;
-        color: #666;
-    }
-    
-    .empty-state p {
-        margin-bottom: 20px;
     }
     
     .stats-summary {
@@ -245,321 +60,600 @@
         color: #666;
     }
     
-    @media (max-width: 768px) {
-        .material-grid {
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-        }
-        
+    .materials-table-container {
+        background-color: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        margin-bottom: 30px;
+    }
+    
+    .materials-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 0;
+    }
+    
+    .materials-table th {
+        background-color: var(--bs-blind-dark);
+        color: white;
+        padding: 15px 12px;
+        text-align: left;
+        font-weight: 600;
+        border: none;
+    }
+    
+    .materials-table th:first-child {
+        width: 30%;
+    }
+    
+    .materials-table th:nth-child(2) {
+        width: 15%;
+    }
+    
+    .materials-table th:nth-child(3) {
+        width: 12%;
+    }
+    
+    .materials-table th:nth-child(4) {
+        width: 12%;
+    }
+    
+    .materials-table th:nth-child(5) {
+        width: 12%;
+    }
+    
+    .materials-table th:nth-child(6) {
+        width: 10%;
+        text-align: center;
+    }
+    
+    .materials-table th:last-child {
+        width: 15%;
+        text-align: center;
+    }
+    
+    .materials-table td {
+        padding: 15px 12px;
+        border-bottom: 1px solid #eee;
+        vertical-align: middle;
+    }
+    
+    .materials-table tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+    
+    .materials-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+    
+    .material-title {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 4px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        line-height: 1.4;
+        max-height: 2.8em;
+    }
+    
+    .material-description {
+        font-size: 12px;
+        color: #888;
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .category-badge {
+        background-color: var(--bs-blind-light-gray);
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        display: inline-block;
+        margin-bottom: 2px;
+    }
+    
+    .grade-badge {
+        background-color: #6c757d;
+        color: white;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-size: 11px;
+        display: inline-block;
+        margin-right: 4px;
+    }
+    
+    .subject-badge {
+        background-color: #17a2b8;
+        color: white;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-size: 11px;
+        display: inline-block;
+    }
+    
+    .instructor-name {
+        font-weight: 500;
+        color: #555;
+    }
+    
+    .material-price {
+        font-weight: bold;
+        color: var(--bs-blind-dark);
+        font-size: 16px;
+    }
+    
+    .purchase-date {
+        font-size: 14px;
+        color: #666;
+    }
+    
+    .download-count {
+        text-align: center;
+        font-weight: 600;
+        color: #333;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 5px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .btn-sm {
+        padding: 6px 12px;
+        font-size: 12px;
+        border-radius: 4px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+    
+    .btn-download {
+        background-color: var(--bs-blind-dark);
+        color: white;
+    }
+    
+    .btn-download:hover {
+        background-color: var(--bs-blind-gray);
+        color: white;
+    }
+    
+    .btn-download:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+    }
+    
+    .btn-review {
+        background-color: #ffc107;
+        color: #333;
+    }
+    
+    .btn-review:hover {
+        background-color: #e0a800;
+        color: #333;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 80px 20px;
+        color: #888;
+    }
+    
+    .empty-state i {
+        font-size: 64px;
+        margin-bottom: 20px;
+        color: #ddd;
+    }
+    
+    .empty-state h3 {
+        margin-bottom: 10px;
+        color: #666;
+    }
+    
+    .empty-state p {
+        margin-bottom: 20px;
+    }
+    
+    .results-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        padding: 0 5px;
+    }
+    
+    .results-count {
+        font-size: 14px;
+        color: #666;
+    }
+    
+    .results-count strong {
+        color: var(--bs-blind-dark);
+    }
+    
+    /* 페이지네이션 스타일 커스터마이징 */
+    .pagination {
+        margin: 0;
+    }
+    
+    .pagination .page-link {
+        color: var(--bs-blind-dark);
+        border-color: #dee2e6;
+        padding: 8px 12px;
+    }
+    
+    .pagination .page-item.active .page-link {
+        background-color: var(--bs-blind-dark);
+        border-color: var(--bs-blind-dark);
+        color: white;
+    }
+    
+    .pagination .page-item:hover .page-link {
+        background-color: var(--bs-blind-light-gray);
+        color: white;
+        border-color: var(--bs-blind-light-gray);
+    }
+    
+    .pagination .page-item.disabled .page-link {
+        color: #6c757d;
+        background-color: #fff;
+        border-color: #dee2e6;
+    }
+    
+    @media (max-width: 992px) {
         .stats-summary {
             grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .materials-table-container {
+            overflow-x: auto;
+        }
+        
+        .materials-table {
+            min-width: 800px;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .action-buttons {
+            flex-direction: column;
+        }
+        
+        .btn-sm {
+            font-size: 11px;
+            padding: 4px 8px;
         }
     }
     
     @media (max-width: 480px) {
-        .material-grid {
+        .stats-summary {
             grid-template-columns: 1fr;
         }
         
-        .stats-summary {
-            grid-template-columns: 1fr;
+        .content-title {
+            font-size: 20px;
         }
     }
 </style>
 
-<div class="content-header">
-    <h2 class="content-title">구매한 학습자료</h2>
-</div>
+<div class="container mt-4">
+    <div class="content-header">
+        <h2 class="content-title">구매한 학습자료</h2>
+    </div>
 
-<!-- 통계 요약 -->
-<div class="stats-summary" id="material-stats">
-    <div class="stat-item">
-        <div class="stat-number">0</div>
-        <div class="stat-label">총 구매 자료</div>
-    </div>
-    <div class="stat-item">
-        <div class="stat-number">0원</div>
-        <div class="stat-label">총 구매 금액</div>
-    </div>
-    <div class="stat-item">
-        <div class="stat-number">0</div>
-        <div class="stat-label">다운로드 횟수</div>
-    </div>
-    <div class="stat-item">
-        <div class="stat-number">0</div>
-        <div class="stat-label">작성한 리뷰</div>
-    </div>
-</div>
-
-<!-- 필터 섹션 -->
-<div class="filter-section">
-    <form id="material-filter-form">
-        <div class="row">
-            <div class="col-md-3 mb-3">
-                <label class="form-label">카테고리</label>
-                <select name="category" class="form-input">
-                    <option value="">전체</option>
-                    <option value="math">수학</option>
-                    <option value="english">영어</option>
-                    <option value="korean">국어</option>
-                    <option value="science">과학</option>
-                    <option value="social">사회</option>
-                    <option value="etc">기타</option>
-                </select>
-            </div>
-            <div class="col-md-3 mb-3">
-                <label class="form-label">학습 단계</label>
-                <select name="level" class="form-input">
-                    <option value="">전체</option>
-                    <option value="elementary">초등</option>
-                    <option value="middle">중등</option>
-                    <option value="high">고등</option>
-                    <option value="general">일반</option>
-                </select>
-            </div>
-            <div class="col-md-4 mb-3">
-                <label class="form-label">자료명 검색</label>
-                <input type="text" name="keyword" class="form-input" placeholder="자료명을 검색하세요">
-            </div>
-            <div class="col-md-2 mb-3 d-flex align-items-end">
-                <button type="submit" class="btn btn-primary w-100">
-                    <i class="bi bi-search me-1"></i>검색
-                </button>
-            </div>
+    <!-- 통계 요약 -->
+    <div class="stats-summary">
+        <div class="stat-item">
+            <div class="stat-number"><%=totalCount%></div>
+            <div class="stat-label">총 구매 자료</div>
         </div>
-    </form>
-</div>
-
-<!-- 자료 목록 -->
-<div class="material-grid" id="material-list">
-    <div style="grid-column: 1 / -1;">
-        <div class="empty-state">
-            <div style="display: inline-block; width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid var(--bs-blind-dark); border-radius: 50%; animation: spin 1s linear infinite;"></div>
-            <p style="margin-top: 20px;">구매한 학습자료를 불러오는 중...</p>
+        <div class="stat-item">
+            <div class="stat-number"><%=String.format("%,d", totalAmount)%>원</div>
+            <div class="stat-label">총 구매 금액</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number"><%=totalDownloads%></div>
+            <div class="stat-label">다운로드 횟수</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number"><%=totalReviews%></div>
+            <div class="stat-label">작성한 리뷰</div>
         </div>
     </div>
-</div>
 
-<!-- 페이지네이션 -->
-<div class="pagination" id="material-pagination"></div>
+    <!-- 검색 결과 정보 -->
+    <div class="results-info">
+        <div class="results-count">
+            총 <strong><%=totalCount%></strong>개의 구매한 자료가 있습니다.
+        </div>
+    </div>
+
+    <!-- 자료 목록 테이블 -->
+    <div class="materials-table-container">
+        <%
+        if (materials != null && !materials.isEmpty()) {
+        %>
+            <table class="materials-table">
+                <thead>
+                    <tr>
+                        <th>자료명</th>
+                        <th>카테고리</th>
+                        <th>강사명</th>
+                        <th>구매가격</th>
+                        <th>구매일</th>
+                        <th>다운로드</th>
+                        <th>액션</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <%
+                    for (PurchasedMaterial material : materials) {
+                    %>
+                        <tr>
+                            <td>
+                                <div class="material-title"><%=material.materialTitle()%></div>
+                                <%
+                                if (material.materialDiscription() != null && !material.materialDiscription().trim().isEmpty()) {
+                                %>
+                                    <div class="material-description"><%=material.materialDiscription()%></div>
+                                <%
+                                }
+                                %>
+                            </td>
+                            <td>
+                                <div class="category-badge"><%=material.materialCategory()%></div>
+                                <br>
+                                <%
+                                if (material.materialGrade() != null && !material.materialGrade().trim().isEmpty()) {
+                                %>
+                                    <span class="grade-badge"><%=material.materialGrade()%></span>
+                                <%
+                                }
+                                if (material.materialSubject() != null && !material.materialSubject().trim().isEmpty()) {
+                                %>
+                                    <span class="subject-badge"><%=material.materialSubject()%></span>
+                                <%
+                                }
+                                %>
+                            </td>
+                            <td>
+                                <div class="instructor-name"><%=material.instructorName()%></div>
+                            </td>
+                            <td>
+                                <div class="material-price"><%=String.format("%,d", material.purchasePrice())%>원</div>
+                            </td>
+                            <td>
+                                <div class="purchase-date"><%=material.purchaseDate()%></div>
+                            </td>
+                            <td>
+                                <div class="download-count"><%=material.materialDownloadCount()%>회</div>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn-sm btn-download" 
+                                            data-material-id="<%=material.materialId()%>" 
+                                            onclick="downloadMaterial(<%=material.materialId()%>)">
+                                        <i class="bi bi-download"></i>다운로드
+                                    </button>
+                                    <button class="btn-sm btn-review" 
+                                            data-material-id="<%=material.materialId()%>" 
+                                            data-material-title="<%=material.materialTitle()%>"
+                                            onclick="openReviewModal(<%=material.materialId()%>, '<%=material.materialTitle()%>')">
+                                        <i class="bi bi-star"></i>리뷰
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    <%
+                    }
+                    %>
+                </tbody>
+            </table>
+        <%
+        } else {
+        %>
+            <div class="empty-state">
+                <i class="bi bi-folder-x"></i>
+                <h3>구매한 학습자료가 없습니다</h3>
+                <p>아직 구매한 학습자료가 없습니다.<br>다양한 학습자료를 둘러보세요!</p>
+                <a href="<%=request.getContextPath()%>/market/list.do" class="btn btn-primary">
+                    <i class="bi bi-search me-1"></i>학습자료 둘러보기
+                </a>
+            </div>
+        <%
+        }
+        %>
+    </div>
+
+    <!-- 페이지네이션 (서블릿에서 생성된 pageBar 사용) -->
+    <%
+    if (pageBar != null && !pageBar.isEmpty()) {
+    %>
+        <div class="d-flex justify-content-center mt-4">
+            <%=pageBar%>
+        </div>
+    <%
+    }
+    %>
+</div>
 
 <script>
-$(document).ready(function() {
-    var currentPage = 1;
-    
-    // 페이지 로드 시 데이터 불러오기
-    loadMaterials();
-    loadStats();
-    
-    // 필터 폼 제출
-    $('#material-filter-form').on('submit', function(e) {
-        e.preventDefault();
-        currentPage = 1;
-        loadMaterials();
-    });
-    
-    // 페이지네이션 클릭
-    $(document).on('click', '.page-link', function(e) {
-        e.preventDefault();
-        currentPage = parseInt($(this).data('page'));
-        loadMaterials();
-    });
-    
-    // 다운로드 버튼 클릭
-    $(document).on('click', '.btn-download', function(e) {
-        e.preventDefault();
-        var materialId = $(this).data('material-id');
-        var $btn = $(this);
-        
-        if(confirm('이 자료를 다운로드하시겠습니까?')) {
-            $btn.prop('disabled', true).text('다운로드 중...');
-            
-            $.ajax({
-                url: '<%=request.getContextPath()%>/material/download.do',
-                type: 'POST',
-                data: { materialId: materialId },
-                success: function(response) {
-                    if(response.success) {
-                        // 파일 다운로드 처리
-                        window.location.href = response.downloadUrl;
-                        
-                        // 다운로드 횟수 업데이트
-                        var currentCount = parseInt($btn.closest('.material-card').find('.download-badge').text().replace('다운로드 ', '').replace('회', ''));
-                        $btn.closest('.material-card').find('.download-badge').text('다운로드 ' + (currentCount + 1) + '회');
-                        
-                        // 통계 업데이트
-                        loadStats();
-                    } else {
-                        alert('다운로드에 실패했습니다: ' + response.message);
-                    }
-                },
-                error: function() {
-                    alert('서버 오류가 발생했습니다. 다시 시도해주세요.');
-                },
-                complete: function() {
-                    $btn.prop('disabled', false).text('다운로드');
-                }
-            });
-        }
-    });
-    
-    // 리뷰 작성 버튼 클릭
-    $(document).on('click', '.btn-review', function(e) {
-        e.preventDefault();
-        var materialId = $(this).data('material-id');
-        var materialTitle = $(this).data('material-title');
-        
-        // 리뷰 모달 또는 페이지로 이동
-        openReviewModal(materialId, materialTitle);
-    });
-});
+// 현재 페이지 번호를 저장 
+var currentPage = <%=request.getAttribute("currentPage") != null ? request.getAttribute("currentPage") : 1%>;
 
-// 구매한 자료 목록 로드
-function loadMaterials() {
-    var formData = $('#material-filter-form').serialize();
-    formData += '&page=' + currentPage;
-    
-    $('#material-list').html(`
-        <div style="grid-column: 1 / -1;">
-            <div class="empty-state">
-                <div style="display: inline-block; width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid var(--bs-blind-dark); border-radius: 50%; animation: spin 1s linear infinite;"></div>
-                <p style="margin-top: 20px;">구매한 학습자료를 불러오는 중...</p>
-            </div>
+// 페이지가 마이페이지 내부에서 로드되었는지 확인
+var isInMypage = <%=request.getParameter("fromMypage") != null ? "true" : "false"%>;
+
+// 다운로드 함수
+function downloadMaterial(materialId) {
+    if(confirm('이 자료를 다운로드하시겠습니까?')) {
+        var $btn = $('button[data-material-id="' + materialId + '"].btn-download');
+        var originalText = $btn.html();
+        $btn.prop('disabled', true).html('<i class="bi bi-download"></i>다운로드 중...');
+        
+        $.ajax({
+            url: '<%=request.getContextPath()%>/material/download.do',
+            type: 'POST',
+            data: { materialId: materialId },
+            success: function(response) {
+                if(response.success) {
+                    // 파일 다운로드 처리
+                    if(response.downloadUrl) {
+                        window.location.href = response.downloadUrl;
+                    } else {
+                        // 파일을 직접 다운로드하는 경우
+                        var link = document.createElement('a');
+                        link.href = '<%=request.getContextPath()%>/material/download.do?materialId=' + materialId;
+                        link.download = '';
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                    }
+                    
+                    // 다운로드 수 업데이트를 위해 현재 페이지 새로고침
+                    setTimeout(function() {
+                        if (isInMypage) {
+                            // 마이페이지 내부에서 실행중이면 AJAX로 새로고침
+                            loadMaterialPage(currentPage);
+                        } else {
+                            // 직접 접근이면 일반 새로고침
+                            location.reload();
+                        }
+                    }, 1000);
+                } else {
+                    alert('다운로드에 실패했습니다: ' + (response.message || '알 수 없는 오류'));
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Download error:', error);
+                alert('서버 오류가 발생했습니다. 다시 시도해주세요.');
+            },
+            complete: function() {
+                $btn.prop('disabled', false).html(originalText);
+            }
+        });
+    }
+}
+
+// 리뷰 모달 함수
+function openReviewModal(materialId, materialTitle) {
+    if(confirm('리뷰 작성 페이지로 이동하시겠습니까?\n자료: ' + materialTitle)) {
+        window.location.href = '<%=request.getContextPath()%>/review/write.do?materialId=' + materialId;
+    }
+}
+
+// 🔥 핵심: 자체 AJAX로 페이지 로드 (마이페이지 코드 건드리지 않음)
+function loadMaterialPage(page) {
+    // 로딩 표시 (기존 테이블 영역만)
+    $('.materials-table-container').html(`
+        <div style="padding: 60px 0; text-align: center; color: #888;">
+            <div style="border: 4px solid #f3f3f3; border-top: 4px solid var(--bs-blind-dark); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
+            <p>데이터를 불러오는 중입니다...</p>
         </div>
     `);
     
+    // 페이지네이션도 숨기기
+    $('.pagination').parent().hide();
+    
     $.ajax({
-        url: '<%=request.getContextPath()%>/user/purchasedMaterialsData.do',
+        url: '<%=request.getContextPath()%>/user/mypage/materials.do',
         type: 'GET',
-        data: formData,
-        success: function(response) {
-            if(response.success && response.data.length > 0) {
-                var materials = '';
-                
-                $.each(response.data, function(index, material) {
-                    materials += createMaterialCard(material);
-                });
-                
-                $('#material-list').html(materials);
-                createPagination(response.totalPages, currentPage);
+        data: { cPage: page,
+        		fromMypage: 'true'	
+        },
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest' 
+        },
+        success: function(data) {
+            // 임시 컨테이너에 받은 HTML 넣기
+            var $temp = $('<div>').html(data);
+            
+            // 필요한 부분만 추출해서 교체
+            var newTableHtml = $temp.find('.materials-table-container').html();
+            var newStatsHtml = $temp.find('.stats-summary').html();
+            var newResultsHtml = $temp.find('.results-info').html();
+            var newPaginationHtml = $temp.find('.pagination').parent().html();
+            
+            // 기존 요소들 업데이트
+            if (newTableHtml) $('.materials-table-container').html(newTableHtml);
+            if (newStatsHtml) $('.stats-summary').html(newStatsHtml);
+            if (newResultsHtml) $('.results-info').html(newResultsHtml);
+            if (newPaginationHtml) {
+                $('.pagination').parent().html(newPaginationHtml).show();
+            }
+            
+            // 현재 페이지 업데이트
+            currentPage = page;
+            
+            // 스크롤을 맨 위로
+            if (isInMypage) {
+                $('.main-content').scrollTop(0);
             } else {
-                showEmptyState();
+                $('html, body').scrollTop(0);
             }
         },
-        error: function() {
-            $('#material-list').html(`
-                <div style="grid-column: 1 / -1;">
-                    <div class="empty-state">
-                        <i class="bi bi-exclamation-triangle"></i>
-                        <h3>오류 발생</h3>
-                        <p>데이터를 불러오는데 실패했습니다.</p>
-                        <button class="btn btn-primary" onclick="loadMaterials()">다시 시도</button>
-                    </div>
+        error: function(xhr, status, error) {
+            $('.materials-table-container').html(`
+                <div style="padding: 60px 0; text-align: center; color: #dc3545;">
+                    <i class="bi bi-exclamation-triangle" style="font-size: 48px; margin-bottom: 20px;"></i>
+                    <p>데이터를 불러오는데 실패했습니다.</p>
+                    <button class="btn btn-primary" onclick="loadMaterialPage(` + page + `)">다시 시도</button>
                 </div>
             `);
         }
     });
 }
 
-// 통계 데이터 로드
-function loadStats() {
-    $.ajax({
-        url: '<%=request.getContextPath()%>/user/purchasedMaterialsStats.do',
-        type: 'GET',
-        success: function(response) {
-            if(response.success) {
-                $('#material-stats .stat-item').eq(0).find('.stat-number').text(response.totalCount || 0);
-                $('#material-stats .stat-item').eq(1).find('.stat-number').text((response.totalAmount || 0).toLocaleString() + '원');
-                $('#material-stats .stat-item').eq(2).find('.stat-number').text(response.totalDownloads || 0);
-                $('#material-stats .stat-item').eq(3).find('.stat-number').text(response.totalReviews || 0);
-            }
+// 페이지 로드 완료시 초기화
+$(document).ready(function() {
+    // 🔥 핵심: 페이지네이션 클릭 이벤트 (자체 처리)
+    $(document).on('click', '.material-page-link', function(e) {
+        e.preventDefault(); // 기본 링크 동작 방지
+        
+        var page = $(this).data('page');
+        
+        // 마이페이지 내부에서만 AJAX 처리
+        if (isInMypage) {
+            loadMaterialPage(page);
+        } else {
+            // 직접 접근시에는 일반적인 페이지 이동
+            window.location.href = '<%=request.getContextPath()%>/user/mypage/materials.do?cPage=' + page;
         }
     });
-}
+    
+    // 페이지네이션 링크에 호버 효과 추가
+    $(document).on('mouseenter', '.pagination .page-link', function() {
+        if (!$(this).closest('.page-item').hasClass('active') && !$(this).closest('.page-item').hasClass('disabled')) {
+            $(this).css('background-color', 'var(--bs-blind-light-gray)');
+            $(this).css('color', 'white');
+        }
+    }).on('mouseleave', '.pagination .page-link', function() {
+        if (!$(this).closest('.page-item').hasClass('active')) {
+            $(this).css('background-color', '');
+            $(this).css('color', 'var(--bs-blind-dark)');
+        }
+    });
+});
 
-// 자료 카드 생성
-function createMaterialCard(material) {
-    var imageContent = material.thumbnail ? 
-        `<img src="\${material.thumbnail}" alt="\${material.title}">` : 
-        `<i class="bi bi-file-earmark-text placeholder-icon"></i>`;
-    
-    var downloadBtnClass = material.downloadCount >= material.maxDownload ? 'disabled' : '';
-    var downloadBtnText = material.downloadCount >= material.maxDownload ? '다운로드 완료' : '다운로드';
-    
-    return `
-        <div class="material-card">
-            <div class="material-img">
-                \${imageContent}
-                <div class="download-badge">다운로드 \${material.downloadCount}회</div>
-            </div>
-            <div class="material-info">
-                <div class="material-title">\${material.title}</div>
-                <div class="material-meta">\${material.category} > \${material.level} | \${material.author}</div>
-                <div class="material-price">\${material.price.toLocaleString()}원</div>
-                <div class="material-date">구매일: \${material.purchaseDate}</div>
-                <div class="material-actions">
-                    <button class="btn btn-download \${downloadBtnClass}" 
-                            data-material-id="\${material.id}" 
-                            ${material.downloadCount >= material.maxDownload ? 'disabled' : ''}>
-                        <i class="bi bi-download me-1"></i>${downloadBtnText}
-                    </button>
-                    <button class="btn btn-review" 
-                            data-material-id="\${material.id}" 
-                            data-material-title="\${material.title}">
-                        <i class="bi bi-star me-1"></i>리뷰작성
-                    </button>
-                </div>
-            </div>
-        </div>
-    `;
-}
-
-// 빈 상태 표시
-function showEmptyState() {
-    $('#material-list').html(`
-        <div style="grid-column: 1 / -1;">
-            <div class="empty-state">
-                <i class="bi bi-folder-x"></i>
-                <h3>구매한 학습자료가 없습니다</h3>
-                <p>아직 구매한 학습자료가 없습니다.<br>다양한 학습자료를 둘러보세요!</p>
-                <a href="<%=request.getContextPath()%>/material/list.do" class="btn btn-primary">
-                    <i class="bi bi-search me-1"></i>학습자료 둘러보기
-                </a>
-            </div>
-        </div>
-    `);
-    $('#material-pagination').html('');
-}
-
-// 페이지네이션 생성
-function createPagination(totalPages, currentPage) {
-    if(totalPages <= 1) {
-        $('#material-pagination').html('');
-        return;
+// CSS 애니메이션 추가
+$('<style>').prop('type', 'text/css').html(`
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
     }
-    
-    var pagination = '';
-    var startPage = Math.max(1, currentPage - 2);
-    var endPage = Math.min(totalPages, currentPage + 2);
-    
-    if(currentPage > 1) {
-        pagination += `<div class="page-item"><a href="#" class="page-link" data-page="\${currentPage - 1}">‹</a></div>`;
-    }
-    
-    for(var i = startPage; i <= endPage; i++) {
-        var activeClass = i === currentPage ? 'active' : '';
-        pagination += `<div class="page-item \${activeClass}"><a href="#" class="page-link" data-page="\${i}">${i}</a></div>`;
-    }
-    
-    if(currentPage < totalPages) {
-        pagination += `<div class="page-item"><a href="#" class="page-link" data-page="\${currentPage + 1}">›</a></div>`;
-    }
-    
-    $('#material-pagination').html(pagination);
-}
-
-// 리뷰 모달 열기
-function openReviewModal(materialId, materialTitle) {
-    // 실제 구현시에는 모달을 만들거나 별도 페이지로 이동
-    alert('리뷰 작성 기능은 준비 중입니다.\n자료: ' + materialTitle);
-}
+`).appendTo('head');
 </script>
+

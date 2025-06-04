@@ -98,4 +98,11 @@ public enum StudyGroupService {
 		return studygroups;
 	}
 
+	public List<StudyGroup> mainSearchStudyGroup(String keyWord) {
+		conn = JDBCTemplate.getConnection();
+		List<StudyGroup> studygroups = dao.mainSearchStudyGroup(conn,keyWord);
+		JDBCTemplate.close(conn);
+		return studygroups;
+	}
+
 }

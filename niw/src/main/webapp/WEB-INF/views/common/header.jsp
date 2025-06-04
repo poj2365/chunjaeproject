@@ -19,7 +19,7 @@ User loginUser= (User)session.getAttribute("loginUser");
 <html>
 <head>
 <meta charset="UTF-8">
-<title>나의 첫 프로젝트</title>
+<title>학습메이트 - 함께 성장하는 학습 커뮤니티 </title>
 
 <script src="<%=request.getContextPath()%>/resources/js/jquery-3.7.1.min.js"></script>
   <!-- 폰트 -->
@@ -31,7 +31,10 @@ User loginUser= (User)session.getAttribute("loginUser");
    <link rel="stylesheet" href=" <%=request.getContextPath()%>/resources/css/common.css">
   <link rel="stylesheet" href=" <%=request.getContextPath()%>/resources/css/header.css">
   <link rel="stylesheet" href=" <%=request.getContextPath()%>/resources/css/footer.css">
- 
+	<!-- CKEditor -->
+	<script src="https://cdn.ckeditor.com/ckeditor5/45.1.0/ckeditor5.umd.js" crossorigin></script>
+	<script src="https://cdn.ckeditor.com/ckeditor5/45.1.0/translations/ko.umd.js" crossorigin></script>
+	<script src="https://cdn.ckbox.io/ckbox/2.6.1/ckbox.js" crossorigin></script> 
 </head>
 <body>
   <!-- 상단 메뉴 -->
@@ -77,7 +80,7 @@ User loginUser= (User)session.getAttribute("loginUser");
         <div class="col-lg-6 col-md-7 col-12 mt-3 mt-md-0">
           <div class="blind-search">
             <i class="bi bi-search blind-search-icon"></i>
-            <input type="text" class="form-control" placeholder="찾고 싶은 학습자료를 검색해보세요">
+            <input type="text" class="form-control" id="search" placeholder="찾고 싶은 학습자료를 검색해보세요">
           </div>
         </div>
         <div class="col-lg-3 col-md-1 d-none d-md-block">
@@ -133,6 +136,9 @@ User loginUser= (User)session.getAttribute("loginUser");
           </a>
           <div class="custom-dropdown-menu">
             <a class="custom-dropdown-item" href="<%=request.getContextPath()%>/study/grouplist.do">스터디 모집</a>
+            <%if(loginUser!=null){ %>
+            <a class="custom-dropdown-item" href="<%=request.getContextPath()%>/study/groupdetail.do">내 스터디 그룹</a>
+            <%} %>
             <div class="custom-dropdown-divider"></div>
             <a class="custom-dropdown-item" href="<%=request.getContextPath()%>/study/timerecord.do">공부 시간 기록</a>
             <a class="custom-dropdown-item" href="<%=request.getContextPath()%>/study/timeranking.do">랭킹</a>
@@ -216,6 +222,14 @@ User loginUser= (User)session.getAttribute("loginUser");
     const myPoint =()=>{
     	location.assign('<%=request.getContextPath()%>/point/mypoint.do');
     }
+    
+    // 엔터키로 검색
+    document.querySelector('.form-control').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+        	const keyWord = document.getElementById('search').value;
+        	location.assign('<%=request.getContextPath()%>/search.do?keyWord='+keyWord);
+        }
+    });
   </script>
 
 

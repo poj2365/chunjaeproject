@@ -442,7 +442,9 @@ List<GroupMember> members = (List<GroupMember>) request.getAttribute("members");
 					for(GroupMember m : members){
 						if(m.groupNumber()==g.groupNumber()){ 
 							i++;
-						}
+							%>
+							<span><%=m.userId() %></span><br>
+						<%}
 					} %>
 					<span>그룹인원 : <%=i%>명 / <%=g.groupLimit()%>명
 					</span><br>
@@ -466,7 +468,7 @@ List<GroupMember> members = (List<GroupMember>) request.getAttribute("members");
 						<i class="bi bi-person-slash"></i> 그룹 삭제하기
 					</button>
 					<button type="button" onclick="groupManage(<%=g.groupNumber()%>)" class="btn btn-success">
-						<i class="bi bi-gear"></i> 그룹원 관리
+						<i class="bi bi-gear"></i> 그룹 멤버 관리
 					</button>
 					<%}else{ %>
 					<button type="button" onclick="openModal2(<%=g.groupNumber()%>)" class="btn btn-danger">

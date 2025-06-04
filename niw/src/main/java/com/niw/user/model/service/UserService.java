@@ -28,6 +28,29 @@ public enum UserService {
 	}
 	
 
+	public int updateUser(String userId, String phone, String address) {
+		Connection conn = getConnection();
+		int result = 0;
+		
+		try {
+			result = dao.updateUser(conn, userId, phone, address);
+			
+			if (result > 0) {
+				commit(conn);
+			} else {
+				rollback(conn);
+			}
+			
+		} catch (Exception e) {
+			rollback(conn);
+			e.printStackTrace();
+		} finally {
+			close(conn);
+		}
+		
+		return result;
+	}
+	
 	public int insertUser(User user) {
 		Connection conn = getConnection();
 		int result = 0;

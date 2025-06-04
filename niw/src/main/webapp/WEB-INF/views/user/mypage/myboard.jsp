@@ -58,8 +58,11 @@
 	
 </div>
 
-<script>	
-	const loadData = (cPage) => {
+<script>
+
+	$(document).ready(loadData(1));
+
+	function loadData(cPage) {
 		const $container = $("#board-container");
 		const $pageBar = $("#board-pagebar");
         let tab = $("div.tabs>div.active").data("tab");
@@ -110,10 +113,8 @@
 			}
 		})
 	}
-	
-	$(document).ready(loadData(1));
 
-	const changeActive = (e) => {
+	function changeActive(e) {
 		$(".tab-item").toArray().forEach(t => {
 			t.classList.remove("active");
 		});
@@ -121,7 +122,7 @@
 		loadData(1);
 	}
 	
-	const getComment = (comment) => {
+	function getComment(comment) {
 		const $form = $("<div>").addClass("align-item-center").css("min-width", "800px")
 		const $name = $("<div>").addClass("mb-3").text(comment['userId']);
 		const $container = $("<div>").addClass("align-items-center mb-3").text(comment['commentContent']);
@@ -141,7 +142,7 @@
 		return $form;
 	}
 	
-	const getArticle = (article) => {
+	function getArticle(article) {
 		const $form = $("<div>").addClass("row flex-row justify-content-between align-item-center").css("min-width", "800px");
 		const $container = $("<div>").addClass("col-lg-6 d-flex align-items-center");
 		const $category = $("<span>").addClass("badge me-3");
@@ -185,31 +186,13 @@
 		const $date = $("<li>").addClass("col-lg-5");
 		$date.text(timeFormat(article['articleDateTime']));
 		$info.append($date);
-		
-		const $delete = $("<li>").addClass("col-lg-1");
-		const $i = $("<i>", {
-			class: "bi bi-x fw-bold border rounded-2 d-flex justify-content-center align-items-center",
-		    css: {
-		        width: "24px",
-		        height: "24px",
-		        cursor: "pointer",
-		        fontStyle: "normal"
-		    },
-		    click: function () {
-				const articleId = article['articleId'];
-		        deleteArticle(articleId, "/board/boardentrance.do?category=0");
-		    }
-		});
-		$delete.append($i);
-		
-		$info.append($delete);
 		$form.append($container).append($info);
 		return $form;
 	}
 	
 	
 	
-	const timeFormat = (datetime) => {
+	function timeFormat(datetime) {
 		const ldt = new Date(datetime);
 		const now = new Date();
 		if(!(ldt.toDateString() === now.toDateString())){
@@ -224,69 +207,8 @@
 		return diffSec + '초전';
 	}
 	
-	const insertRecommend = (e, recType, boardType, userId) => {
-		if(userId != null && userId.trim() != ""){
-			const $span = $(e.target).closest("span[data-target-id]");
-			const targetId = $span[0].getAttribute("data-target-id");
-			fetch(getContextPath() + "/board/recommend.do", {
-				method: "post",
-				headers: {
-					"Content-type":"application/json;charset=utf-8"
-				},
-				body: JSON.stringify({
-					"recType":recType,
-					"boardType":boardType,
-					"targetId":targetId
-				})
-			})
-			.then(response => {
-				if(response.ok){
-					return response.json();
-				} else {
-					throw new Error('recommend fail');
-				}
-			})
-			.then(data => {
-				const recommendFlag = data['recommendFlag'];
-				const recommend = data['recommend'];
-				const changeArticle = data['changeArticle'];
-				if(recType == '1'){
-					if(changeArticle > 0 && recommend > 0){
-						if(recommendFlag == 0){
-							$span.find("i")[0].innerText =Number($span.find("i")[0].innerText)+1;
-							$span.find("i").addClass("bi-hand-thumbs-up-fill");
-							$span.find("i").removeClass("bi-hand-thumbs-up");
-						} else{
-							$span.find("i")[0].innerText =Number($span.find("i")[0].innerText)-1;
-							$span.find("i").removeClass("bi-hand-thumbs-up-fill");
-							$span.find("i").addClass("bi-hand-thumbs-up");					
-						}
-					} else {
-						throw new Error("recommend fail");
-					}
-				} else {
-					if(changeArticle > 0 && recommend > 0){
-						if(recommendFlag == 0){
-							$span.find("i")[0].innerText =Number($span.find("i")[0].innerText)+1;
-							$span.find("i").addClass("bi-hand-thumbs-down-fill");
-							$span.find("i").removeClass("bi-hand-thumbs-down");
-						} else{
-							$span.find("i")[0].innerText =Number($span.find("i")[0].innerText)-1;
-							$span.find("i").removeClass("bi-hand-thumbs-down-fill");
-							$span.find("i").addClass("bi-hand-thumbs-down");					
-						}
-					} else {
-						throw new Error("recommend fail");
-					}
-
-				}
-			})		
-		} else {
-			alert("로그인이 필요한 기능입니다.");
-		}
-	}
 	
-	const getContextPath = () => {
+	function getContextPath() {
 		return "/" + window.location.pathname.split("/")[1];
 	}
 </script>

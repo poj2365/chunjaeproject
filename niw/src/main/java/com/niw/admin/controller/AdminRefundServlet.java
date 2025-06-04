@@ -21,7 +21,8 @@ public class AdminRefundServlet extends HttpServlet {
 
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		request.getRequestDispatcher(CommonTemplate.WEB_VIEWS + "/admin/adminrefund.jsp").forward(request, response);
+		System.out.println("들어왓닝");
+		request.getRequestDispatcher(CommonTemplate.WEB_VIEWS+"/admin/adminrefund.jsp").forward(request, response);
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

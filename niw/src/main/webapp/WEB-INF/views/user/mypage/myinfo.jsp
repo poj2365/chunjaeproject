@@ -109,7 +109,7 @@
 
 <div class="content-section">
     <h3 class="section-title">기본 정보</h3>
-    <form id="edit-user-info">
+    <form id="edit-user-info" method="post" action="<%=request.getContextPath()%>/user/update.do">
         <table class="info-table">
             <tr>
                 <th>회원 ID</th>
@@ -182,71 +182,5 @@
 </div>
 
 <script>
-$(document).ready(function() {
-    // 회원정보 수정 폼 제출 이벤트
-    $('#edit-user-info').on('submit', function(e) {
-        e.preventDefault();
-        
-        if(confirm('회원정보를 수정하시겠습니까?')) {
-            var formData = $(this).serialize();
-            
-            $.ajax({
-                url: '<%=request.getContextPath()%>/user/update.do',
-                type: 'POST',
-                data: formData,
-                success: function(response) {
-                    if(response.success) {
-                        alert('회원정보가 성공적으로 수정되었습니다.');
-                        // 프로필 정보 업데이트
-                        location.reload();
-                    } else {
-                        alert('회원정보 수정에 실패했습니다: ' + response.message);
-                    }
-                },
-                error: function() {
-                    alert('서버 오류가 발생했습니다. 다시 시도해주세요.');
-                }
-            });
-        }
-    });
-    
-    // 비밀번호 변경 폼 제출 이벤트
-    $('#change-password').on('submit', function(e) {
-        e.preventDefault();
-        
-        var newPwd = $('input[name="newPwd"]').val();
-        var newPwdCheck = $('input[name="newPwdCheck"]').val();
-        
-        if(newPwd !== newPwdCheck) {
-            alert('새 비밀번호와 비밀번호 확인이 일치하지 않습니다.');
-            return;
-        }
-        
-        if(newPwd.length < 8) {
-            alert('비밀번호는 8자 이상이어야 합니다.');
-            return;
-        }
-        
-        if(confirm('비밀번호를 변경하시겠습니까?')) {
-            var formData = $(this).serialize();
-            
-            $.ajax({
-                url: '<%=request.getContextPath()%>/user/changePwd.do',
-                type: 'POST',
-                data: formData,
-                success: function(response) {
-                    if(response.success) {
-                        alert('비밀번호가 성공적으로 변경되었습니다.');
-                        $('#change-password')[0].reset();
-                    } else {
-                        alert('비밀번호 변경에 실패했습니다: ' + response.message);
-                    }
-                },
-                error: function() {
-                    alert('서버 오류가 발생했습니다. 다시 시도해주세요.');
-                }
-            });
-        }
-    });
-});
+
 </script>
