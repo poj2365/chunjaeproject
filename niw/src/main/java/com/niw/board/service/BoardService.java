@@ -12,6 +12,7 @@ import com.niw.board.model.dao.BoardDao;
 import com.niw.board.model.dto.Article;
 import com.niw.board.model.dto.Comment;
 import com.niw.board.model.dto.Notice;
+import com.niw.board.model.dto.Report;
 
 public enum BoardService {
 	SERVICE;
@@ -291,4 +292,27 @@ public enum BoardService {
 		close(conn);
 		return result;
 	} 
+	
+	public int countReportByAdmin() {
+		Connection conn = getConnection();
+		int result = BoardDao.DAO.countReportByAdmin(conn);
+		close(conn);
+		return result;
+	}
+	
+	public List<Report> searchReportByAdmin(){
+		Connection conn = getConnection();
+		List<Report> reports = BoardDao.DAO.searchReportByAdmin(conn);
+		close(conn);
+		return reports;
+	}
+	
+	public int deleteReportByAdmin(int reportId) {
+		Connection conn = getConnection();
+		int result = BoardDao.DAO.deleteReportByAdmin(conn, reportId);
+		if(result > 0) commit(conn);
+		else rollback(conn);
+		close(conn);
+		return result;
+	}
 }

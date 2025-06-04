@@ -94,9 +94,20 @@ public class InstructorApplySupplyServlet extends HttpServlet {
 
 		InstructorApplication instructorApplication = new InstructorApplication(size, userId, instructorName, bankName,
 				accountHolder, accountNumber, accountNumber, portfolioFiles, null, null, null);
-		InstructorApplicationService.SERVICE.instructorApply(instructorApplication);
-
-		doGet(request, response);
+		int result = InstructorApplicationService.SERVICE.instructorApply(instructorApplication);
+		response.getWriter();
+		response.setContentType("text/html; charset=UTF-8");
+		if(result>0) {
+			response.getWriter().println("<script>");
+			response.getWriter().println("alert('강사 지원이 완료되었습니다. 검토 후 연락드리겠습니다.');");
+			response.getWriter().println("</script>");
+			request.getRequestDispatcher("/WEB-INF/views/market/marketview.jsp").forward(request, response);
+		}else {
+			response.getWriter().println("<script>");
+			response.getWriter().println("alert('강사 지원 처리 중 오류가 발생했습니다. 다시 시도해주세요.');");
+			response.getWriter().println("history.back();");
+			response.getWriter().println("</script>");
+		}
 	}
 
 }

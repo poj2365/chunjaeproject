@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.niw.point.model.dto.PointRefund;
+import com.niw.point.model.dto.PointRefundList;
 import com.niw.point.model.service.PointService;
 
 /**
@@ -27,11 +28,10 @@ public class AdminRefundListServlet extends HttpServlet {
 
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		List<PointRefund> refundlists = PointService.ponitService().showAllRefundList();
+		List<PointRefundList> refundlists = PointService.ponitService().showAllRefundList();
 		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
-		// Gson 으로 포맷을 바꿔 주어 2025-06-02 이런 형식으로 나오게 해준다.
 		response.setContentType("application/json; charset=UTF-8");
-	    // gson.toJson(refundList, response.getWriter());
+	    gson.toJson(refundlists, response.getWriter());
 		
 		
 	}

@@ -41,6 +41,7 @@ public class CalendarSearchServlet extends HttpServlet {
 		Gson gson = new Gson();
 		
 		Calendar c = gson.fromJson(jsonData, Calendar.class);
+		System.out.println(c);
 		Calendar calList = CalendarService.SERVICE.searchCalendarById(c);
 		
 		response.setContentType("application/json;charset=utf-8");

@@ -39,6 +39,14 @@ public record PurchasedMaterial(
         Date downloadExpireDate
 ) {
     
+	
+	
+	
+	
+	
+	
+	
+	
     // 편의 메서드들
     public boolean isCompleted() {
         return "COMPLETED".equals(purchaseStatus);

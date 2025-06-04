@@ -28,9 +28,7 @@ public enum PurchasedMaterialDao {
         }
     }
 
-    /**
-     * 사용자가 구매한 자료 목록 조회 (페이징)
-     */
+    
     public List<PurchasedMaterial> getPurchasedMaterialList(Connection conn, String userId, int startRow, int endRow) {
         List<PurchasedMaterial> materials = new ArrayList<>();
         
@@ -50,9 +48,7 @@ public enum PurchasedMaterialDao {
         return materials;
     }
 
-    /**
-     * 사용자가 구매한 자료 총 개수
-     */
+  
     public int getPurchasedMaterialCount(Connection conn, String userId) {
         int count = 0;
         
@@ -70,9 +66,7 @@ public enum PurchasedMaterialDao {
         return count;
     }
 
-    /**
-     * 사용자의 구매 통계 정보
-     */
+
     public PurchaseStats getPurchaseStats(Connection conn, String userId) {
         PurchaseStats stats = new PurchaseStats(0, 0, 0, 0);
         
@@ -95,9 +89,7 @@ public enum PurchasedMaterialDao {
         return stats;
     }
 
-    /**
-     * ResultSet을 PurchasedMaterial 객체로 변환
-     */
+  
     private PurchasedMaterial getPurchasedMaterial(ResultSet rs) throws SQLException {
         String thumbnailFilePath = rs.getString("THUMBNAIL_FILE_PATH");
         List<String> thumbnailFilePaths = new ArrayList<>();
@@ -131,7 +123,7 @@ public enum PurchasedMaterialDao {
             .materialRating(rs.getDouble("MATERIAL_RATING"))
             .materialCommentCount(rs.getInt("MATERIAL_COMMENT_COUNT"))
             
-            // Purchase 정보
+           
             .purchaseId(rs.getInt("PURCHASE_ID"))
             .purchasePrice(rs.getInt("PURCHASE_PRICE"))
             .purchaseStatus(rs.getString("PURCHASE_STATUS"))
@@ -140,9 +132,7 @@ public enum PurchasedMaterialDao {
             .build();
     }
 
-    /**
-     * 구매 통계 내부 클래스
-     */
+   
     public static record PurchaseStats(
         int totalCount,
         int totalAmount,

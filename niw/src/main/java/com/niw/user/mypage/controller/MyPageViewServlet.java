@@ -1,13 +1,16 @@
 package com.niw.user.mypage.controller;
 
 import java.io.IOException;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import com.niw.common.CommonTemplate;
+import com.niw.user.model.dto.User;
 
 /**
  * Servlet implementation class MyPageViewServlet
@@ -29,6 +32,13 @@ public class MyPageViewServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
+		HttpSession session = request.getSession();
+		User loginUser =(User)session.getAttribute("loginUser");
+		
+	       if (loginUser == null ) {
+	            response.sendRedirect(request.getContextPath() + "/user/loginview.do");
+	            return;
+	        }
 		request.getRequestDispatcher(CommonTemplate.WEB_VIEWS+"/user/mypage/mypage.jsp").forward(request, response);
 		
 	}

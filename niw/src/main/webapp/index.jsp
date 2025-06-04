@@ -143,6 +143,47 @@
 	margin-bottom: 10px;
 }
 
+.material-container .post-item {
+    transition: all 0.2s ease;
+}
+
+.material-container .post-item:hover {
+    background-color: #f8f9fa;
+    transform: translateX(5px);
+}
+
+.material-container .badge {
+    font-size: 0.7rem;
+}
+
+.material-container .post-stats {
+    min-width: 200px;
+    display: flex;
+    gap: 10px;
+    font-size: 0.8rem;
+    color: #666;
+}
+
+.material-container .stat-item {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.material-container .stat-item i {
+    font-size: 0.75rem;
+}
+
+@media (max-width: 768px) {
+    .material-container .post-stats {
+        min-width: auto;
+        gap: 8px;
+    }
+    
+    .material-container .stat-item {
+        font-size: 0.75rem;
+    }
+
 @media ( max-width : 768px) {
 	.search-input {
 		font-size: 0.9rem;
@@ -186,7 +227,7 @@
 					<div class="board-header resource">
 						<h3 class="board-title">자료게시판</h3>
 					</div>
-					<div class="board-content">
+					<div class="board-content material-container">
 						<div class="post-item">
 							<div class="post-info">
 								<a href="#" class="post-title">데이터를 불러오고 있습니다...</a>
@@ -255,6 +296,9 @@
     
     // board
        loadArticle("");
+    
+    //material
+       loadRecentMaterials();
     }); 
 
         // 광고 배너 클릭 이벤트
@@ -296,7 +340,6 @@
 			const $container = $(".best-container");
 			$container.html("");
 			for(let article of articles) {
-				console.log(article);
 				const $ul = $("<ul>").addClass("post-item clickable-ul row flex-row")
 									 .on("click", function() {
 										 boardDetail(article['articleId']);
@@ -335,4 +378,132 @@
 		return diffSec + '초전';
 	}
 </script>
+
+<script>
+function timeFormat2(datetime) {
+	   console.log('입력값:', datetime);
+	    
+	    if (!datetime) {
+	        return '등록일';
+	    }
+	    
+	    const dateStr = datetime.toString();
+	    console.log('문자열:', dateStr);
+	    
+	    // 모든 숫자를 추출 (4자리는 년도, 나머지는 월/일)
+	    const numbers = dateStr.match(/\d+/g);
+	    console.log('추출된 숫자들:', numbers);
+	    
+	    if (!numbers || numbers.length < 3) {
+	        return '등록일';
+	    }
+	    
+	    let year, month, day;
+	    
+	    // 4자리 숫자를 년도로 찾기
+	    const yearIndex = numbers.findIndex(num => num.length === 4);
+	    if (yearIndex !== -1) {
+	        year = numbers[yearIndex];
+	        // 년도를 제외한 나머지 숫자들
+	        const otherNumbers = numbers.filter((_, index) => index !== yearIndex);
+	        [month, day] = otherNumbers;
+	    } else {
+	        // 4자리 년도가 없으면 순서대로
+	        [month, day, year] = numbers;
+	    }
+	    
+	    console.log('년:', year, '월:', month, '일:', day);
+	    
+	    // 패딩 적용
+	    year = year || new Date().getFullYear();
+	    month = String(month).padStart(2, '0');
+	    day = String(day).padStart(2, '0');
+	    
+	    const result = `\${year}-\${month}-\${day}`;
+	    console.log('결과:', result);
+	    
+	    return result;
+	}
+function loadRecentMaterials() {
+    $.ajax({
+        url: '<%=request.getContextPath()%>/main/materials.do',
+        method: 'GET',
+        dataType: 'json',
+        success: function(materials) {
+            const $container = $('.material-container');
+            $container.html('');
+            
+            if (materials && materials.length > 0) {
+                materials.forEach(function(material) {
+                    // 베스트와 동일한 ul > li 구조 사용
+                    const $ul = $("<ul>").addClass("post-item clickable-ul row flex-row")
+                                         .on("click", function() {
+                                             // 자료 상세페이지로 이동
+                                             location.href = '<%=request.getContextPath()%>/market/detail.do?materialId=' + material.materialId;
+                                         });
+                    
+                    // 제목 + 카테고리 (col-lg-6)
+                    const $title = $("<li>").addClass("post-title overflow-hidden col-lg-6 d-flex align-items-center");
+                    const $category = $("<span>").addClass("badge me-2");
+                    
+                    // 카테고리 배지 설정
+                    if (material.materialCategory) {
+                        switch(material.materialCategory) {
+                            case '초등학교':
+                                $category.addClass('bg-success').text('초등학교');
+                                break;
+                            case '중학교':
+                                $category.addClass('bg-info').text('중학교');
+                                break;
+                            case '고등학교':
+                                $category.addClass('bg-warning').text('고등학교');
+                                break;
+                            default:
+                                $category.addClass('bg-secondary').text(material.materialCategory);
+                        }
+                    } else {
+                        $category.addClass('bg-secondary').text('자료');
+                    }
+                    
+                    // 제목에 카테고리와 텍스트 추가
+                    $title.append($category).append(" " + material.materialTitle);
+                    $ul.append($title);
+                    
+                    // 작성자 (col-lg-2)
+                    $ul.append($("<li>").addClass("post-title col-lg-2").text(material.instructorName || '작성자'));
+                    
+                    // 작성일 (col-lg-2) - 베스트와 동일한 timeFormat 함수 사용
+                    console.log(material.materialUpdatedDate);
+                 
+                    const displayTime = timeFormat2(material.materialUpdatedDate);
+                    console.log(displayTime);
+                    $ul.append($("<li>").addClass("post-title col-lg-2").text(displayTime));
+                    
+                    $container.append($ul);
+                });
+            } else {
+                // 자료가 없을 때도 베스트와 동일한 형식
+                const $ul = $("<ul>").addClass("post-item row flex-row");
+                const $title = $("<li>").addClass("post-title overflow-hidden col-lg-6 d-flex align-items-center");
+                $title.text("등록된 자료가 없습니다.");
+                $ul.append($title);
+                $container.append($ul);
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('자료 목록 로드 실패:', error);
+            const $container = $('.material-container');
+            $container.html('');
+            
+            // 에러 시에도 베스트와 동일한 형식
+            const $ul = $("<ul>").addClass("post-item row flex-row");
+            const $title = $("<li>").addClass("post-title overflow-hidden col-lg-6 d-flex align-items-center");
+            $title.text("자료를 불러오는데 실패했습니다.");
+            $ul.append($title);
+            $container.append($ul);
+        }
+    });
+}
+</script>
+
 	

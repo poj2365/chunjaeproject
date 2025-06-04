@@ -9,3 +9,4 @@ Scripts/
 src/main/resources/
 bin/
 .dbeaver/
+/.metadata/
