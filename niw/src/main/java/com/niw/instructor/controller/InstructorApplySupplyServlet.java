@@ -95,8 +95,8 @@ public class InstructorApplySupplyServlet extends HttpServlet {
 		InstructorApplication instructorApplication = new InstructorApplication(size, userId, instructorName, bankName,
 				accountHolder, accountNumber, accountNumber, portfolioFiles, null, null, null);
 		InstructorApplicationService.SERVICE.instructorApply(instructorApplication);
-
-		doGet(request, response);
+		response.getWriter();
+		
 	}
 
 }

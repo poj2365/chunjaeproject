@@ -16,7 +16,7 @@ import com.niw.point.model.dto.Point;
 import com.niw.point.model.dto.PointHistory;
 import com.niw.point.model.dto.PointMyFile;
 import com.niw.point.model.dto.PointRefund;
-import com.niw.user.model.dto.User;
+import com.niw.point.model.dto.PointRefundList;
 
 public class PointDao {
 	
@@ -191,20 +191,85 @@ public class PointDao {
 		return files;
 	}
 	
-//	public List<PointRefund> showAllRefundList (Connection conn){
-//		List<PointMyFile> lists = new ArrayList<PointMyFile>();
-//		try {
-//			pstmt = conn.prepareStatement(sql.getProperty("showAllRefundList"));
-//			rs = pstmt.executeQuery();
-//			
-//			while (rs.next()) {
-//				String userId = rs.getString("user_id");
-//				
-//			}
-//		} catch (SQLException e) {
-//			e.printStackTrace();
-//		}
-//		
-//	}
+	public List<PointRefundList> showAllRefundList (Connection conn){
+		List<PointRefundList> lists = new ArrayList<PointRefundList>();
+		try {
+			pstmt = conn.prepareStatement(sql.getProperty("showAllRefundList"));
+			rs = pstmt.executeQuery();
+			
+			while (rs.next()) {
+				String refundId= rs.getString("refund_id");
+				String userId = rs.getString("user_id");
+				String userName = rs.getString("user_name");
+				Date refundDate = rs.getDate("refund_date");
+				int pointAmount = rs.getInt("refund_point");
+				String bank = rs.getString("refund_bank");
+				String bankAccount = rs.getString("refund_account");
+				String status = rs.getString("refund_status");
+				PointRefundList list = 
+						new PointRefundList(refundId,userId,userName,refundDate,pointAmount,bank,bankAccount,status);
+				lists.add(list);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			JDBCTemplate.close(rs);
+			JDBCTemplate.close(pstmt);
+		} return lists;
+		
+	}
+	
+	public int approvePointRefund (Connection conn, Long refundId,String userId, int pointAmount) {
+		int result =0;
+		int point =0;
+		pointAmount = pointAmount * -1;
+		try {
+			// 포인트 업데이트하기
+			pstmt = conn.prepareStatement(sql.getProperty("getUserPoint"));
+			pstmt.setString(2,userId);
+			pstmt.setInt(1, pointAmount);
+			result = pstmt.executeUpdate();
+			
+			// 업데이트 된 포인트 가져오기
+			pstmt = conn.prepareStatement(sql.getProperty("myPoint"));
+			pstmt.setString(1,userId);
+			rs = pstmt.executeQuery();
+			while(rs.next()) {
+				point = rs.getInt("USER_POINT");
+			}
+			
+			// 업데이트한 포인트 남은포인트 컬럼에 넣어주기
+			pstmt= conn.prepareStatement(sql.getProperty("approveRefund"));
+			pstmt.setInt(1, point);
+			pstmt.setLong(2,refundId);
+			result = pstmt.executeUpdate();
+			
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			JDBCTemplate.close(rs);
+			JDBCTemplate.close(pstmt);
+		}
+		return result;
+	}
+	
+	public int rejectPointRefund (Connection conn, Long refundId) {
+		int result =0;
+		try {
+			pstmt= conn.prepareStatement(sql.getProperty("rejectRefund"));
+			pstmt.setLong(1,refundId);
+			result = pstmt.executeUpdate();
+		
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			JDBCTemplate.close(rs);
+			JDBCTemplate.close(pstmt);
+		}
+		return result;
+	}
+		
+	
 
 }

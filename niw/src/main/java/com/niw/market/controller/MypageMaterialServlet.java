@@ -28,12 +28,12 @@ public class MypageMaterialServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-        // 로그인 체크
+     
         HttpSession session = request.getSession();
         User loginUser = (User) session.getAttribute("loginUser");
         
         if (loginUser == null) {
-            // AJAX 요청인 경우 JSON 응답
+            
             String ajaxRequest = request.getHeader("X-Requested-With");
             if ("XMLHttpRequest".equals(ajaxRequest)) {
                 response.setContentType("application/json");
@@ -45,7 +45,7 @@ public class MypageMaterialServlet extends HttpServlet {
             return;
         }
         
-        // 페이지 파라미터 처리
+     
         String cPageStr = request.getParameter("cPage");
         int cPage = 1;
         if (cPageStr != null) {
@@ -56,25 +56,25 @@ public class MypageMaterialServlet extends HttpServlet {
             }
         }
         
-        // Service를 통해 데이터 조회
+  
         PurchasedMaterialService service = PurchasedMaterialService.SERVICE;
         
-        // 구매한 자료 목록 조회
+     
         List<PurchasedMaterial> materials = service.getPurchasedMaterialList(loginUser.userId(), cPage, PAGE_SIZE);
         
-        // 총 개수 조회
+ 
         int totalCount = service.getPurchasedMaterialCount(loginUser.userId());
         
-        // 총 페이지 수 계산
+ 
         int totalPage = service.getTotalPage(totalCount, PAGE_SIZE);
         
-        // 통계 정보 조회
+     
         PurchaseStats stats = service.getPurchaseStats(loginUser.userId());
         
-        // 페이지바 생성
+ 
         String pageBar = generatePageBar(request, cPage, totalPage, service);
         
-        // request에 데이터 설정
+
         request.setAttribute("materials", materials);
         request.setAttribute("pageBar", pageBar);
         request.setAttribute("totalCount", stats.totalCount());
@@ -95,7 +95,7 @@ public class MypageMaterialServlet extends HttpServlet {
 
     private String generatePageBar(HttpServletRequest request, int cPage, int totalPage, PurchasedMaterialService service) {
         if (totalPage == 0) {
-            return ""; // 데이터가 없으면 페이지바도 없음
+            return ""; 
         }
         
         int pageNo = service.getStartPage(cPage, PAGE_BAR_SIZE);
@@ -103,7 +103,7 @@ public class MypageMaterialServlet extends HttpServlet {
 
         StringBuffer pageBar = new StringBuffer("<ul class='pagination justify-content-center'>");
 
-        // 이전 버튼
+
         if (cPage == 1) {
             pageBar.append("<li class='page-item disabled'>");
             pageBar.append("<a class='page-link' href='#'> prev </a>");
@@ -114,7 +114,7 @@ public class MypageMaterialServlet extends HttpServlet {
             pageBar.append("</li>");
         }
 
-        // 페이지 번호들
+
         for (int i = pageNo; i <= pageEnd; i++) {
             if (i == cPage) {
                 pageBar.append("<li class='page-item active'>");
@@ -126,7 +126,7 @@ public class MypageMaterialServlet extends HttpServlet {
             pageBar.append("</li>");
         }
 
-        // 다음 버튼
+
         if (cPage == totalPage) {
             pageBar.append("<li class='page-item disabled'>");
             pageBar.append("<a class='page-link' href='#'> next </a>");

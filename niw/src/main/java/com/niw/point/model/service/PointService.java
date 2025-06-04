@@ -10,6 +10,7 @@ import com.niw.point.model.dto.Point;
 import com.niw.point.model.dto.PointHistory;
 import com.niw.point.model.dto.PointMyFile;
 import com.niw.point.model.dto.PointRefund;
+import com.niw.point.model.dto.PointRefundList;
 
 public class PointService {
 
@@ -89,12 +90,30 @@ public class PointService {
 		return files;
 	}
 	
-	public List<PointRefund> showAllRefundList(){
-		List<PointRefund> lists = new ArrayList<PointRefund>();
+	public List<PointRefundList> showAllRefundList(){
+		List<PointRefundList> lists = new ArrayList<PointRefundList>();
 		Connection conn = JDBCTemplate.getConnection();
-		//lists = dao.showAllRefundList(conn);
+		lists = dao.showAllRefundList(conn);
 		JDBCTemplate.close(conn);
 		return lists;
+		
+	}
+	
+	public int approvePointRefund(Long refundId,String userId,int pointAmount) {
+		int result = 0;
+		Connection conn = JDBCTemplate.getConnection();
+		result = dao.approvePointRefund(conn,refundId,userId,pointAmount);
+		JDBCTemplate.close(conn);
+		return result;
+		
+	}
+	
+	public int rejectPointRefund(Long refundId) {
+		int result = 0;
+		Connection conn = JDBCTemplate.getConnection();
+		result = dao.rejectPointRefund(conn,refundId);
+		JDBCTemplate.close(conn);
+		return result;
 		
 	}
 	

@@ -1,9 +1,11 @@
 package com.niw.market.model.service;
 
+import static com.niw.common.JDBCTemplate.*;
+
 import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.List;
 
-import static com.niw.common.JDBCTemplate.*;
 import com.niw.market.model.dao.MaterialDao;
 import com.niw.market.model.dto.Material;
 
@@ -68,6 +70,21 @@ public enum MaterialService {
         }
         
         return material;
+    }
+    
+    public List<Material> getRecentMaterials(int limit) {
+        Connection conn = getConnection();
+        List<Material> materials = new ArrayList<>();
+        
+        try {
+            materials = dao.getRecentMaterials(conn, limit);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            close(conn);
+        }
+        
+        return materials;
     }
     
 
@@ -251,5 +268,7 @@ public enum MaterialService {
             int endPage = getStartPage(pageBarSize) + pageBarSize - 1;
             return Math.min(endPage, totalPage);
         }
+        
+        
     }
 }
