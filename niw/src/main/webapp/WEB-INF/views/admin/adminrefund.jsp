@@ -628,7 +628,6 @@ if (loginUser == null) {
 	        success: function(result) {
 	            if(result === "success") {
 	                alert('승인 완료!');
-	                
 	                location.reload(); 
 	            } else {
 	                alert('승인 실패!');
@@ -642,7 +641,7 @@ if (loginUser == null) {
 	
 	function rejectRefund(refundId) {
 	    $.ajax({
-	        url: '<%=request.getContextPath()%>/admin/rejectPointRefund.do', 
+	        url: 't<%=request.getContextPath()%>/admin/rejectPointRefund.do', 
 	        method: 'POST',
 	        data: { refundId: refundId, userId: userId, pointAmount: pointAmount },
 	        success: function(result) {

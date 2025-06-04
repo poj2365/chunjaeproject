@@ -60,7 +60,7 @@ public class PointRefundEndServlet extends HttpServlet {
 			System.out.println("포인트 환불 기록 실패");
 			request.setAttribute("message", "환불 요청이 실패했습니다.");
 		}
-		response.sendRedirect(request.getContextPath() + "/point/mypointhistory.do");
+		response.sendRedirect(request.getContextPath() + "/user/mypage.do");
 		
 	}
 
