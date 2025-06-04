@@ -432,88 +432,140 @@ if (loginUser == null) {
 	</div>
 
 <script>
-	 $(document).ready(() => {
-		    let allPointHistory = []; // 배열을 생성
-		    $.get("<%=request.getContextPath()%>/point/pointhistory.do?userId=<%=loginUser.userId()%>")
-		    .done(data => {
-		    	console.log(data);
-		        allPointHistory = data; // 가지고 온 리스트를 저장 
-		        displayPointHistory(allPointHistory); // 처음엔 전체 보여줌
-		    })
-		    .fail(error => {
-		        $('#point-history-tbody').html(`<tr>
-		            <td colspan="4" style="text-align: center; padding: 50px;">데이터를 불러올 수 없습니다.</td>
-		        </tr>`);
-		        console.log(error);
-		    });
-		      
-		    
-		    $('.tab-item').on('click', function() {
-		        $('.tab-item').removeClass('active');
-		        $(this).addClass('active');
-		        const type = $(this).data('type'); 
-		        filterPointHistory(type);
-		    });
+$(document).ready(() => {
+    let allPointHistory = []; // 배열을 생성
+    $.get("<%=request.getContextPath()%>/point/pointhistory.do?userId=<%=loginUser.userId()%>")
+    .done(data => {
+        console.log(data);
+        allPointHistory = data; // 가지고 온 리스트를 저장 
+        displayPointHistory(allPointHistory); // 처음엔 전체 보여줌
+    })
+    .fail(error => {
+        $('#point-history-tbody').html(`<tr>
+            <td colspan="4" style="text-align: center; padding: 50px;">데이터를 불러올 수 없습니다.</td>
+        </tr>`);
+        console.log(error);
+    });
+      
+    
+    $('.tab-item').on('click', function() {
+        $('.tab-item').removeClass('active');
+        $(this).addClass('active');
+        const type = $(this).data('type'); 
+        filterPointHistory(type);
+    });
 
-		    // 필터링 함수
-		    function filterPointHistory(type) {
-		        let filteredData = [];
-		        if (type === 'all') {
-		            filteredData = allPointHistory;
-		        } else if (type === 'plus') {
-		            filteredData = allPointHistory.filter(row => (parseInt(row.changePoint) || 0) > 0);
-		        } else if (type === 'minus') {
-		            filteredData = allPointHistory.filter(row => (parseInt(row.changePoint) || 0) < 0);
-		        }
-		        displayPointHistory(filteredData);
-		    }
+    // 필터링 함수
+    function filterPointHistory(type) {
+        let filteredData = [];
+        if (type === 'all') {
+            filteredData = allPointHistory;
+        } else if (type === 'plus') {
+            filteredData = allPointHistory.filter(row => (parseInt(row.changePoint) || 0) > 0);
+        } else if (type === 'minus') {
+            filteredData = allPointHistory.filter(row => (parseInt(row.changePoint) || 0) < 0);
+        }
+        displayPointHistory(filteredData);
+    }
 
-		    // 표 그리기 함수
-		    function displayPointHistory(data) {
-		        const pointHistory = document.getElementById('point-history-tbody');
-		        pointHistory.innerHTML = '';
-		        if (data.length === 0) {
-		            pointHistory.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 50px;">데이터가 없습니다.</td></tr>`;
-		        } else {
-		            data.forEach(row => {
-		                const tr = document.createElement('tr');
-		                const tdDate = document.createElement('td');
-		                tdDate.textContent = row["date"];
-		                const tdContent = document.createElement('td');
-		                tdContent.textContent = row["content"];
-		                const tdChangePoint = document.createElement('td');
-		                tdChangePoint.style.textAlign = 'right';
-		                
-		                const changePoint = parseInt(row["changePoint"]) || 0;
-		                if (changePoint > 0) {
-		                    tdChangePoint.style.color = '#28a745'; 
-		                    tdChangePoint.textContent = '+' + changePoint + 'P';
-		                } else if (changePoint < 0) {
-		                    tdChangePoint.style.color = '#dc3545'; 
-		                    tdChangePoint.textContent = changePoint + 'P';
-		                } else {
-		                    tdChangePoint.textContent = changePoint + 'P';
-		                }
-		                
-		                const tdMyPoint = document.createElement('td');
-		                tdMyPoint.style.textAlign = 'right';
-		                tdMyPoint.textContent = row["myPoint"] + 'P';
-		                tr.appendChild(tdDate);
-		                tr.appendChild(tdContent);
-		                tr.appendChild(tdChangePoint);
-		                tr.appendChild(tdMyPoint);
-		                pointHistory.appendChild(tr); 
-		            });
-		        }
-		    }
-		});
-	 
-		 $('.btn btn-primary').on('click',function(e){
-			e.preventDefault();
-			const startDate = document.getElementById('start-date').value;
-			const endDate = document.getElementById('end-date').value;
-			
-			
-	 
-		 }
+    // 표 그리기 함수
+    function displayPointHistory(data) {
+        const pointHistory = document.getElementById('point-history-tbody');
+        pointHistory.innerHTML = '';
+        if (data.length === 0) {
+            pointHistory.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 50px;">데이터가 없습니다.</td></tr>`;
+        } else {
+            data.forEach(row => {
+                const tr = document.createElement('tr');
+                const tdDate = document.createElement('td');
+                tdDate.textContent = row["date"];
+                const tdContent = document.createElement('td');
+                tdContent.textContent = row["content"];
+                const tdChangePoint = document.createElement('td');
+                tdChangePoint.style.textAlign = 'right';
+                
+                const changePoint = parseInt(row["changePoint"]) || 0;
+                if (changePoint > 0) {
+                    tdChangePoint.style.color = '#28a745'; 
+                    tdChangePoint.textContent = '+' + changePoint + 'P';
+                } else if (changePoint < 0) {
+                    tdChangePoint.style.color = '#dc3545'; 
+                    tdChangePoint.textContent = changePoint + 'P';
+                } else {
+                    tdChangePoint.textContent = changePoint + 'P';
+                }
+                
+                const tdMyPoint = document.createElement('td');
+                tdMyPoint.style.textAlign = 'right';
+                tdMyPoint.textContent = row["myPoint"] + 'P';
+                tr.appendChild(tdDate);
+                tr.appendChild(tdContent);
+                tr.appendChild(tdChangePoint);
+                tr.appendChild(tdMyPoint);
+                pointHistory.appendChild(tr); 
+            });
+        }
+    }
+
+    // 날짜 필터링 기능 - 수정된 부분
+    $('#point-filter-form').on('submit', function(e) {
+        e.preventDefault();
+        const startDate = $('#start-date').val();
+        const endDate = $('#end-date').val();
+        const pointType = $('#point-type').val();
+        
+        let filteredData = allPointHistory;
+        
+        // 날짜 필터링
+        if (startDate || endDate) {
+            filteredData = filteredData.filter(row => {
+                const rowDate = new Date(row.date);
+                let isInRange = true;
+                
+                if (startDate) {
+                    const start = new Date(startDate);
+                    isInRange = isInRange && rowDate >= start;
+                }
+                
+                if (endDate) {
+                    const end = new Date(endDate);
+                    end.setHours(23, 59, 59, 999); // 종료일 하루 끝까지 포함
+                    isInRange = isInRange && rowDate <= end;
+                }
+                
+                return isInRange;
+            });
+        }
+        
+        // 포인트 타입 필터링
+        if (pointType !== 'all') {
+            if (pointType === 'plus') {
+                filteredData = filteredData.filter(row => (parseInt(row.changePoint) || 0) > 0);
+            } else if (pointType === 'minus') {
+                filteredData = filteredData.filter(row => (parseInt(row.changePoint) || 0) < 0);
+            }
+        }
+        
+        // 탭 상태 업데이트
+        $('.tab-item').removeClass('active');
+        $(`.tab-item[data-type="${pointType}"]`).addClass('active');
+        
+        displayPointHistory(filteredData);
+    });
+    
+    // 날짜 필터 초기화 기능 (선택사항)
+    function resetDateFilter() {
+        $('#start-date').val('');
+        $('#end-date').val('');
+        $('#point-type').val('all');
+        $('.tab-item').removeClass('active');
+        $('.tab-item[data-type="all"]').addClass('active');
+        displayPointHistory(allPointHistory);
+    }
+    
+    // 초기화 버튼이 있다면 이벤트 연결 (HTML에 버튼이 있을 경우)
+    $('#reset-filter-btn').on('click', function() {
+        resetDateFilter();
+    });
+});
 </script>
