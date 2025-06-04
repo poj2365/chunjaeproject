@@ -363,9 +363,10 @@ const timeRecordTitle = [
             	  openModal();
             	  document.getElementById("content").textContent = "";
             	  document.getElementById("start").value = arg.event.startStr;
-
+				  console.log(arg.event.id);
+				  console.log(arg.event.getEventId);
       		   const jsonData = {
-    		    		startTime: arg.event.start,
+    		    		calendarNo: arg.event.id,
     		    		userId: userId
     		    };
             	  fetch("<%=request.getContextPath()%>/study/calendarsearchbydate.do",{
@@ -380,6 +381,8 @@ const timeRecordTitle = [
     		        }
     		        throw new Error('네트워크 응답이 올바르지 않습니다.');
     		    }).then(data=>{
+    		    	console.log(data);
+    		    	console.log(data.calendarNo);
     		    	document.getElementById("no").value = data.calendarNo;
         		    document.getElementById("name").value = arg.event.title;
               	  	document.getElementById("end").value = arg.event.endStr;
@@ -407,7 +410,8 @@ const timeRecordTitle = [
 					}%>
             	  <%if (calendarList != null) {%>
                   <%for (Calendar c : calendarList) {%>
-            	  {
+            	  {	
+            		id : <%=c.calendarNo()%>,
             		title : '<%=c.calendarName()%>',
             		start : '<%=c.startTime()%>',
             		end : '<%=c.endTime()%>'

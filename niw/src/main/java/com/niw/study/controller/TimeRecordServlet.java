@@ -47,7 +47,6 @@ public class TimeRecordServlet extends HttpServlet {
 			trList = TimeRecordService.SERVICE.searchTimeToday(user.userId(), startDate, endDate);
 		}
 
-
 		request.setAttribute("trList", trList);
 		request.getRequestDispatcher("/WEB-INF/views/study/timeRecord.jsp").forward(request, response);
 
