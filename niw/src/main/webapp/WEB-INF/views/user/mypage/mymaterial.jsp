@@ -19,6 +19,9 @@
 %>
 
 <style>
+.container {
+    max-width: calc(1140px + 200px); /* Bootstrap container 기본보다 10px 넓게 */
+}
     .content-header {
         display: flex;
         justify-content: space-between;
@@ -72,6 +75,7 @@
         width: 100%;
         border-collapse: collapse;
         margin: 0;
+        min-width:1000px;
     }
     
     .materials-table th {
@@ -100,16 +104,16 @@
     }
     
     .materials-table th:nth-child(5) {
-        width: 12%;
+        width: 18%;
     }
     
-    .materials-table th:nth-child(6) {
-        width: 10%;
+ /*    .materials-table th:nth-child(6) {
+        width: 25%;
         text-align: center;
-    }
+    } */
     
     .materials-table th:last-child {
-        width: 15%;
+        width: 23%;
         text-align: center;
     }
     
@@ -364,10 +368,10 @@
             <div class="stat-number"><%=String.format("%,d", totalAmount)%>원</div>
             <div class="stat-label">총 구매 금액</div>
         </div>
-        <div class="stat-item">
+      <%--   <div class="stat-item">
             <div class="stat-number"><%=totalDownloads%></div>
             <div class="stat-label">다운로드 횟수</div>
-        </div>
+        </div> --%>
         <div class="stat-item">
             <div class="stat-number"><%=totalReviews%></div>
             <div class="stat-label">작성한 리뷰</div>
@@ -394,7 +398,7 @@
                         <th>강사명</th>
                         <th>구매가격</th>
                         <th>구매일</th>
-                        <th>다운로드</th>
+                        <!-- <th>다운로드</th> -->
                         <th>액션</th>
                     </tr>
                 </thead>
@@ -438,9 +442,9 @@
                             <td>
                                 <div class="purchase-date"><%=material.purchaseDate()%></div>
                             </td>
-                            <td>
+                            <%-- <td>
                                 <div class="download-count"><%=material.materialDownloadCount()%>회</div>
-                            </td>
+                            </td> --%>
                             <td>
                                 <div class="action-buttons">
                                     <button class="btn-sm btn-download" 

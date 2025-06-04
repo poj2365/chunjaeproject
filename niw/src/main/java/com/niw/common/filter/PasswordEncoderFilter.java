@@ -17,7 +17,7 @@ import com.niw.common.PasswordEncoder;
 /**
  * Servlet Filter implementation class PasswordEncoderFilter
  */
-@WebFilter(servletNames = {"memberEnrollEndServlet","loginServlet","findServlet"})
+@WebFilter(servletNames = {"memberEnrollEndServlet","loginServlet","findServlet","changePassword"})
 public class PasswordEncoderFilter extends HttpFilter implements Filter {
        
     /**

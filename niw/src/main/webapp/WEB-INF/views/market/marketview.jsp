@@ -504,7 +504,7 @@
                 <!-- 자료 등록 버튼 -->
                 <div class="upload-section">
                     <% if (loginUser != null) { %>
-                        <% if ("instructor".equals(loginUser.userRole())) { %>
+                        <% if ("INSTRUCTOR".equals(loginUser.userRole())) { %>
                             <!-- 강사 권한: 자료 등록 -->
                             <button class="btn-upload" onclick="goToUpload()">
                                 <i class="bi bi-cloud-upload me-2"></i>자료 등록
@@ -834,7 +834,7 @@ function downloadMaterial(materialId, materialTitle) {
 
 //자료 등록 페이지로 이동 (강사 권한)
 function goToUpload() {
-    location.href = '<%= request.getContextPath() %>/market/upload.do';
+    location.href = '<%= request.getContextPath() %>/market/materialregist.do';
 }
 
 // 권한 요청 (일반 사용자)

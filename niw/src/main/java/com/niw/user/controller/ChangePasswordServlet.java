@@ -15,7 +15,7 @@ import com.niw.user.model.service.UserService;
 /**
  * Servlet implementation class ChangePasswordServlet
  */
-@WebServlet("/user/changePassword.do")
+@WebServlet(name="changePassword",urlPatterns="/user/changePassword.do")
 public class ChangePasswordServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
@@ -42,9 +42,18 @@ public class ChangePasswordServlet extends HttpServlet {
 		HttpSession session = request.getSession();
 		User loginUser = (User)session.getAttribute("loginUser");
 		String userId=loginUser.userId();
+		User user = UserService.USERSERVICE.searchById(userId);
+		String curPassword=request.getParameter("currentPwd");
+		System.out.println(curPassword);
 		String password=request.getParameter("newPwd");
+		System.out.println(password);
+		if(password.equals(curPassword)) {
 		UserService.USERSERVICE.updateUserPassword(userId, password);
-		
+		System.out.println("변경성공");
+		}
+		User updatedUser=UserService.USERSERVICE.searchById(userId);
+		session.setAttribute("loginUser", updatedUser);
+		request.getRequestDispatcher("/WEB-INF/views/user/mypage/mypage.jsp").forward(request, response);
 	}
 
 }

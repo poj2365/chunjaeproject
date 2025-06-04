@@ -198,6 +198,7 @@ if (loginUser == null) {
                 </li>
             </ul>
         </div>
+        <%if(loginUser.userRole().equals("INSTRUCTOR")){ %>
         <div class="menu-section">
             <div class="menu-title">판매 관리</div>
             <ul>
@@ -206,6 +207,7 @@ if (loginUser == null) {
                 </li>
             </ul>
         </div>
+        <%} %>
     </div>
     
     <!-- 메인 컨텐츠 영역 -->

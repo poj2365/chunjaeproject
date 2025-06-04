@@ -1,5 +1,7 @@
 package com.niw.instructor.model.service;
 
+import static com.niw.common.JDBCTemplate.*;
+
 import java.sql.Connection;
 import java.util.List;
 
@@ -18,6 +20,21 @@ public enum InstructorApplicationService {
     /**
      * 신청서 목록 조회 결과 클래스
      */
+    public InstructorApplication searchbyUserId(String id) {
+		Connection conn = getConnection();
+		InstructorApplication application = null;
+		
+		try {
+			application = dao.searchByUserId(conn, id);
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			close(conn);
+		}
+		
+		return application;
+	}
+    
     public static class ApplicationListResult {
         private List<InstructorApplication> applications;
         private int totalCount;
