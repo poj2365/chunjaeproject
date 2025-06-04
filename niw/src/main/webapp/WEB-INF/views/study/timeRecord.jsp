@@ -287,6 +287,15 @@ List<TimeRecord> trList = (List<TimeRecord>) request.getAttribute("trList");
 		<div class="content-header">
     <h2 class="content-title">공부 시간 기록</h2>
 </div>
+			<%
+			if (loginUser == null) {
+				%>
+				<script>
+				alert('로그인한 사용자만 이용할 수 있는 메뉴입니다.');
+				location.replace('<%=request.getContextPath() %>/user/loginview.do');
+				</script>
+			<%}
+			%>
 		<div class="timer-container">
 			<h2>타이머</h2>
 			<div class="timer-display" id="timer">00:00:00</div>
@@ -355,10 +364,6 @@ List<TimeRecord> trList = (List<TimeRecord>) request.getAttribute("trList");
             
             // 시작 버튼 클릭 이벤트
             startBtn.addEventListener('click', function() {
-                <%if(loginUser==null){%>
-                alert("데이터 저장에 실패하였습니다. 로그인 후 사용 가능한 기능입니다.");
-                status.textContent = '';
-                <% }else {%>
                 if (!isRunning) {
                     if (!isPaused) {
                         startTime = Date.now();
@@ -452,7 +457,6 @@ List<TimeRecord> trList = (List<TimeRecord>) request.getAttribute("trList");
                     status.textContent = '데이터 저장 실패: ' + error.message;
                     console.error('저장 오류:', error);
                 });
-                <% }%>
             }
 
             // 페이지 떠날 때 경고
