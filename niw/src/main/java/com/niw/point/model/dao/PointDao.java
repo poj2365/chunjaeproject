@@ -219,10 +219,45 @@ public class PointDao {
 		
 	}
 	
-	public int approvePointRefund (Connection conn, Long refundId) {
+	public int approvePointRefund (Connection conn, Long refundId,String userId, int pointAmount) {
+		int result =0;
+		int point =0;
+		pointAmount = pointAmount * -1;
+		try {
+			// 포인트 업데이트하기
+			pstmt = conn.prepareStatement(sql.getProperty("getUserPoint"));
+			pstmt.setString(2,userId);
+			pstmt.setInt(1, pointAmount);
+			result = pstmt.executeUpdate();
+			
+			// 업데이트 된 포인트 가져오기
+			pstmt = conn.prepareStatement(sql.getProperty("myPoint"));
+			pstmt.setString(1,userId);
+			rs = pstmt.executeQuery();
+			while(rs.next()) {
+				point = rs.getInt("USER_POINT");
+			}
+			
+			// 업데이트한 포인트 남은포인트 컬럼에 넣어주기
+			pstmt= conn.prepareStatement(sql.getProperty("approveRefund"));
+			pstmt.setInt(1, point);
+			pstmt.setLong(2,refundId);
+			result = pstmt.executeUpdate();
+			
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			JDBCTemplate.close(rs);
+			JDBCTemplate.close(pstmt);
+		}
+		return result;
+	}
+	
+	public int rejectPointRefund (Connection conn, Long refundId) {
 		int result =0;
 		try {
-			pstmt= conn.prepareStatement(sql.getProperty("approveRefund"));
+			pstmt= conn.prepareStatement(sql.getProperty("rejectRefund"));
 			pstmt.setLong(1,refundId);
 			result = pstmt.executeUpdate();
 		

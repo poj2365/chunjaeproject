@@ -568,11 +568,16 @@ if (loginUser == null) {
 	            acceptBtn.className = 'btn btn-success btn-sm me-1';
 	            acceptBtn.textContent = '수락';
 	            acceptBtn.dataset.id = row.refundId;
+	            acceptBtn.dataset.userid = row.userId;         
+	            acceptBtn.dataset.amount = row.pointAmount;
+	            
 
 	            const rejectBtn = document.createElement('button');
 	            rejectBtn.className = 'btn btn-danger btn-sm';
 	            rejectBtn.textContent = '거절';
 	            rejectBtn.dataset.id = row.refundId;
+	            acceptBtn.dataset.userid = row.userId;         
+	            acceptBtn.dataset.amount = row.pointAmount;
 
 	            tdBtn.appendChild(acceptBtn);
 	            tdBtn.appendChild(rejectBtn);
@@ -594,24 +599,32 @@ if (loginUser == null) {
 	    if (e.target.classList.contains('btn-success')) {
 	        // 수락 버튼
 	        const refundId = e.target.dataset.id;
+	        const userId = e.target.dataset.userid;
+	        const pointAmount = e.target.dataset.amount;
+	        console.log(refundId);
+	        console.log(userId);
+	        console.log(pointAmount);
+	        
 	        if (confirm('해당 환불을 승인하시겠습니까?')) {
-	            approveRefund(refundId);
+	            approveRefund(refundId,userId,pointAmount);
 	        }
 	    }
 	    if (e.target.classList.contains('btn-danger')) {
 	        // 거절 버튼
 	        const refundId = e.target.dataset.id;
+	        const userId = e.target.dataset.userid;
+	        const pointAmount = e.target.dataset.amount;
 	        if (confirm('해당 환불을 거절하시겠습니까?')) {
-	            rejectRefund(refundId);
+	            rejectRefund(refundId,userId,pointAmount);
 	        }
 	    }
 	});
 	
-	function approveRefund(refundId) {
+	function approveRefund(refundId,userId,pointAmount) {
 	    $.ajax({
 	        url: '<%=request.getContextPath()%>/admin/approvePointRefund.do', 
 	        method: 'POST',
-	        data: { refundId: refundId },
+	        data: { refundId: refundId, userId: userId, pointAmount: pointAmount},
 	        success: function(result) {
 	            if(result === "success") {
 	                alert('승인 완료!');
@@ -631,11 +644,11 @@ if (loginUser == null) {
 	    $.ajax({
 	        url: '<%=request.getContextPath()%>/admin/rejectPointRefund.do', 
 	        method: 'POST',
-	        data: { refundId: refundId },
+	        data: { refundId: refundId, userId: userId, pointAmount: pointAmount },
 	        success: function(result) {
 	            if(result === "success") {
 	                alert('거절 완료!');
-	                location.reload(); // 혹은 ajax로 목록만 새로 불러오기
+	                location.reload(); 
 	            } else {
 	                alert('거절 실패!');
 	            }
