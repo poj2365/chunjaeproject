@@ -55,7 +55,7 @@ public class PointFileRefundEndServlet extends HttpServlet {
 			request.setAttribute("message", "환불 요청이 실패했습니다.");
 		}
 		
-		response.sendRedirect(request.getContextPath() + "/point/mypointhistory.do");
+		response.sendRedirect(request.getContextPath() + "/user/mypage.do");
 		
 	}
 

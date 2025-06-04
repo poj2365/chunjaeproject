@@ -103,6 +103,11 @@ public class PointService {
 		int result = 0;
 		Connection conn = JDBCTemplate.getConnection();
 		result = dao.approvePointRefund(conn,refundId,userId,pointAmount);
+		if (result > 0) {
+			JDBCTemplate.commit(conn);
+		} else {
+			JDBCTemplate.rollback(conn);
+		}
 		JDBCTemplate.close(conn);
 		return result;
 		
@@ -112,6 +117,11 @@ public class PointService {
 		int result = 0;
 		Connection conn = JDBCTemplate.getConnection();
 		result = dao.rejectPointRefund(conn,refundId);
+		if (result > 0) {
+			JDBCTemplate.commit(conn);
+		} else {
+			JDBCTemplate.rollback(conn);
+		}
 		JDBCTemplate.close(conn);
 		return result;
 		
