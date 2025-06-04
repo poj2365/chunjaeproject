@@ -29,7 +29,7 @@ public class PurchaseMaterialServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
         
         try {
-            // 1. 로그인 사용자 확인
+        
             HttpSession session = request.getSession();
             User loginUser = (User) session.getAttribute("loginUser");
             
@@ -38,7 +38,7 @@ public class PurchaseMaterialServlet extends HttpServlet {
                 return;
             }
             
-            // 2. 자료 ID 파라미터 받기
+           
             String materialIdStr = request.getParameter("materialId");
             if (materialIdStr == null || materialIdStr.trim().isEmpty()) {
                 out.print("{\"success\": false, \"message\": \"잘못된 요청입니다.\"}");
@@ -55,14 +55,14 @@ public class PurchaseMaterialServlet extends HttpServlet {
             
             String userId = loginUser.userId();
             
-            // 3. 이미 구매했는지 확인
+         
             PurchaseService purchaseService = PurchaseService.SERVICE;
             if (purchaseService.isPurchased(userId, materialId)) {
                 out.print("{\"success\": false, \"message\": \"이미 구매한 자료입니다.\"}");
                 return;
             }
             
-            // 4. 자료 정보 조회 (가격 확인)
+        
             MaterialService materialService = MaterialService.SERVICE;
             Material material = materialService.getMaterialById(materialId);
             

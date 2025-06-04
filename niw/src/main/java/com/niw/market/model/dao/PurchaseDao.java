@@ -27,9 +27,7 @@ public enum PurchaseDao {
         }
     }
     
-    /**
-     * 구매 여부 확인
-     */
+ 
     public boolean isPurchased(Connection conn, String userId, int materialId) {
         boolean isPurchased = false;
         try (PreparedStatement pstmt = conn.prepareStatement(sqlProp.getProperty("checkPurchase"))) {
@@ -44,15 +42,13 @@ public enum PurchaseDao {
         return isPurchased;
     }
     
-    /**
-     * 여러 자료의 구매 여부 한번에 확인
-     */
+ 
     public List<Integer> getPurchasedMaterialIds(Connection conn, String userId, List<Integer> materialIds) {
         List<Integer> purchasedIds = new ArrayList<>();
         
         if (materialIds.isEmpty()) return purchasedIds;
         
-        // IN 절을 위한 동적 쿼리 생성
+   
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT MATERIAL_ID FROM PURCHASE WHERE USER_ID = ? AND MATERIAL_ID IN (");
         for (int i = 0; i < materialIds.size(); i++) {
@@ -79,9 +75,7 @@ public enum PurchaseDao {
         return purchasedIds;
     }
     
-    /**
-     * 구매 정보 조회
-     */
+   
     public Purchase getPurchaseInfo(Connection conn, String userId, int materialId) {
         Purchase purchase = null;
         try (PreparedStatement pstmt = conn.prepareStatement(sqlProp.getProperty("getPurchaseInfo"))) {
@@ -106,9 +100,7 @@ public enum PurchaseDao {
         return purchase;
     }
     
-    /**
-     * 구매 등록
-     */
+   
     
     public int insertPurchase(Connection conn, Purchase purchase) {
         int result = 0;

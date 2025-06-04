@@ -200,6 +200,24 @@ public enum MaterialDao {
         
         return paramIndex;
     }
+    
+    public List<Material> getRecentMaterials(Connection conn, int limit) {
+        List<Material> materials = new ArrayList<>();
+        
+        try (PreparedStatement pstmt = conn.prepareStatement(sqlProp.getProperty("getRecentMaterials"))) {
+            pstmt.setInt(1, limit);
+            
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    materials.add(getMaterial(rs));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return materials;
+    }
 
    
     private boolean isNotEmpty(String value) {
@@ -219,5 +237,7 @@ public enum MaterialDao {
 				rs.getInt("material_view_count"), rs.getInt("material_download_count"), rs.getDouble("material_rating"),
 				rs.getInt("material_comment_count"));
 	}
+	
+	
 
 }
