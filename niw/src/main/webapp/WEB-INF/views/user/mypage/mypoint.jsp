@@ -508,19 +508,12 @@ if (loginUser == null) {
 		    }
 		});
 	 
-	 /* 	$('#point-filter-form').on('submit', function(e) {
-		    e.preventDefault(); // 이 코드가 
-		    
-		    const startDate = $('#start-date').val();
-		    const endDate = $('#end-date').val();
-		    const pointType = $('#point-type').val();
-		    
-		    if ()
-		    
-		    
-		    
-		}); */
-	 	
+		 $('.btn btn-primary').on('click',function(e){
+			e.preventDefault();
+			const startDate = document.getElementById('start-date').value;
+			const endDate = document.getElementById('end-date').value;
+			
+			
 	 
-
+		 }
 </script>
