@@ -157,7 +157,7 @@
 
 <div class="content-section">
     <h3 class="section-title">비밀번호 변경</h3>
-    <form id="change-password">
+    <form id="change-password" action="<%=request.getContextPath()%>/user/changePassword.do">
         <div class="form-group">
             <label class="form-label">현재 비밀번호</label>
             <input type="password" class="form-input" name="currentPwd" placeholder="현재 비밀번호" required>

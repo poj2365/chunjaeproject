@@ -17,7 +17,7 @@ import com.niw.user.model.service.UserService;
 /**
  * 비밀번호 찾기 및 아이디 찾기 처리 컨트롤러
  */
-@WebServlet({
+@WebServlet(name="findServlet",urlPatterns={
     "/user/idpwfind.do",
     "/userIdPwFind"
 })

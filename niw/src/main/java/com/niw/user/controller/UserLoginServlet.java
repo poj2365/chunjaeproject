@@ -16,7 +16,7 @@ import com.niw.user.model.service.UserService;
 /**
  * Servlet implementation class UserLoginServlet
  */
-@WebServlet("/user/login.do")
+@WebServlet(name="loginServlet",urlPatterns="/user/login.do")
 public class UserLoginServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
