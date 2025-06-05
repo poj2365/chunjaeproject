@@ -25,9 +25,13 @@ public class AdminApproveRefundPointServlet extends HttpServlet {
 	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		Long refundId = Long.parseLong(request.getParameter("refundId"));
+		System.out.println(refundId);
 		String userId = request.getParameter("userId");
+		System.out.println(userId);
 		int pointAmount = Integer.parseInt(request.getParameter("pointAmount"));
+		System.out.println(pointAmount);
 		int updateresult = PointService.ponitService().approvePointRefund(refundId,userId,pointAmount);
+		System.out.println(updateresult);
 		 response.setContentType("text/plain; charset=UTF-8");
 		    if (updateresult > 0) {
 		        response.getWriter().write("success");

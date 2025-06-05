@@ -1,4 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+	<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="com.niw.user.model.dto.User"%>
 <%@ include file="/WEB-INF/views/common/header.jsp"%>
 <%
@@ -193,19 +193,17 @@ if (loginUser == null) {
             <div class="user-name"><%=loginUser.userName()%></div>
             <div class="point-info">포인트: <%=loginUser.userPoint()%>P</div>
         </div>
-        <div class="menu-section">
-            <div class="menu-title">내 계정</div>
-            <ul>
-                <li class="menu-item active" data-tab="info">
-                    <i class="bi bi-person"></i>회원정보 조회/수정
-                </li>
-            </ul>
-        </div>
-        <div class="menu-section">
+          <div class="menu-section">
             <div class="menu-title">내 활동</div>
             <ul>
                 <li class="menu-item" data-tab="activity">
                     <i class="bi bi-clock-history"></i>활동 내역
+                </li>
+                <li class="menu-item" data-tab="studygroup">
+                    <i class="bi bi-people"></i>내 스터디 그룹
+                </li>
+                <li class="menu-item" data-tab="calendar">
+                    <i class="bi bi-calendar-check"></i>스터디 플래너
                 </li>
                 <li class="menu-item" data-tab="point">
                     <i class="bi bi-coin"></i>포인트 내역
@@ -384,14 +382,14 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // 환불 요청일 오늘 날짜 자동 설정
+    
     const dateInput = document.getElementById('refundDateInput');
     if (dateInput) {
         const today = new Date().toISOString().split('T')[0];
         dateInput.value = today;
     }
 
-    // 환불 파일 전송 함수 (글로벌로)
+ 
     window.refundFile = function(){
         const change = document.getElementById('saveRefund');
         change.action = "<%=request.getContextPath()%>/point/refundendfile.do";

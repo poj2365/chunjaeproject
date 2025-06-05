@@ -8,7 +8,6 @@ if (loginUser == null) {
 	return;
 }
 %>
-
 <style>
     .mypage-container {
         max-width: 1400px;
@@ -462,41 +461,34 @@ if (loginUser == null) {
                 <th>회원ID</th>
                 <th>이름</th>
                 <th>요청일</th>
-                <th>환불 포인트</th>
-                <th>은행</th>
-                <th>계좌번호</th>
+                <th>파일이름</th>
+                <th>파일가격</th>
                 <th>상태</th>
                 <th>관리</th>
             </tr>
         </thead>
-        <tbody id="refundPointList">
+        <tbody id="refundFileList">
            
         </tbody>
     </table>
 </div>
 
-<style>
-/* 환불 요청 테이블 전용 스타일 */
-
-</style>
-
 <script>
 	$(document).ready(function() {
-	    $.get('<%=request.getContextPath()%>/admin/adminpage/refundlist.do', function(data) {
+	    $.get('<%=request.getContextPath()%>/admin/adminpage/refundfilelist.do', function(data) {
 			console.log(data);
-	        // data가 배열 형태로 올 때
-	        renderRefundList(data);
+	        renderRefundFileList(data);
 	    });
 	});
 	
-	function renderRefundList(list) {
-	    const tbody = document.getElementById('refundPointList');
-	    tbody.innerHTML = ''; // tbody 비우기
+	function renderRefundFileList(list) {
+	    const tbody = document.getElementById('refundFileList');
+	    tbody.innerHTML = ''; 
 
 	    if (!list || list.length === 0) {
 	        const tr = document.createElement('tr');
 	        const td = document.createElement('td');
-	        td.colSpan = 9;
+	        td.colSpan = 8;
 	        td.style.textAlign = 'center';
 	        td.style.padding = '40px';
 	        td.textContent = '데이터가 없습니다.';
@@ -528,24 +520,17 @@ if (loginUser == null) {
 	        tdDate.textContent = row.refundDate;
 	        tr.appendChild(tdDate);
 
-	        // 5. 포인트 (콤마 + P)
-	        const tdPoint = document.createElement('td');
-	        tdPoint.className = 'point-minus';
-	        tdPoint.style.textAlign = 'right';
-	        tdPoint.textContent =  Number((row.pointAmount)*-1).toLocaleString() + 'P';
-	        tr.appendChild(tdPoint);
+	        // 5. 파일이름
+	        const tdFileName = document.createElement('td');
+	        tdFileName.textContent =  row.fileName;
+	        tr.appendChild(tdFileName);
 
-	        // 6. 은행명
-	        const tdBank = document.createElement('td');
-	        tdBank.textContent = row.bank;
-	        tr.appendChild(tdBank);
+	        // 6. 파일가격
+	        const tdPrice = document.createElement('td');
+	        tdPrice.textContent = row.price;
+	        tr.appendChild(tdPrice);
 
-	        // 7. 계좌번호
-	        const tdAccount = document.createElement('td');
-	        tdAccount.textContent = row.banckAccount;
-	        tr.appendChild(tdAccount);
-
-	        // 8. 상태 뱃지
+	        // 7. 상태 뱃지
 	        const tdStatus = document.createElement('td');
 	        const span = document.createElement('span');
 	        if (row.status === 'WAIT') {
@@ -561,7 +546,7 @@ if (loginUser == null) {
 	        tdStatus.appendChild(span);
 	        tr.appendChild(tdStatus);
 
-	        // 9. 버튼
+	        // 8. 버튼
 	        const tdBtn = document.createElement('td');
 	        if (row.status === 'WAIT') {
 	            const acceptBtn = document.createElement('button');
@@ -569,7 +554,7 @@ if (loginUser == null) {
 	            acceptBtn.textContent = '수락';
 	            acceptBtn.dataset.id = row.refundId;
 	            acceptBtn.dataset.userid = row.userId;         
-	            acceptBtn.dataset.amount = row.pointAmount;
+	            acceptBtn.dataset.amount = row.price;
 	            
 
 	            const rejectBtn = document.createElement('button');
@@ -577,7 +562,7 @@ if (loginUser == null) {
 	            rejectBtn.textContent = '거절';
 	            rejectBtn.dataset.id = row.refundId;
 	            rejectBtn.dataset.userid = row.userId;         
-	            rejectBtn.dataset.amount = row.pointAmount;
+	            rejectBtn.dataset.amount = row.price;
 
 	            tdBtn.appendChild(acceptBtn);
 	            tdBtn.appendChild(rejectBtn);
@@ -595,7 +580,7 @@ if (loginUser == null) {
 	    });
 	}
 	
-	document.getElementById('refundPointList').addEventListener('click', function(e) {
+	document.getElementById('refundFileList').addEventListener('click', function(e) {
 	    if (e.target.classList.contains('btn-success')) {
 	        // 수락 버튼
 	        const refundId = e.target.dataset.id;
@@ -659,6 +644,6 @@ if (loginUser == null) {
 	            alert('서버 오류!');
 	        }
 	    });
-	}
+	} 
 
 </script>
