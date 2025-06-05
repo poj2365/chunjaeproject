@@ -811,7 +811,8 @@ function purchaseMaterial(materialId, materialTitle, price) {
             button.prop('disabled', false).html('<i class="bi bi-cart-plus me-1"></i>구매하기');
         }
     });
-}
+} 
+
 
 // 자료 다운로드
 function downloadMaterial(materialId, materialTitle) {

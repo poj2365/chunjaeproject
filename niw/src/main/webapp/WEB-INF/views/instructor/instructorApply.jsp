@@ -286,9 +286,7 @@
 </div>
 
 <script>
-// 은행별 계좌번호 자동 포맷팅 JavaScript
 
-// 은행별 포맷 패턴 정의
 const BANK_FORMATS = {
     '국민은행': [6, 2, 6],      // 123456-12-123456
     '신한은행': [3, 2, 6],      // 123-12-123456  
@@ -302,21 +300,21 @@ const BANK_FORMATS = {
     '신협': [3, 4, 6]           // 123-1234-123456
 };
 
-// 계좌번호 자동 포맷팅 함수
+
 function formatAccountNumber(bankName, inputValue) {
-    // 숫자만 추출
+
     const numbersOnly = inputValue.replace(/[^0-9]/g, '');
     
-    // 선택된 은행의 포맷 패턴 가져오기
+ 
     const format = BANK_FORMATS[bankName];
     if (!format) {
-        return numbersOnly; // 패턴이 없으면 숫자만 반환
+        return numbersOnly; 
     }
     
     let formatted = '';
     let currentIndex = 0;
     
-    // 각 구간별로 하이픈 추가
+
     for (let i = 0; i < format.length; i++) {
         const sectionLength = format[i];
         const section = numbersOnly.substr(currentIndex, sectionLength);
@@ -324,7 +322,7 @@ function formatAccountNumber(bankName, inputValue) {
         if (section.length > 0) {
             formatted += section;
             
-            // 마지막 구간이 아니고, 다음에 들어갈 숫자가 있으면 하이픈 추가
+            
             if (i < format.length - 1 && numbersOnly.length > currentIndex + sectionLength) {
                 formatted += '-';
             }

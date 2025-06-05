@@ -27,7 +27,7 @@ public class RegistMaterialViewServlet extends HttpServlet {
         super();
         // TODO Auto-generated constructor stub
     }
-
+    
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -41,8 +41,7 @@ public class RegistMaterialViewServlet extends HttpServlet {
 		
 		request.setAttribute("introduce", introduce);
 		request.getRequestDispatcher("/WEB-INF/views/market/materialregist.jsp").forward(request, response);
-	}
-
+	}	
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */

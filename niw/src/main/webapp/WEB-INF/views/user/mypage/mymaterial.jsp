@@ -372,10 +372,10 @@
             <div class="stat-number"><%=totalDownloads%></div>
             <div class="stat-label">다운로드 횟수</div>
         </div> --%>
-        <div class="stat-item">
+      <%--   <div class="stat-item">
             <div class="stat-number"><%=totalReviews%></div>
             <div class="stat-label">작성한 리뷰</div>
-        </div>
+        </div> --%>
     </div>
 
     <!-- 검색 결과 정보 -->
@@ -452,12 +452,12 @@
                                             onclick="downloadMaterial(<%=material.materialId()%>)">
                                         <i class="bi bi-download"></i>다운로드
                                     </button>
-                                    <button class="btn-sm btn-review" 
+                                    <%-- <button class="btn-sm btn-review" 
                                             data-material-id="<%=material.materialId()%>" 
                                             data-material-title="<%=material.materialTitle()%>"
                                             onclick="openReviewModal(<%=material.materialId()%>, '<%=material.materialTitle()%>')">
                                         <i class="bi bi-star"></i>리뷰
-                                    </button>
+                                    </button> --%>
                                 </div>
                             </td>
                         </tr>
@@ -498,7 +498,7 @@
 // 현재 페이지 번호를 저장 
 var currentPage = <%=request.getAttribute("currentPage") != null ? request.getAttribute("currentPage") : 1%>;
 
-// 페이지가 마이페이지 내부에서 로드되었는지 확인
+
 var isInMypage = <%=request.getParameter("fromMypage") != null ? "true" : "false"%>;
 
 // 다운로드 함수
@@ -516,9 +516,9 @@ function openReviewModal(materialId, materialTitle) {
     }
 }
 
-// 🔥 핵심: 자체 AJAX로 페이지 로드 (마이페이지 코드 건드리지 않음)
+
 function loadMaterialPage(page) {
-    // 로딩 표시 (기존 테이블 영역만)
+
     $('.materials-table-container').html(`
         <div style="padding: 60px 0; text-align: center; color: #888;">
             <div style="border: 4px solid #f3f3f3; border-top: 4px solid var(--bs-blind-dark); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
@@ -526,7 +526,6 @@ function loadMaterialPage(page) {
         </div>
     `);
     
-    // 페이지네이션도 숨기기
     $('.pagination').parent().hide();
     
     $.ajax({
@@ -539,16 +538,16 @@ function loadMaterialPage(page) {
             'X-Requested-With': 'XMLHttpRequest' 
         },
         success: function(data) {
-            // 임시 컨테이너에 받은 HTML 넣기
+           
             var $temp = $('<div>').html(data);
             
-            // 필요한 부분만 추출해서 교체
+           
             var newTableHtml = $temp.find('.materials-table-container').html();
             var newStatsHtml = $temp.find('.stats-summary').html();
             var newResultsHtml = $temp.find('.results-info').html();
             var newPaginationHtml = $temp.find('.pagination').parent().html();
             
-            // 기존 요소들 업데이트
+          
             if (newTableHtml) $('.materials-table-container').html(newTableHtml);
             if (newStatsHtml) $('.stats-summary').html(newStatsHtml);
             if (newResultsHtml) $('.results-info').html(newResultsHtml);
@@ -556,10 +555,10 @@ function loadMaterialPage(page) {
                 $('.pagination').parent().html(newPaginationHtml).show();
             }
             
-            // 현재 페이지 업데이트
+           
             currentPage = page;
             
-            // 스크롤을 맨 위로
+            
             if (isInMypage) {
                 $('.main-content').scrollTop(0);
             } else {
@@ -580,17 +579,17 @@ function loadMaterialPage(page) {
 
 // 페이지 로드 완료시 초기화
 $(document).ready(function() {
-    // 🔥 핵심: 페이지네이션 클릭 이벤트 (자체 처리)
+    
     $(document).on('click', '.material-page-link', function(e) {
         e.preventDefault(); // 기본 링크 동작 방지
         
         var page = $(this).data('page');
         
-        // 마이페이지 내부에서만 AJAX 처리
+       
         if (isInMypage) {
             loadMaterialPage(page);
         } else {
-            // 직접 접근시에는 일반적인 페이지 이동
+          
             window.location.href = '<%=request.getContextPath()%>/user/mypage/materials.do?cPage=' + page;
         }
     });

@@ -128,20 +128,13 @@ public class GeneratePreviewServlet extends HttpServlet {
 		
 	  private JSONArray convertPdfToImages(File uploadFile, String previewPath, String savedFileName) throws IOException {
 	        JSONArray imageFiles = new JSONArray();
-	        
 	        try (PDDocument document = Loader.loadPDF(uploadFile);) {
 	            PDFRenderer pdfRenderer = new PDFRenderer(document);
-	            
-	            
+
 	            for (int page = 0; page < document.getNumberOfPages(); page++) {
-	               
 	                BufferedImage image = pdfRenderer.renderImageWithDPI(page, 150, ImageType.RGB);
-	                
-	               
 	                String imageFileName = savedFileName.substring(0,savedFileName.lastIndexOf("."))+"_preview_"+ "page" + (page + 1) + ".png";
 	                String imageFilePath = previewPath + File.separator + imageFileName;
-	                
-	              
 	                File imageFile = new File(imageFilePath);
 	                ImageIO.write(image, "PNG", imageFile);
 	                
